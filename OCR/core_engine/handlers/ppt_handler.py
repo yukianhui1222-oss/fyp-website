@@ -39,48 +39,72 @@ class PPTHandler:
         self.ocr = ocr_processor
 
     def _convert_ppt_to_pptx(self, ppt_path: str) -> str:
-        """Use PowerPoint OLE automation to convert .ppt to .pptx (Windows only)"""
-        try:
-            import win32com.client
-        except ImportError:
-            logger.error("pywin32 not installed, cannot perform .ppt conversion")
-            raise RuntimeError("System missing pywin32 library, cannot support .ppt format. Please install pywin32 or upload .pptx files directly.")
-
-        logger.info("Calling PowerPoint for format conversion: %s", ppt_path)
-        
-        abs_ppt_path = os.path.abspath(ppt_path).replace('/', '\\')
-        
-        # 创建临时输出路径
-        temp_dir = tempfile.gettempdir()
-        base_name = os.path.basename(ppt_path)
-        tmp_pptx_path = os.path.join(temp_dir, f"conv_{base_name}x")
-        abs_pptx_path = os.path.abspath(tmp_pptx_path).replace('/', '\\')
-
-        powerpoint = None
-        presentation = None
-        try:
-            # 使用 CoInitialize 确保在某些多线程环境下正常运行
-            import pythoncom
-            pythoncom.CoInitialize()
-
-            powerpoint = win32com.client.DispatchEx("PowerPoint.Application")
-            # Open 参数说明: FileName, ReadOnly, Untitled, WithWindow
-            presentation = powerpoint.Presentations.Open(abs_ppt_path, ReadOnly=True, WithWindow=False)
-            
-            # FileFormat 24 = ppSaveAsDefault (.pptx)
-            presentation.SaveAs(abs_pptx_path, 24) 
-            return abs_pptx_path
-        except Exception as e:
-            logger.error("PowerPoint conversion failed: %s", e)
-            raise RuntimeError(f"PowerPoint conversion failed. Please ensure Microsoft PowerPoint is installed and the file is not in use. Error: {e}")
-        finally:
+        """Use PowerPoint OLE automation or LibreOffice to convert .ppt to .pptx"""
+        # Try win32com first on Windows
+        if os.name == 'nt':
             try:
-                if presentation:
-                    presentation.Close()
-                if powerpoint:
-                    powerpoint.Quit()
-            except Exception:
-                pass
+                import win32com.client
+                logger.info("Using PowerPoint OLE automation for conversion: %s", ppt_path)
+                abs_ppt_path = os.path.abspath(ppt_path).replace('/', '\\')
+                temp_dir = tempfile.gettempdir()
+                base_name = os.path.basename(ppt_path)
+                tmp_pptx_path = os.path.join(temp_dir, f"conv_{base_name}x")
+                abs_pptx_path = os.path.abspath(tmp_pptx_path).replace('/', '\\')
+
+                # Ensure CoInitialize
+                import pythoncom
+                pythoncom.CoInitialize()
+
+                powerpoint = win32com.client.DispatchEx("PowerPoint.Application")
+                # Open: FileName, ReadOnly, Untitled, WithWindow
+                presentation = powerpoint.Presentations.Open(abs_ppt_path, ReadOnly=True, WithWindow=False)
+                presentation.SaveAs(abs_pptx_path, 24) # 24 = ppSaveAsDefault (.pptx)
+                presentation.Close()
+                powerpoint.Quit()
+                return abs_pptx_path
+            except Exception as e:
+                logger.warning("PowerPoint OLE automation failed or pywin32 missing: %s. Trying LibreOffice...", e)
+        
+        # Try LibreOffice conversion
+        try:
+            import subprocess
+            import shutil
+            soffice_path = shutil.which("soffice") or shutil.which("libreoffice")
+            if not soffice_path and os.name == 'nt':
+                standard_paths = [
+                    r"C:\Program Files\LibreOffice\program\soffice.exe",
+                    r"C:\Program Files (x86)\LibreOffice\program\soffice.exe"
+                ]
+                for p in standard_paths:
+                    if os.path.exists(p):
+                        soffice_path = p
+                        break
+            
+            if not soffice_path:
+                raise RuntimeError("LibreOffice/soffice executable not found in system PATH.")
+                
+            temp_dir = tempfile.gettempdir()
+            cmd = [soffice_path, "--headless", "--convert-to", "pptx", ppt_path, "--outdir", temp_dir]
+            logger.info("Running LibreOffice command: %s", " ".join(cmd))
+            
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=30)
+            if result.returncode != 0:
+                raise RuntimeError(f"LibreOffice failed with code {result.returncode}: {result.stderr}")
+                
+            base_name = os.path.basename(ppt_path)
+            root_name, _ = os.path.splitext(base_name)
+            output_filename = f"{root_name}.pptx"
+            output_path = os.path.join(temp_dir, output_filename)
+            
+            if not os.path.exists(output_path):
+                raise RuntimeError("Converted file not found at expected path.")
+                
+            return output_path
+        except Exception as e:
+            logger.error("All conversion methods failed: %s", e)
+            raise RuntimeError(
+                "System missing conversion libraries. Please ensure LibreOffice is installed (listed in packages.txt on Streamlit Cloud) or upload .pptx files directly. Error details: " + str(e)
+            )
 
     # ------------------------------------------------------------------
     def process(self, file_path: str, progress_callback: Optional[Callable] = None) -> List[Dict[str, Any]]:
