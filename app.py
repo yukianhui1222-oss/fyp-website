@@ -2004,113 +2004,7 @@ def main():
             font-weight: 700 !important;
         }
 
-        /* Export Document Popover Button Styling */
-        button[aria-label*="Export Document"],
-        div[class*="export_document_popover"] button,
-        div[class*="export-document-popover"] button {
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
-            border: none !important;
-            color: #FFFFFF !important;
-            font-weight: 700 !important;
-            border-radius: 8px !important;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
-            transition: all 0.2s ease !important;
-        }
-        button[aria-label*="Export Document"] *,
-        div[class*="export_document_popover"] button *,
-        div[class*="export-document-popover"] button * {
-            color: #FFFFFF !important;
-            font-weight: 700 !important;
-            transition: all 0.2s ease !important;
-        }
-        button[aria-label*="Export Document"]:hover,
-        div[class*="export_document_popover"] button:hover,
-        div[class*="export-document-popover"] button:hover {
-            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
-            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25) !important;
-            transform: translateY(-1px);
-        }
-        
-        /* Chat Clear Button - Coral Red */
-        button[aria-label*="Clear"],
-        div[class*="clear_chat"] button,
-        div[class*="clear-chat"] button {
-            background-color: #ef4444 !important;
-            color: #FFFFFF !important;
-            border: none !important;
-            border-radius: 8px !important;
-            font-weight: 700 !important;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15) !important;
-            transition: all 0.2s ease !important;
-        }
-        button[aria-label*="Clear"] *,
-        div[class*="clear_chat"] button *,
-        div[class*="clear-chat"] button * {
-            color: #FFFFFF !important;
-            font-weight: 700 !important;
-            transition: all 0.2s ease !important;
-        }
-        button[aria-label*="Clear"]:hover,
-        div[class*="clear_chat"] button:hover,
-        div[class*="clear-chat"] button:hover {
-            background-color: #dc2626 !important;
-            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25) !important;
-            transform: translateY(-1px);
-        }
-        
-        /* Quick Prompt Simpler Button - Amber Yellow */
-        button[aria-label*="Simpler"],
-        div[class*="quick_simpler"] button,
-        div[class*="quick-simpler"] button {
-            background-color: #f59e0b !important;
-            color: #FFFFFF !important;
-            border: none !important;
-            border-radius: 8px !important;
-            font-weight: 700 !important;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15) !important;
-            transition: all 0.2s ease !important;
-        }
-        button[aria-label*="Simpler"] *,
-        div[class*="quick_simpler"] button *,
-        div[class*="quick-simpler"] button * {
-            color: #FFFFFF !important;
-            font-weight: 700 !important;
-            transition: all 0.2s ease !important;
-        }
-        button[aria-label*="Simpler"]:hover,
-        div[class*="quick_simpler"] button:hover,
-        div[class*="quick-simpler"] button:hover {
-            background-color: #d97706 !important;
-            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25) !important;
-            transform: translateY(-1px);
-        }
-        
-        /* Quick Prompt Example Button - Emerald Green */
-        button[aria-label*="Example"],
-        div[class*="quick_example"] button,
-        div[class*="quick-example"] button {
-            background-color: #10b981 !important;
-            color: #FFFFFF !important;
-            border: none !important;
-            border-radius: 8px !important;
-            font-weight: 700 !important;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
-            transition: all 0.2s ease !important;
-        }
-        button[aria-label*="Example"] *,
-        div[class*="quick_example"] button *,
-        div[class*="quick-example"] button * {
-            color: #FFFFFF !important;
-            font-weight: 700 !important;
-            transition: all 0.2s ease !important;
-        }
-        button[aria-label*="Example"]:hover,
-        div[class*="quick_example"] button:hover,
-        div[class*="quick-example"] button:hover {
-            background-color: #059669 !important;
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25) !important;
-            transform: translateY(-1px);
-        }
+        /* Specific button style references have been moved to the bottom of the stylesheet to ensure they cascade and override general button rules */
 
         /* Upload & Analyze Panel Custom Styling */
         div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]) {
@@ -2555,6 +2449,182 @@ def main():
             background-color: #fef2f2 !important;
             color: #ef4444 !important;
             border-color: #fca5a5 !important;
+        }
+
+        /* ----------------------------------------------------
+           SPECIFIC BUTTON OVERRIDES (defined at the bottom to ensure CSS cascade order)
+           ---------------------------------------------------- */
+
+        /* 1. "💡 Simpler" Button - Solid Amber Yellow */
+        div[class*="st-key-quick_simpler"] button,
+        div[class*="st-key-quick-simpler"] button,
+        button[aria-label*="Simpler"],
+        div[class*="quick_simpler"] button,
+        div[class*="quick-simpler"] button {
+            background-color: #f59e0b !important;
+            background: #f59e0b !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15) !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-quick_simpler"] button *,
+        div[class*="st-key-quick-simpler"] button *,
+        button[aria-label*="Simpler"] *,
+        div[class*="quick_simpler"] button *,
+        div[class*="quick-simpler"] button * {
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-quick_simpler"] button:hover,
+        div[class*="st-key-quick-simpler"] button:hover,
+        button[aria-label*="Simpler"]:hover,
+        div[class*="quick_simpler"] button:hover,
+        div[class*="quick-simpler"] button:hover {
+            background-color: #d97706 !important;
+            background: #d97706 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25) !important;
+            transform: translateY(-1px);
+        }
+        div[class*="st-key-quick_simpler"] button:hover *,
+        div[class*="st-key-quick-simpler"] button:hover *,
+        button[aria-label*="Simpler"]:hover *,
+        div[class*="quick_simpler"] button:hover *,
+        div[class*="quick-simpler"] button:hover * {
+            color: #FFFFFF !important;
+        }
+
+        /* 2. "🧪 Example" Button - Solid Emerald Green */
+        div[class*="st-key-quick_example"] button,
+        div[class*="st-key-quick-example"] button,
+        button[aria-label*="Example"],
+        div[class*="quick_example"] button,
+        div[class*="quick-example"] button {
+            background-color: #10b981 !important;
+            background: #10b981 !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-quick_example"] button *,
+        div[class*="st-key-quick-example"] button *,
+        button[aria-label*="Example"] *,
+        div[class*="quick_example"] button *,
+        div[class*="quick-example"] button * {
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-quick_example"] button:hover,
+        div[class*="st-key-quick-example"] button:hover,
+        button[aria-label*="Example"]:hover,
+        div[class*="quick_example"] button:hover,
+        div[class*="quick-example"] button:hover {
+            background-color: #059669 !important;
+            background: #059669 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25) !important;
+            transform: translateY(-1px);
+        }
+        div[class*="st-key-quick_example"] button:hover *,
+        div[class*="st-key-quick-example"] button:hover *,
+        button[aria-label*="Example"]:hover *,
+        div[class*="quick_example"] button:hover *,
+        div[class*="quick-example"] button:hover * {
+            color: #FFFFFF !important;
+        }
+
+        /* 3. "🧹 Clear" Button - Solid Coral Red */
+        div[class*="st-key-clear_chat"] button,
+        div[class*="st-key-clear-chat"] button,
+        button[aria-label*="Clear"],
+        div[class*="clear_chat"] button,
+        div[class*="clear-chat"] button {
+            background-color: #ef4444 !important;
+            background: #ef4444 !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15) !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-clear_chat"] button *,
+        div[class*="st-key-clear-chat"] button *,
+        button[aria-label*="Clear"] *,
+        div[class*="clear_chat"] button *,
+        div[class*="clear-chat"] button * {
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-clear_chat"] button:hover,
+        div[class*="st-key-clear-chat"] button:hover,
+        button[aria-label*="Clear"]:hover,
+        div[class*="clear_chat"] button:hover,
+        div[class*="clear-chat"] button:hover {
+            background-color: #dc2626 !important;
+            background: #dc2626 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25) !important;
+            transform: translateY(-1px);
+        }
+        div[class*="st-key-clear_chat"] button:hover *,
+        div[class*="st-key-clear-chat"] button:hover *,
+        button[aria-label*="Clear"]:hover *,
+        div[class*="clear_chat"] button:hover *,
+        div[class*="clear-chat"] button:hover * {
+            color: #FFFFFF !important;
+        }
+
+        /* 4. "📤 Export Document" Button - Indigo */
+        div[class*="st-key-export_document"] button,
+        div[class*="st-key-export-document"] button,
+        button[aria-label*="Export Document"],
+        div[class*="export_document_popover"] button,
+        div[class*="export-document-popover"] button {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+            background-color: #6366f1 !important;
+            border: none !important;
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-export_document"] button *,
+        div[class*="st-key-export-document"] button *,
+        button[aria-label*="Export Document"] *,
+        div[class*="export_document_popover"] button *,
+        div[class*="export-document-popover"] button * {
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-export_document"] button:hover,
+        div[class*="st-key-export-document"] button:hover,
+        button[aria-label*="Export Document"]:hover,
+        div[class*="export_document_popover"] button:hover,
+        div[class*="export-document-popover"] button:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+            background-color: #4f46e5 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25) !important;
+            transform: translateY(-1px);
+        }
+        div[class*="st-key-export_document"] button:hover *,
+        div[class*="st-key-export-document"] button:hover *,
+        button[aria-label*="Export Document"]:hover *,
+        div[class*="export_document_popover"] button:hover *,
+        div[class*="export-document-popover"] button:hover * {
+            color: #FFFFFF !important;
         }
         </style>
     """, unsafe_allow_html=True)
