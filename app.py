@@ -2005,6 +2005,7 @@ def main():
         }
 
         /* Export Document Popover Button Styling */
+        button[aria-label*="Export Document"],
         div[class*="export_document_popover"] button,
         div[class*="export-document-popover"] button {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
@@ -2015,12 +2016,14 @@ def main():
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
             transition: all 0.2s ease !important;
         }
+        button[aria-label*="Export Document"] *,
         div[class*="export_document_popover"] button *,
         div[class*="export-document-popover"] button * {
             color: #FFFFFF !important;
             font-weight: 700 !important;
             transition: all 0.2s ease !important;
         }
+        button[aria-label*="Export Document"]:hover,
         div[class*="export_document_popover"] button:hover,
         div[class*="export-document-popover"] button:hover {
             background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
@@ -2029,6 +2032,7 @@ def main():
         }
         
         /* Chat Clear Button - Coral Red */
+        button[aria-label*="Clear"],
         div[class*="clear_chat"] button,
         div[class*="clear-chat"] button {
             background-color: #ef4444 !important;
@@ -2039,12 +2043,14 @@ def main():
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15) !important;
             transition: all 0.2s ease !important;
         }
+        button[aria-label*="Clear"] *,
         div[class*="clear_chat"] button *,
         div[class*="clear-chat"] button * {
             color: #FFFFFF !important;
             font-weight: 700 !important;
             transition: all 0.2s ease !important;
         }
+        button[aria-label*="Clear"]:hover,
         div[class*="clear_chat"] button:hover,
         div[class*="clear-chat"] button:hover {
             background-color: #dc2626 !important;
@@ -2053,6 +2059,7 @@ def main():
         }
         
         /* Quick Prompt Simpler Button - Amber Yellow */
+        button[aria-label*="Simpler"],
         div[class*="quick_simpler"] button,
         div[class*="quick-simpler"] button {
             background-color: #f59e0b !important;
@@ -2063,12 +2070,14 @@ def main():
             box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15) !important;
             transition: all 0.2s ease !important;
         }
+        button[aria-label*="Simpler"] *,
         div[class*="quick_simpler"] button *,
         div[class*="quick-simpler"] button * {
             color: #FFFFFF !important;
             font-weight: 700 !important;
             transition: all 0.2s ease !important;
         }
+        button[aria-label*="Simpler"]:hover,
         div[class*="quick_simpler"] button:hover,
         div[class*="quick-simpler"] button:hover {
             background-color: #d97706 !important;
@@ -2077,6 +2086,7 @@ def main():
         }
         
         /* Quick Prompt Example Button - Emerald Green */
+        button[aria-label*="Example"],
         div[class*="quick_example"] button,
         div[class*="quick-example"] button {
             background-color: #10b981 !important;
@@ -2087,12 +2097,14 @@ def main():
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
             transition: all 0.2s ease !important;
         }
+        button[aria-label*="Example"] *,
         div[class*="quick_example"] button *,
         div[class*="quick-example"] button * {
             color: #FFFFFF !important;
             font-weight: 700 !important;
             transition: all 0.2s ease !important;
         }
+        button[aria-label*="Example"]:hover,
         div[class*="quick_example"] button:hover,
         div[class*="quick-example"] button:hover {
             background-color: #059669 !important;
