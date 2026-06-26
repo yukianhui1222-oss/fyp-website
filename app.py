@@ -2942,7 +2942,20 @@ def main():
             border: 1px solid #E5E7EB !important;
             border-radius: 12px !important;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
-            padding: 16px !important;
+            padding: 16px 16px 28px 16px !important;
+            max-height: 420px !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        div[data-testid="stPopoverBody"] > div,
+        div[data-testid="stPopoverBody"] [data-testid="stVerticalBlock"],
+        div[data-testid="stPopoverBody"] [data-testid="stVerticalBlockBorderWrapper"],
+        div[data-testid="stPopoverBody"] [data-testid="stHorizontalBlock"],
+        div[data-testid="stPopoverBody"] [data-testid="column"],
+        div[data-testid="stPopoverBody"] [data-testid="element-container"],
+        div[data-testid="stPopoverBody"] [class*="element-container"] {
+            background-color: transparent !important;
+            background: transparent !important;
         }
         div[data-testid="stPopoverBody"] p,
         div[data-testid="stPopoverBody"] span,
