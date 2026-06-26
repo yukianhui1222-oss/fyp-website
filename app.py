@@ -1735,31 +1735,45 @@ def copy_to_clipboard(text, label="Copy"):
     """Creates a small HTML button to copy text to the clipboard"""
     escaped_text = json.dumps(text) # Safely escape for JS
     button_id = f"copy-btn-{abs(hash(label + text[:20]))}" # Ensure positive ID for CSS
+    
+    # Check if the label already starts with an emoji/symbol to avoid double-prepending
+    has_emoji = any(ord(char) > 127 for char in label[:2])
+    emoji_html = "" if has_emoji else '<span style="font-size: 0.95rem;">📋</span> '
+    
     html_code = f"""
         <style>
+            body {{
+                margin: 0;
+                padding: 0;
+                background-color: transparent;
+                overflow: hidden;
+            }}
             #{button_id} {{
                 background-color: rgba(99, 102, 241, 0.05) !important;
                 color: #6366f1 !important;
                 border: 1px solid rgba(99, 102, 241, 0.25) !important;
                 border-radius: 8px !important;
-                padding: 8px 16px !important;
-                font-size: 0.85rem !important;
+                padding: 6px 12px !important;
+                font-size: 0.8rem !important;
                 font-weight: 600 !important;
                 cursor: pointer !important;
                 transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
                 display: inline-flex !important;
                 align-items: center !important;
-                gap: 8px !important;
-                margin-bottom: 15px !important;
+                gap: 6px !important;
+                margin: 0 !important;
                 font-family: 'Inter', sans-serif !important;
                 box-shadow: 0 2px 4px rgba(99, 102, 241, 0.02) !important;
+                white-space: nowrap !important;
+                width: auto !important;
+                box-sizing: border-box !important;
             }}
             #{button_id}:hover {{
                 background-color: #6366f1 !important;
                 color: white !important;
                 border-color: #6366f1 !important;
                 box-shadow: 0 6px 16px rgba(99, 102, 241, 0.22) !important;
-                transform: translateY(-1.5px) !important;
+                transform: translateY(-1px) !important;
             }}
             #{button_id}:active {{
                 transform: translateY(0) !important;
@@ -1767,26 +1781,26 @@ def copy_to_clipboard(text, label="Copy"):
             }}
         </style>
         <button id="{button_id}">
-            <span style="font-size: 1rem;">📋</span> {label}
+            {emoji_html}{label}
         </button>
         <script>
             document.getElementById('{button_id}').onclick = function() {{
                 const text = {escaped_text};
                 navigator.clipboard.writeText(text).then(() => {{
                     const originalContent = this.innerHTML;
-                    this.innerHTML = '<span style="font-size: 1rem;">✅</span> Copied!';
+                    this.innerHTML = '<span style="font-size: 0.95rem;">✅</span> Copied!';
                     this.style.backgroundColor = '#6366f1';
                     this.style.color = 'white';
                     setTimeout(() => {{
                         this.innerHTML = originalContent;
-                        this.style.backgroundColor = 'transparent';
+                        this.style.backgroundColor = 'rgba(99, 102, 241, 0.05)';
                         this.style.color = '#6366f1';
                     }}, 2000);
                 }});
             }};
         </script>
     """
-    components.html(html_code, height=50)
+    components.html(html_code, height=36)
 
 def main():
 
@@ -2911,6 +2925,59 @@ def main():
         div[class*="export-document-popover"] button:hover * {
             color: #FFFFFF !important;
         }
+
+        /* AI Study Assistant Chatbot Card Container styling */
+        div[class*="st-key-chatbot_container"] {
+            background-color: #FFFFFF !important;
+            border: 1px solid #E5E7EB !important;
+            border-radius: 16px !important;
+            padding: 24px !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+            margin-bottom: 1.5rem !important;
+        }
+
+        /* st.popover body container: Force white background, border and light theme text/contents */
+        div[data-testid="stPopoverBody"] {
+            background-color: #FFFFFF !important;
+            border: 1px solid #E5E7EB !important;
+            border-radius: 12px !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+            padding: 16px !important;
+        }
+        div[data-testid="stPopoverBody"] p,
+        div[data-testid="stPopoverBody"] span,
+        div[data-testid="stPopoverBody"] label,
+        div[data-testid="stPopoverBody"] h1,
+        div[data-testid="stPopoverBody"] h2,
+        div[data-testid="stPopoverBody"] h3,
+        div[data-testid="stPopoverBody"] h4,
+        div[data-testid="stPopoverBody"] h5,
+        div[data-testid="stPopoverBody"] h6,
+        div[data-testid="stPopoverBody"] [data-testid="stMarkdownContainer"] {
+            color: #1F2937 !important;
+        }
+        div[data-testid="stPopoverBody"] div[data-testid="stCaptionContainer"] p,
+        div[data-testid="stPopoverBody"] div[data-testid="stCaptionContainer"] {
+            color: #6B7280 !important;
+        }
+        /* Buttons inside popover body: keep clean theme integration */
+        div[data-testid="stPopoverBody"] button[data-testid="baseButton-secondary"] *,
+        div[data-testid="stPopoverBody"] button[data-testid="baseButton-secondary"] span,
+        div[data-testid="stPopoverBody"] button[data-testid="baseButton-secondary"] p {
+            color: #1F2937 !important;
+        }
+        div[data-testid="stPopoverBody"] button[data-testid="baseButton-secondary"]:hover *,
+        div[data-testid="stPopoverBody"] button[data-testid="baseButton-secondary"]:hover span,
+        div[data-testid="stPopoverBody"] button[data-testid="baseButton-secondary"]:hover p {
+            color: #8B5CF6 !important;
+        }
+        div[data-testid="stPopoverBody"] div[class*="st-key-del_doc_"] button {
+            color: #9ca3af !important;
+        }
+        div[data-testid="stPopoverBody"] div[class*="st-key-del_doc_"] button:hover {
+            color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
         </style>
     """, unsafe_allow_html=True)
     
@@ -3543,7 +3610,7 @@ def main():
                     use_container_width=True,
                     key="export_md_btn"
                 )
-                copy_to_clipboard(summary_result, "📋 Copy Summary Markdown")
+                copy_to_clipboard(summary_result, "Copy Summary Markdown")
         
         # Cloud Database Saving UI (Flat layout Notion-style)
         if not is_saved:
@@ -3605,17 +3672,18 @@ def main():
         main_col, chat_col = st.columns([1.6, 1.0], gap="large")
 
         with chat_col:
-            render_left_panel(raw_text, summary_result, api_key, results)
+            with st.container(border=True, key="chatbot_container"):
+                render_left_panel(raw_text, summary_result, api_key, results)
 
         with main_col:
             tab1, tab2, tab3, tab4 = st.tabs(["Summary", f"🌐 {result_lang} Translation", "🗺️ Mind Map", "📝 Quiz"])
             
             with tab1:
-                sum_col1, sum_col2 = st.columns([7, 3])
+                sum_col1, sum_col2 = st.columns([6, 4], vertical_alignment="center")
                 with sum_col1:
                     st.markdown("#### ✨ AI Summary")
                 with sum_col2:
-                    copy_to_clipboard(summary_result, "📋 Copy Summary")
+                    copy_to_clipboard(summary_result, "Copy Summary")
                 
                 st.markdown(summary_result)
                 st.markdown("---")
