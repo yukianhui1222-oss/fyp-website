@@ -3274,12 +3274,28 @@ def main():
         ocr_time = results['time']
         result_lang = results.get('lang', 'Chinese')
         
+        # Calculate stats
+        page_count = max(1, raw_text.count('-- Page '))
+        word_count = len(raw_text.split())
+        is_saved = results.get('is_loaded_from_db', False)
+
         st.markdown("<div style='margin-top: 32px;'></div>", unsafe_allow_html=True)
         
         # Header and dropdown Export button
         header_col, export_col = st.columns([2, 1])
         with header_col:
             st.markdown("### ✨ Analysis Results")
+            db_badge_html = (
+                '  •  <span style="background-color: rgba(16, 185, 129, 0.1); color: #059669; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; display: inline-flex; align-items: center; vertical-align: middle; gap: 3px;">'
+                '☁️ Cloud Saved'
+                '</span>'
+            ) if is_saved else ""
+            st.markdown(
+                f"<div style='font-size: 0.85rem; color: #6b7280; font-weight: 500; margin-top: -6px; margin-bottom: 24px;'>"
+                f"⏱️ {ocr_time:.2f}s  •  📊 {word_count} words  •  📄 {page_count} pages{db_badge_html}"
+                f"</div>",
+                unsafe_allow_html=True
+            )
         with export_col:
             from doc_generator import generate_docx
             docx_data = generate_docx(summary_result, translation_result, result_lang)
@@ -3308,51 +3324,6 @@ def main():
                     key="export_md_btn"
                 )
                 copy_to_clipboard(summary_result, "📋 Copy Summary Markdown")
-                
-        # Horizontal stats bar (minimalist, borderless, page count included)
-        page_count = max(1, raw_text.count('-- Page '))
-        word_count = len(raw_text.split())
-        
-        is_saved = results.get('is_loaded_from_db', False)
-        db_badge_html = ""
-        if is_saved:
-            db_badge_html = (
-                '<div style="width: 1px; height: 24px; background-color: #e5e7eb;"></div>'
-                '<div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">'
-                '<span style="background-color: rgba(16, 185, 129, 0.1); color: #059669; font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 99px; display: inline-flex; align-items: center; gap: 4px;">'
-                '<span>☁️</span> Cloud Saved'
-                '</span>'
-                '</div>'
-            )
-            
-        st.markdown(f"""
-            <div style="display: flex; gap: 32px; align-items: center; padding: 12px 16px; background-color: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 12px; margin-bottom: 24px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 1.2rem;">⏱️</span>
-                    <div>
-                        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; font-weight: 600;">Processing Time</div>
-                        <div style="font-size: 0.95rem; font-weight: 700; color: #1f2937;">{ocr_time:.2f}s</div>
-                    </div>
-                </div>
-                <div style="width: 1px; height: 24px; background-color: #e5e7eb;"></div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 1.2rem;">📊</span>
-                    <div>
-                        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; font-weight: 600;">Word Count</div>
-                        <div style="font-size: 0.95rem; font-weight: 700; color: #1f2937;">{word_count}</div>
-                    </div>
-                </div>
-                <div style="width: 1px; height: 24px; background-color: #e5e7eb;"></div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 1.2rem;">📄</span>
-                    <div>
-                        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; font-weight: 600;">Page Count</div>
-                        <div style="font-size: 0.95rem; font-weight: 700; color: #1f2937;">{page_count}</div>
-                    </div>
-                </div>
-                {db_badge_html}
-            </div>
-        """, unsafe_allow_html=True)
         
         # Cloud Database Saving UI (Flat layout Notion-style)
         if not is_saved:
