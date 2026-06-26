@@ -2042,7 +2042,7 @@ def main():
             transition: all 0.2s ease !important;
         }
         div[class*="st-key-clear_chat_"] button:hover {
-            background-color: #ef4444 !important;
+            background: #ef4444 !important;
             border-color: #ef4444 !important;
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15) !important;
         }
@@ -2065,7 +2065,7 @@ def main():
             transition: all 0.2s ease !important;
         }
         div[class*="st-key-quick_simpler_"] button:hover {
-            background-color: #f59e0b !important;
+            background: #f59e0b !important;
             border-color: #f59e0b !important;
             box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15) !important;
         }
@@ -2088,7 +2088,7 @@ def main():
             transition: all 0.2s ease !important;
         }
         div[class*="st-key-quick_example_"] button:hover {
-            background-color: #10b981 !important;
+            background: #10b981 !important;
             border-color: #10b981 !important;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
         }
