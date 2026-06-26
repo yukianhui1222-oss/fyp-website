@@ -2004,6 +2004,98 @@ def main():
             font-weight: 700 !important;
         }
 
+        /* Export Document Popover Button Styling */
+        div[class*="st-key-export_document_popover"] button {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.06) 100%) !important;
+            border: 1px solid rgba(99, 102, 241, 0.3) !important;
+            color: #6366f1 !important;
+            font-weight: 700 !important;
+            border-radius: 8px !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-export_document_popover"] button * {
+            color: #6366f1 !important;
+            font-weight: 700 !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-export_document_popover"] button:hover {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
+        }
+        div[class*="st-key-export_document_popover"] button:hover * {
+            color: #FFFFFF !important;
+        }
+        
+        /* Chat Clear Button - Coral Red */
+        div[class*="st-key-clear_chat_"] button {
+            background-color: rgba(239, 68, 68, 0.05) !important;
+            color: #ef4444 !important;
+            border: 1px solid rgba(239, 68, 68, 0.2) !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-clear_chat_"] button * {
+            color: #ef4444 !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-clear_chat_"] button:hover {
+            background-color: #ef4444 !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15) !important;
+        }
+        div[class*="st-key-clear_chat_"] button:hover * {
+            color: #FFFFFF !important;
+        }
+        
+        /* Quick Prompt Simpler Button - Amber Yellow */
+        div[class*="st-key-quick_simpler_"] button {
+            background-color: rgba(245, 158, 11, 0.05) !important;
+            color: #d97706 !important;
+            border: 1px solid rgba(245, 158, 11, 0.2) !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-quick_simpler_"] button * {
+            color: #d97706 !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-quick_simpler_"] button:hover {
+            background-color: #f59e0b !important;
+            border-color: #f59e0b !important;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15) !important;
+        }
+        div[class*="st-key-quick_simpler_"] button:hover * {
+            color: #FFFFFF !important;
+        }
+        
+        /* Quick Prompt Example Button - Emerald Green */
+        div[class*="st-key-quick_example_"] button {
+            background-color: rgba(16, 185, 129, 0.05) !important;
+            color: #059669 !important;
+            border: 1px solid rgba(16, 185, 129, 0.2) !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-quick_example_"] button * {
+            color: #059669 !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-quick_example_"] button:hover {
+            background-color: #10b981 !important;
+            border-color: #10b981 !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
+        }
+        div[class*="st-key-quick_example_"] button:hover * {
+            color: #FFFFFF !important;
+        }
+
         /* Upload & Analyze Panel Custom Styling */
         div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]) {
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%), #FFFFFF !important;
@@ -3025,7 +3117,7 @@ def main():
                 md_text += f"\n\n---\n\n## Translation ({result_lang})\n\n{translation_result}"
             md_data = md_text.encode('utf-8')
             
-            with st.popover("📤 Export Document", use_container_width=True):
+            with st.popover("📤 Export Document", use_container_width=True, key="export_document_popover"):
                 st.download_button(
                     label="📄 Export as Word (.docx)",
                     data=docx_data,
