@@ -2949,7 +2949,9 @@ def main():
         div[class*="st-key-chatbot_container"],
         div[data-testid="stBorderedContainer"][class*="st-key-chatbot_container"],
         div[class*="st-key-chatbot_container"] div[data-testid="stBorderedContainer"],
-        div[data-testid="column"] div[class*="st-key-chatbot_container"] {
+        div[data-testid="column"] div[class*="st-key-chatbot_container"],
+        div[data-testid="column"]:nth-of-type(2) div[data-testid="stBorderedContainer"],
+        div[data-testid="column"]:nth-child(2) div[data-testid="stBorderedContainer"] {
             background-color: #FFFFFF !important;
             border: 1px solid #E5E7EB !important;
             border-radius: 16px !important;
