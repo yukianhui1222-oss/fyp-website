@@ -1628,17 +1628,23 @@ def main():
         if user_name and user_name == user_email and '@' in user_email:
             user_name = user_email.split('@')[0]
 
-        # Initialize user profile details
-        if 'user_profile' not in st.session_state or st.session_state.user_profile is None:
-            uid = user_info.get("uid")
+        # Initialize user profile details with owner UID check to auto-detect account changes
+        current_uid = user_info.get("uid")
+        cached_profile = st.session_state.get("user_profile")
+        cached_uid = cached_profile.get("uid") if isinstance(cached_profile, dict) else None
+        
+        if cached_profile is None or cached_uid != current_uid:
+            uid = current_uid
             id_token = user_info.get("idToken")
             profile, err = fetch_user_details(uid, id_token)
             if profile and (profile.get("exists", False) or profile.get("name") or profile.get("phone") or profile.get("role") != "Standard Account" or profile.get("bio") or profile.get("gender") != "Prefer not to say" or profile.get("birth_date") or profile.get("joined_at") or profile.get("avatar")):
                 if not profile.get("joined_at"):
                     profile["joined_at"] = datetime.now().strftime("%B %d, %Y")
+                profile["uid"] = uid
                 st.session_state.user_profile = profile
             else:
                 st.session_state.user_profile = {
+                    "uid": uid,
                     "name": user_name,
                     "phone": "",
                     "role": "Standard Account",
@@ -2841,6 +2847,17 @@ def main():
             if user_data is not None:
                 if user_data == "LOGOUT_DONE":
                     st.session_state.logout_request = False
+                    st.session_state.user = None
+                    st.session_state.user_profile = None
+                    if 'ocr_results' in st.session_state:
+                        del st.session_state.ocr_results
+                    if 'quiz_data' in st.session_state:
+                        del st.session_state.quiz_data
+                    st.session_state.quiz_mode_active = False
+                    st.session_state.edit_profile_active = False
+                    st.session_state.quiz_finished = False
+                    st.session_state.quiz_submitted = False
+                    st.session_state.guest_quiz_attempts = []
                     st.rerun()
                 else:
                     # user_data is a dict containing {uid, email, name} received from Custom Component
@@ -3028,6 +3045,16 @@ def main():
                 if st.button("Logout", key="nav_logout_button", use_container_width=True, type="primary"):
                     st.session_state.user = None
                     st.session_state.logout_request = True
+                    st.session_state.user_profile = None
+                    if 'ocr_results' in st.session_state:
+                        del st.session_state.ocr_results
+                    if 'quiz_data' in st.session_state:
+                        del st.session_state.quiz_data
+                    st.session_state.quiz_mode_active = False
+                    st.session_state.edit_profile_active = False
+                    st.session_state.quiz_finished = False
+                    st.session_state.quiz_submitted = False
+                    st.session_state.guest_quiz_attempts = []
                     st.rerun()
 
     
