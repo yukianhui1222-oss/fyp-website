@@ -3481,10 +3481,10 @@ def main():
                                 margin-bottom: 8px;
                             }}
                             div[class*="st-key-generate_quiz_action_btn"] button,
-                            .st-key-generate_quiz_action_btn button {
+                            .st-key-generate_quiz_action_btn button {{
                                 color: #FFFFFF !important;
                                 font-weight: 700 !important;
-                            }
+                            }}
                             </style>
                             <div class="progression-row">
                                 <div style="display: flex; align-items: center; gap: 8px;">
