@@ -73,6 +73,29 @@ def patch_streamlit_index_html():
 
 patch_streamlit_index_html()
 
+# Patch Streamlit's main JS bundle to disable the 'c' keyboard shortcut (clear cache dialog)
+def patch_streamlit_js_hotkeys():
+    try:
+        import os
+        import glob
+        import streamlit as st
+        streamlit_dir = os.path.dirname(st.__file__)
+        js_pattern = os.path.join(streamlit_dir, "static", "static", "js", "index.*.js")
+        js_files = glob.glob(js_pattern)
+        for js_path in js_files:
+            with open(js_path, "r", encoding="utf-8", errors="ignore") as f:
+                content = f.read()
+            target_str = 'case"c":showDevelopmentOptions'
+            if target_str in content:
+                new_content = content.replace('case"c":showDevelopmentOptions', 'case"disabled_c":showDevelopmentOptions')
+                with open(js_path, "w", encoding="utf-8") as f:
+                    f.write(new_content)
+    except Exception:
+        pass
+
+patch_streamlit_js_hotkeys()
+
+
 # Page Configuration
 st.set_page_config(
     page_title="DocuMind MVP",
