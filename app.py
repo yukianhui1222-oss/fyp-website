@@ -2946,7 +2946,10 @@ def main():
         }
 
         /* AI Study Assistant Chatbot Card Container styling */
-        div[class*="st-key-chatbot_container"] {
+        div[class*="st-key-chatbot_container"],
+        div[data-testid="stBorderedContainer"][class*="st-key-chatbot_container"],
+        div[class*="st-key-chatbot_container"] div[data-testid="stBorderedContainer"],
+        div[data-testid="column"] div[class*="st-key-chatbot_container"] {
             background-color: #FFFFFF !important;
             border: 1px solid #E5E7EB !important;
             border-radius: 16px !important;
