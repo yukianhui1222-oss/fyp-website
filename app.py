@@ -977,9 +977,9 @@ def render_left_panel(raw_text, summary_result, api_key, results):
 
     # AI Study Assistant Chatbox layout
     # Header Row with Title and Clear Chat Button side-by-side to save space and align cleanly
-    title_col, clear_col = st.columns([7, 3])
+    title_col, clear_col = st.columns([7, 3], vertical_alignment="center")
     with title_col:
-        st.markdown("<h3 style='font-size: 1.15rem; font-weight: 700; color: #1f2937; margin: 0;'>💬 AI Study Assistant</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='font-size: 1.6rem; font-weight: 800; color: #0f172a; margin: 0; font-family: \"Poppins\", sans-serif; display: flex; align-items: center; gap: 8px;'>💬 AI Study Assistant</h3>", unsafe_allow_html=True)
     with clear_col:
         if st.button("🧹 Clear", key=f"clear_chat_{doc_id}", use_container_width=True):
             st.session_state[chat_history_key] = []
@@ -990,7 +990,7 @@ def render_left_panel(raw_text, summary_result, api_key, results):
             st.toast("Chat history cleared!", icon="🧹")
             st.rerun()
     
-    st.caption("Context-aware answers from your notes.")
+    st.markdown("<div style='font-size: 0.88rem; color: #6b7280; margin-top: 2px; margin-bottom: 16px;'>Context-aware answers from your notes.</div>", unsafe_allow_html=True)
     
     # Quick Action Buttons
     st.markdown("<div style='margin-bottom: 5px; font-size: 0.8rem; font-weight: 600; color: #4b5563;'>⚡ Quick Prompts:</div>", unsafe_allow_html=True)
