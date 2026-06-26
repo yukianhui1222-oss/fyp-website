@@ -136,14 +136,14 @@ def save_summary_to_firestore(uid, id_token, title, raw_text, summary_text, tran
     req = urllib.request.Request(url, data=json.dumps(data, ensure_ascii=False).encode("utf-8"), headers=headers, method="POST")
     ctx = ssl._create_unverified_context()
     try:
-        with urllib.request.urlopen(req, context=ctx) as response:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
             return True, doc_id_unique
     except urllib.error.HTTPError as e:
         err_msg = e.read().decode("utf-8")
         # Try public write fallback in case the security rules are public
         try:
             req_public = urllib.request.Request(url, data=json.dumps(data, ensure_ascii=False).encode("utf-8"), headers={"Content-Type": "application/json; charset=utf-8"}, method="POST")
-            with urllib.request.urlopen(req_public, context=ctx) as response:
+            with urllib.request.urlopen(req_public, context=ctx, timeout=10) as response:
                 return True, doc_id_unique
         except Exception:
             return False, f"Database Error: {err_msg}"
@@ -176,14 +176,14 @@ def save_chat_history_to_firestore(uid, doc_id, chat_history_list, id_token=None
     req = urllib.request.Request(url, data=json.dumps(data, ensure_ascii=False).encode("utf-8"), headers=headers, method="PATCH")
     ctx = ssl._create_unverified_context()
     try:
-        with urllib.request.urlopen(req, context=ctx) as response:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
             return True, None
     except urllib.error.HTTPError as e:
         err_msg = e.read().decode("utf-8")
         # Try public write fallback
         try:
             req_public = urllib.request.Request(url, data=json.dumps(data, ensure_ascii=False).encode("utf-8"), headers={"Content-Type": "application/json; charset=utf-8"}, method="PATCH")
-            with urllib.request.urlopen(req_public, context=ctx) as response:
+            with urllib.request.urlopen(req_public, context=ctx, timeout=10) as response:
                 return True, None
         except Exception:
             return False, err_msg
@@ -202,7 +202,7 @@ def fetch_saved_summaries(uid, id_token=None):
     req = urllib.request.Request(url, headers=headers, method="GET")
     ctx = ssl._create_unverified_context()
     try:
-        with urllib.request.urlopen(req, context=ctx) as response:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
             res_data = json.loads(response.read().decode("utf-8"))
             documents = res_data.get("documents", [])
             parsed_docs = []
@@ -229,7 +229,7 @@ def fetch_saved_summaries(uid, id_token=None):
         # Try public read fallback
         try:
             req_public = urllib.request.Request(url, method="GET")
-            with urllib.request.urlopen(req_public, context=ctx) as response:
+            with urllib.request.urlopen(req_public, context=ctx, timeout=10) as response:
                 res_data = json.loads(response.read().decode("utf-8"))
                 documents = res_data.get("documents", [])
                 parsed_docs = []
@@ -270,14 +270,14 @@ def delete_summary_from_firestore(uid, doc_id, id_token=None):
     req = urllib.request.Request(url, headers=headers, method="DELETE")
     ctx = ssl._create_unverified_context()
     try:
-        with urllib.request.urlopen(req, context=ctx) as response:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
             return True, "Successfully deleted summary."
     except urllib.error.HTTPError as e:
         err_msg = e.read().decode("utf-8")
         # Try public delete fallback
         try:
             req_public = urllib.request.Request(url, method="DELETE")
-            with urllib.request.urlopen(req_public, context=ctx) as response:
+            with urllib.request.urlopen(req_public, context=ctx, timeout=10) as response:
                 return True, "Successfully deleted summary."
         except Exception:
             return False, f"Database Error: {err_msg}"
@@ -340,12 +340,12 @@ def save_quiz_attempt(uid, id_token, attempt):
     ctx = ssl._create_unverified_context()
     
     try:
-        with urllib.request.urlopen(req, context=ctx) as response:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
             return True, "Quiz attempt saved to cloud account!"
     except Exception as e:
         try:
             req_public = urllib.request.Request(url, data=json.dumps(data).encode("utf-8"), headers={"Content-Type": "application/json"}, method="POST")
-            with urllib.request.urlopen(req_public, context=ctx) as response:
+            with urllib.request.urlopen(req_public, context=ctx, timeout=10) as response:
                 return True, "Quiz attempt saved to cloud account!"
         except Exception as e_pub:
             return False, str(e_pub)
@@ -367,7 +367,7 @@ def fetch_quiz_attempts(uid, id_token=None):
     ctx = ssl._create_unverified_context()
     
     try:
-        with urllib.request.urlopen(req, context=ctx) as response:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
             res_data = json.loads(response.read().decode("utf-8"))
             documents = res_data.get("documents", [])
             parsed_attempts = []
@@ -416,7 +416,7 @@ def fetch_quiz_attempts(uid, id_token=None):
             return [], None
         try:
             req_public = urllib.request.Request(url, method="GET")
-            with urllib.request.urlopen(req_public, context=ctx) as response:
+            with urllib.request.urlopen(req_public, context=ctx, timeout=10) as response:
                 res_data = json.loads(response.read().decode("utf-8"))
                 documents = res_data.get("documents", [])
                 parsed_attempts = []
@@ -474,7 +474,7 @@ def fetch_user_progression(uid, id_token=None):
     req = urllib.request.Request(url, headers=headers, method="GET")
     ctx = ssl._create_unverified_context()
     try:
-        with urllib.request.urlopen(req, context=ctx) as response:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
             res_data = json.loads(response.read().decode("utf-8"))
             fields = res_data.get("fields", {})
             
@@ -495,7 +495,7 @@ def fetch_user_progression(uid, id_token=None):
             return {"xp": 0, "level": 1, "badges": []}, None
         try:
             req_public = urllib.request.Request(url, method="GET")
-            with urllib.request.urlopen(req_public, context=ctx) as response:
+            with urllib.request.urlopen(req_public, context=ctx, timeout=10) as response:
                 res_data = json.loads(response.read().decode("utf-8"))
                 fields = res_data.get("fields", {})
                 xp = int(fields.get("xp", {}).get("integerValue", "0"))
@@ -566,7 +566,7 @@ def update_user_xp_level(uid, id_token, additional_xp, new_badge=None):
     ctx = ssl._create_unverified_context()
     
     try:
-        with urllib.request.urlopen(req, context=ctx) as response:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
             return True, {
                 "xp": updated_xp,
                 "level": updated_level,
@@ -578,7 +578,7 @@ def update_user_xp_level(uid, id_token, additional_xp, new_badge=None):
     except Exception as e:
         try:
             req_public = urllib.request.Request(url, data=json.dumps(data).encode("utf-8"), headers={"Content-Type": "application/json"}, method="PATCH")
-            with urllib.request.urlopen(req_public, context=ctx) as response:
+            with urllib.request.urlopen(req_public, context=ctx, timeout=10) as response:
                 return True, {
                     "xp": updated_xp,
                     "level": updated_level,
@@ -602,7 +602,7 @@ def fetch_user_details(uid, id_token=None):
     req = urllib.request.Request(url, headers=headers, method="GET")
     ctx = ssl._create_unverified_context()
     try:
-        with urllib.request.urlopen(req, context=ctx) as response:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
             res_data = json.loads(response.read().decode("utf-8"))
             fields = res_data.get("fields", {})
             return {
@@ -621,7 +621,7 @@ def fetch_user_details(uid, id_token=None):
             return {"name": "", "phone": "", "role": "Standard Account", "bio": "", "gender": "Prefer not to say", "birth_date": "", "joined_at": "", "avatar": "", "exists": False}, None
         try:
             req_public = urllib.request.Request(url, method="GET")
-            with urllib.request.urlopen(req_public, context=ctx) as response:
+            with urllib.request.urlopen(req_public, context=ctx, timeout=10) as response:
                 res_data = json.loads(response.read().decode("utf-8"))
                 fields = res_data.get("fields", {})
                 return {
@@ -670,13 +670,13 @@ def save_user_details(uid, id_token, name, phone="", role="Standard Account", bi
     req = urllib.request.Request(url, data=json.dumps(data).encode("utf-8"), headers=headers, method="PATCH")
     ctx = ssl._create_unverified_context()
     try:
-        with urllib.request.urlopen(req, context=ctx) as response:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
             return True, "Profile details updated successfully!"
     except urllib.error.HTTPError as e:
         err_msg = e.read().decode("utf-8")
         try:
             req_public = urllib.request.Request(url, data=json.dumps(data).encode("utf-8"), headers={"Content-Type": "application/json"}, method="PATCH")
-            with urllib.request.urlopen(req_public, context=ctx) as response:
+            with urllib.request.urlopen(req_public, context=ctx, timeout=10) as response:
                 return True, "Profile details updated successfully!"
         except Exception:
             return False, f"Database Error: {err_msg}"
@@ -2846,19 +2846,20 @@ def main():
             
             if user_data is not None:
                 if user_data == "LOGOUT_DONE":
-                    st.session_state.logout_request = False
-                    st.session_state.user = None
-                    st.session_state.user_profile = None
-                    if 'ocr_results' in st.session_state:
-                        del st.session_state.ocr_results
-                    if 'quiz_data' in st.session_state:
-                        del st.session_state.quiz_data
-                    st.session_state.quiz_mode_active = False
-                    st.session_state.edit_profile_active = False
-                    st.session_state.quiz_finished = False
-                    st.session_state.quiz_submitted = False
-                    st.session_state.guest_quiz_attempts = []
-                    st.rerun()
+                    if st.session_state.get('logout_request', False):
+                        st.session_state.logout_request = False
+                        st.session_state.user = None
+                        st.session_state.user_profile = None
+                        if 'ocr_results' in st.session_state:
+                            del st.session_state.ocr_results
+                        if 'quiz_data' in st.session_state:
+                            del st.session_state.quiz_data
+                        st.session_state.quiz_mode_active = False
+                        st.session_state.edit_profile_active = False
+                        st.session_state.quiz_finished = False
+                        st.session_state.quiz_submitted = False
+                        st.session_state.guest_quiz_attempts = []
+                        st.rerun()
                 else:
                     # user_data is a dict containing {uid, email, name} received from Custom Component
                     st.session_state.user = user_data

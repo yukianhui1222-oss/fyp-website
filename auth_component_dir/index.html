@@ -736,14 +736,18 @@
         }
         
         // Handle Logout Request from Python
-        if (args.logout && !logoutRequested) {
-          logoutRequested = true;
-          auth.signOut().then(() => {
-            sendReturnDataToStreamlit("LOGOUT_DONE");
-          }).catch(e => {
-            console.error("SignOut failed", e);
-            sendReturnDataToStreamlit("LOGOUT_DONE"); // Tell python anyway so it clears the flag
-          });
+        if (args.logout) {
+          if (!logoutRequested) {
+            logoutRequested = true;
+            auth.signOut().then(() => {
+              sendReturnDataToStreamlit("LOGOUT_DONE");
+            }).catch(e => {
+              console.error("SignOut failed", e);
+              sendReturnDataToStreamlit("LOGOUT_DONE"); // Tell python anyway so it clears the flag
+            });
+          }
+        } else {
+          logoutRequested = false;
         }
       }
     });
