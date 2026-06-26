@@ -1561,13 +1561,13 @@ def copy_to_clipboard(text, label="Copy"):
     html_code = f"""
         <style>
             #{button_id} {{
-                background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
-                color: #ffffff !important;
-                border: none !important;
+                background-color: rgba(99, 102, 241, 0.05) !important;
+                color: #6366f1 !important;
+                border: 1px solid rgba(99, 102, 241, 0.25) !important;
                 border-radius: 8px !important;
                 padding: 8px 16px !important;
                 font-size: 0.85rem !important;
-                font-weight: 700 !important;
+                font-weight: 600 !important;
                 cursor: pointer !important;
                 transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
                 display: inline-flex !important;
@@ -1575,12 +1575,13 @@ def copy_to_clipboard(text, label="Copy"):
                 gap: 8px !important;
                 margin-bottom: 15px !important;
                 font-family: 'Inter', sans-serif !important;
-                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
+                box-shadow: 0 2px 4px rgba(99, 102, 241, 0.02) !important;
             }}
             #{button_id}:hover {{
-                background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+                background-color: #6366f1 !important;
                 color: white !important;
-                box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25) !important;
+                border-color: #6366f1 !important;
+                box-shadow: 0 6px 16px rgba(99, 102, 241, 0.22) !important;
                 transform: translateY(-1.5px) !important;
             }}
             #{button_id}:active {{
@@ -2010,8 +2011,8 @@ def main():
             color: #FFFFFF !important;
             font-weight: 700 !important;
             border-radius: 8px !important;
-            transition: all 0.2s ease !important;
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
+            transition: all 0.2s ease !important;
         }
         div[class*="st-key-export_document_popover"] button * {
             color: #FFFFFF !important;
@@ -2023,80 +2024,68 @@ def main():
             box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25) !important;
             transform: translateY(-1px);
         }
-        div[class*="st-key-export_document_popover"] button:hover * {
-            color: #FFFFFF !important;
-        }
         
         /* Chat Clear Button - Coral Red */
         div[class*="st-key-clear_chat_"] button {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            background-color: #ef4444 !important;
             color: #FFFFFF !important;
             border: none !important;
             border-radius: 8px !important;
-            font-weight: 600 !important;
-            transition: all 0.2s ease !important;
+            font-weight: 700 !important;
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15) !important;
+            transition: all 0.2s ease !important;
         }
         div[class*="st-key-clear_chat_"] button * {
             color: #FFFFFF !important;
-            font-weight: 600 !important;
+            font-weight: 700 !important;
             transition: all 0.2s ease !important;
         }
         div[class*="st-key-clear_chat_"] button:hover {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+            background-color: #dc2626 !important;
             box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25) !important;
             transform: translateY(-1px);
-        }
-        div[class*="st-key-clear_chat_"] button:hover * {
-            color: #FFFFFF !important;
         }
         
         /* Quick Prompt Simpler Button - Amber Yellow */
         div[class*="st-key-quick_simpler_"] button {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+            background-color: #f59e0b !important;
             color: #FFFFFF !important;
             border: none !important;
             border-radius: 8px !important;
-            font-weight: 600 !important;
-            transition: all 0.2s ease !important;
+            font-weight: 700 !important;
             box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15) !important;
+            transition: all 0.2s ease !important;
         }
         div[class*="st-key-quick_simpler_"] button * {
             color: #FFFFFF !important;
-            font-weight: 600 !important;
+            font-weight: 700 !important;
             transition: all 0.2s ease !important;
         }
         div[class*="st-key-quick_simpler_"] button:hover {
-            background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+            background-color: #d97706 !important;
             box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25) !important;
             transform: translateY(-1px);
-        }
-        div[class*="st-key-quick_simpler_"] button:hover * {
-            color: #FFFFFF !important;
         }
         
         /* Quick Prompt Example Button - Emerald Green */
         div[class*="st-key-quick_example_"] button {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            background-color: #10b981 !important;
             color: #FFFFFF !important;
             border: none !important;
             border-radius: 8px !important;
-            font-weight: 600 !important;
-            transition: all 0.2s ease !important;
+            font-weight: 700 !important;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
+            transition: all 0.2s ease !important;
         }
         div[class*="st-key-quick_example_"] button * {
             color: #FFFFFF !important;
-            font-weight: 600 !important;
+            font-weight: 700 !important;
             transition: all 0.2s ease !important;
         }
         div[class*="st-key-quick_example_"] button:hover {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+            background-color: #059669 !important;
             box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25) !important;
             transform: translateY(-1px);
-        }
-        div[class*="st-key-quick_example_"] button:hover * {
-            color: #FFFFFF !important;
         }
 
         /* Upload & Analyze Panel Custom Styling */
