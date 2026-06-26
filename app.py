@@ -1751,6 +1751,11 @@ def copy_to_clipboard(text, label="Copy"):
                 overflow: hidden;
                 -webkit-text-size-adjust: 100% !important;
                 text-size-adjust: 100% !important;
+                display: flex !important;
+                justify-content: flex-end !important;
+                align-items: center !important;
+                height: 100% !important;
+                width: 100% !important;
             }}
             #{button_id} {{
                 background-color: rgba(99, 102, 241, 0.05) !important;
