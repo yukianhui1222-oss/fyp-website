@@ -1561,13 +1561,13 @@ def copy_to_clipboard(text, label="Copy"):
     html_code = f"""
         <style>
             #{button_id} {{
-                background-color: rgba(99, 102, 241, 0.05) !important;
-                color: #6366f1 !important;
-                border: 1px solid rgba(99, 102, 241, 0.25) !important;
+                background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+                color: #ffffff !important;
+                border: none !important;
                 border-radius: 8px !important;
                 padding: 8px 16px !important;
                 font-size: 0.85rem !important;
-                font-weight: 600 !important;
+                font-weight: 700 !important;
                 cursor: pointer !important;
                 transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
                 display: inline-flex !important;
@@ -1575,13 +1575,12 @@ def copy_to_clipboard(text, label="Copy"):
                 gap: 8px !important;
                 margin-bottom: 15px !important;
                 font-family: 'Inter', sans-serif !important;
-                box-shadow: 0 2px 4px rgba(99, 102, 241, 0.02) !important;
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
             }}
             #{button_id}:hover {{
-                background-color: #6366f1 !important;
+                background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
                 color: white !important;
-                border-color: #6366f1 !important;
-                box-shadow: 0 6px 16px rgba(99, 102, 241, 0.22) !important;
+                box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25) !important;
                 transform: translateY(-1.5px) !important;
             }}
             #{button_id}:active {{
@@ -2006,22 +2005,23 @@ def main():
 
         /* Export Document Popover Button Styling */
         div[class*="st-key-export_document_popover"] button {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.06) 100%) !important;
-            border: 1px solid rgba(99, 102, 241, 0.3) !important;
-            color: #6366f1 !important;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+            border: none !important;
+            color: #FFFFFF !important;
             font-weight: 700 !important;
             border-radius: 8px !important;
             transition: all 0.2s ease !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
         }
         div[class*="st-key-export_document_popover"] button * {
-            color: #6366f1 !important;
+            color: #FFFFFF !important;
             font-weight: 700 !important;
             transition: all 0.2s ease !important;
         }
         div[class*="st-key-export_document_popover"] button:hover {
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
-            border-color: transparent !important;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25) !important;
+            transform: translateY(-1px);
         }
         div[class*="st-key-export_document_popover"] button:hover * {
             color: #FFFFFF !important;
@@ -2029,22 +2029,23 @@ def main():
         
         /* Chat Clear Button - Coral Red */
         div[class*="st-key-clear_chat_"] button {
-            background-color: rgba(239, 68, 68, 0.05) !important;
-            color: #ef4444 !important;
-            border: 1px solid rgba(239, 68, 68, 0.2) !important;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            color: #FFFFFF !important;
+            border: none !important;
             border-radius: 8px !important;
             font-weight: 600 !important;
             transition: all 0.2s ease !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15) !important;
         }
         div[class*="st-key-clear_chat_"] button * {
-            color: #ef4444 !important;
+            color: #FFFFFF !important;
             font-weight: 600 !important;
             transition: all 0.2s ease !important;
         }
         div[class*="st-key-clear_chat_"] button:hover {
-            background: #ef4444 !important;
-            border-color: #ef4444 !important;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15) !important;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25) !important;
+            transform: translateY(-1px);
         }
         div[class*="st-key-clear_chat_"] button:hover * {
             color: #FFFFFF !important;
@@ -2052,22 +2053,23 @@ def main():
         
         /* Quick Prompt Simpler Button - Amber Yellow */
         div[class*="st-key-quick_simpler_"] button {
-            background-color: rgba(245, 158, 11, 0.05) !important;
-            color: #d97706 !important;
-            border: 1px solid rgba(245, 158, 11, 0.2) !important;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+            color: #FFFFFF !important;
+            border: none !important;
             border-radius: 8px !important;
             font-weight: 600 !important;
             transition: all 0.2s ease !important;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15) !important;
         }
         div[class*="st-key-quick_simpler_"] button * {
-            color: #d97706 !important;
+            color: #FFFFFF !important;
             font-weight: 600 !important;
             transition: all 0.2s ease !important;
         }
         div[class*="st-key-quick_simpler_"] button:hover {
-            background: #f59e0b !important;
-            border-color: #f59e0b !important;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15) !important;
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25) !important;
+            transform: translateY(-1px);
         }
         div[class*="st-key-quick_simpler_"] button:hover * {
             color: #FFFFFF !important;
@@ -2075,22 +2077,23 @@ def main():
         
         /* Quick Prompt Example Button - Emerald Green */
         div[class*="st-key-quick_example_"] button {
-            background-color: rgba(16, 185, 129, 0.05) !important;
-            color: #059669 !important;
-            border: 1px solid rgba(16, 185, 129, 0.2) !important;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            color: #FFFFFF !important;
+            border: none !important;
             border-radius: 8px !important;
             font-weight: 600 !important;
             transition: all 0.2s ease !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
         }
         div[class*="st-key-quick_example_"] button * {
-            color: #059669 !important;
+            color: #FFFFFF !important;
             font-weight: 600 !important;
             transition: all 0.2s ease !important;
         }
         div[class*="st-key-quick_example_"] button:hover {
-            background: #10b981 !important;
-            border-color: #10b981 !important;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25) !important;
+            transform: translateY(-1px);
         }
         div[class*="st-key-quick_example_"] button:hover * {
             color: #FFFFFF !important;
