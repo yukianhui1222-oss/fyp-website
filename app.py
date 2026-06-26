@@ -2815,7 +2815,6 @@ def main():
         if not api_key:
             st.error("Please enter your Gemini API Key in the sidebar first!")
             st.session_state.is_processing = False
-            st.rerun()
             return
 
         try:
@@ -2849,7 +2848,6 @@ def main():
             if not raw_text or "⚠️" in raw_text:
                 st.warning(raw_text if raw_text else "No text detected.")
                 st.session_state.is_processing = False
-                st.rerun()
                 return
 
             # Step 2: LLM Summarization
@@ -2901,7 +2899,7 @@ def main():
         except Exception as e:
             st.error(f"An unexpected error occurred: {str(e)}")
             st.session_state.is_processing = False
-            st.rerun()
+            return
 
     # Display results if they exist in session state
     if 'ocr_results' in st.session_state and not st.session_state.is_processing:
