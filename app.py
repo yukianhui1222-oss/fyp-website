@@ -2274,16 +2274,103 @@ def main():
             justify-content: center !important;
         }
         div[data-baseweb="tab-list"] button[aria-selected="true"] {
-            background-color: #FFFFFF !important;
-            color: #6366F1 !important;
-            font-weight: 600 !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
-        }
-        div[data-baseweb="tab-list"] button:hover {
-            color: #1f2937 !important;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
         }
         div[data-baseweb="tab-highlight-line"] {
             display: none !important;
+        }
+
+        /* 1. Summary Tab - Solid Royal Blue when selected, soft blue when hovered */
+        div[data-baseweb="tab-list"] button:nth-child(1)[aria-selected="true"] {
+            background-color: #2563eb !important;
+            background: #2563eb !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(1)[aria-selected="true"] * {
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(1)[aria-selected="true"]:hover {
+            background-color: #1d4ed8 !important;
+            background: #1d4ed8 !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(1):not([aria-selected="true"]):hover {
+            background-color: rgba(37, 99, 235, 0.06) !important;
+            color: #2563eb !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(1):not([aria-selected="true"]):hover * {
+            color: #2563eb !important;
+        }
+
+        /* 2. Chinese Translation Tab - Solid Violet when selected, soft violet when hovered */
+        div[data-baseweb="tab-list"] button:nth-child(2)[aria-selected="true"] {
+            background-color: #8b5cf6 !important;
+            background: #8b5cf6 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2) !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(2)[aria-selected="true"] * {
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(2)[aria-selected="true"]:hover {
+            background-color: #7c3aed !important;
+            background: #7c3aed !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(2):not([aria-selected="true"]):hover {
+            background-color: rgba(139, 92, 246, 0.06) !important;
+            color: #8b5cf6 !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(2):not([aria-selected="true"]):hover * {
+            color: #8b5cf6 !important;
+        }
+
+        /* 3. Mind Map Tab - Solid Emerald Green when selected, soft green when hovered */
+        div[data-baseweb="tab-list"] button:nth-child(3)[aria-selected="true"] {
+            background-color: #10b981 !important;
+            background: #10b981 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(3)[aria-selected="true"] * {
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(3)[aria-selected="true"]:hover {
+            background-color: #059669 !important;
+            background: #059669 !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(3):not([aria-selected="true"]):hover {
+            background-color: rgba(16, 185, 129, 0.06) !important;
+            color: #10b981 !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(3):not([aria-selected="true"]):hover * {
+            color: #10b981 !important;
+        }
+
+        /* 4. Quiz Tab - Solid Vibrant Rose when selected, soft rose when hovered */
+        div[data-baseweb="tab-list"] button:nth-child(4)[aria-selected="true"] {
+            background-color: #f43f5e !important;
+            background: #f43f5e !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 12px rgba(244, 63, 94, 0.2) !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(4)[aria-selected="true"] * {
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(4)[aria-selected="true"]:hover {
+            background-color: #e11d48 !important;
+            background: #e11d48 !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(4):not([aria-selected="true"]):hover {
+            background-color: rgba(244, 63, 94, 0.06) !important;
+            color: #f43f5e !important;
+        }
+        div[data-baseweb="tab-list"] button:nth-child(4):not([aria-selected="true"]):hover * {
+            color: #f43f5e !important;
         }
         
         /* Clean white layout with soft shadow, no border, rounded corners for feature cards */
