@@ -1,3 +1,4 @@
 libgl1
 libgomp1
 libreoffice
+libglib2.0-0
