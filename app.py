@@ -2168,8 +2168,8 @@ def main():
 
         /* Upload & Analyze Panel Custom Styling */
         div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]) {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(139, 92, 246, 0.04) 100%), #FFFFFF !important;
-            border: 1px solid rgba(99, 102, 241, 0.15) !important;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%) !important;
+            border: 1px solid rgba(99, 102, 241, 0.2) !important;
             border-radius: 16px !important;
             box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.08) !important;
             transition: all 0.3s ease !important;
@@ -2195,8 +2195,8 @@ def main():
         }
         
         div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-testid="stFileUploader"]) {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(139, 92, 246, 0.04) 100%), #FFFFFF !important;
-            border: 1px solid rgba(99, 102, 241, 0.15) !important;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%) !important;
+            border: 1px solid rgba(99, 102, 241, 0.2) !important;
             border-radius: 16px !important;
             box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.08) !important;
             transition: all 0.3s ease !important;
@@ -2212,7 +2212,7 @@ def main():
             padding: 0 !important;
         }
         div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] {
-            background-color: rgba(99, 102, 241, 0.03) !important;
+            background-color: rgba(255, 255, 255, 0.7) !important;
             border: 1.5px dashed rgba(99, 102, 241, 0.25) !important;
             border-radius: 12px !important;
             padding: 16px 20px !important;
@@ -2220,7 +2220,7 @@ def main():
         }
         div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"]:hover {
             border-color: #6366f1 !important;
-            background-color: rgba(99, 102, 241, 0.07) !important;
+            background-color: rgba(255, 255, 255, 0.9) !important;
         }
         div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] svg {
             fill: #6366f1 !important;
@@ -3315,7 +3315,7 @@ def main():
                 """, unsafe_allow_html=True)
         else:
             st.markdown("""
-                <div style="background: rgba(99, 102, 241, 0.04); border-left: 3px solid #6366f1; border-radius: 6px; padding: 10px 16px; margin: 15px 0; text-align: left; display: flex; align-items: center; gap: 10px;">
+                <div style="background: rgba(255, 255, 255, 0.85); border-left: 3px solid #6366f1; border-radius: 6px; padding: 10px 16px; margin: 15px 0; text-align: left; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.03);">
                     <span style="font-size: 1.15rem;">💡</span>
                     <span style="color: #475569; font-size: 0.9rem; font-weight: 500;">Ready to start? Drag & drop or browse to upload your document (PDF, Docx, PPTx, or Image).</span>
                 </div>
