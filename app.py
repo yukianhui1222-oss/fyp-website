@@ -2004,6 +2004,66 @@ def main():
             font-weight: 700 !important;
         }
 
+        /* Upload & Analyze Panel Custom Styling */
+        div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]) {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%), #FFFFFF !important;
+            border: 1px solid rgba(99, 102, 241, 0.15) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.08) !important;
+            transition: all 0.3s ease !important;
+            overflow: hidden !important;
+        }
+        div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]):hover {
+            border-color: rgba(99, 102, 241, 0.3) !important;
+            box-shadow: 0 15px 35px -8px rgba(99, 102, 241, 0.14) !important;
+        }
+        div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]) details[open] summary {
+            border-bottom: 1px solid rgba(226, 232, 240, 0.6) !important;
+        }
+        div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]) details summary {
+            border-bottom: none !important;
+            background-color: transparent !important;
+            padding: 14px 20px !important;
+            font-size: 1.05rem !important;
+            font-weight: 700 !important;
+            color: #1e293b !important;
+        }
+        div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]) details summary:hover {
+            background-color: rgba(99, 102, 241, 0.02) !important;
+        }
+        
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-testid="stFileUploader"]) {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%), #FFFFFF !important;
+            border: 1px solid rgba(99, 102, 241, 0.15) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.08) !important;
+            transition: all 0.3s ease !important;
+            padding: 24px !important;
+        }
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-testid="stFileUploader"]):hover {
+            border-color: rgba(99, 102, 241, 0.3) !important;
+            box-shadow: 0 15px 35px -8px rgba(99, 102, 241, 0.14) !important;
+        }
+        
+        /* Premium File Uploader Dropzone Styling */
+        div[data-testid="stFileUploader"] {
+            padding: 0 !important;
+        }
+        div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] {
+            background-color: rgba(255, 255, 255, 0.8) !important;
+            border: 1.5px dashed rgba(99, 102, 241, 0.25) !important;
+            border-radius: 12px !important;
+            padding: 16px 20px !important;
+            transition: all 0.2s ease !important;
+        }
+        div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"]:hover {
+            border-color: #6366f1 !important;
+            background-color: rgba(99, 102, 241, 0.02) !important;
+        }
+        div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] svg {
+            fill: #6366f1 !important;
+        }
+
         /* Sidebar buttons general styling */
         [data-testid="stSidebar"] button {
             text-align: left !important;
@@ -2793,18 +2853,26 @@ def main():
                     st.image(uploaded_file, caption=f"{uploaded_file.name} • {file_size_kb} KB", use_container_width=True)
             else:
                 st.markdown(f"""
-                    <div style="background: rgba(255, 255, 255, 0.6); border-radius: 12px; padding: 14px 20px; border: 1px solid rgba(226, 232, 240, 0.8); display: flex; align-items: center; gap: 14px; margin-top: 10px; margin-bottom: 15px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);">
-                        <span style="font-size: 1.8rem; line-height: 1;">📄</span>
-                        <div>
-                            <div style="font-weight: 700; color: #0f172a; font-size: 0.95rem;">{uploaded_file.name}</div>
-                            <div style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">{file_type.upper()} Document • {file_size_kb} KB</div>
+                    <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(5, 150, 105, 0.04) 100%); border-radius: 12px; padding: 14px 20px; border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 10px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.03);">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <span style="font-size: 2rem; line-height: 1;">📄</span>
+                            <div>
+                                <div style="font-weight: 700; color: #0f172a; font-size: 0.95rem;">{uploaded_file.name}</div>
+                                <div style="font-size: 0.8rem; color: #475569; margin-top: 2px; font-weight: 500;">{file_type.upper()} Document • {file_size_kb} KB</div>
+                            </div>
                         </div>
+                        <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.2);">Ready to Analyze</span>
                     </div>
                 """, unsafe_allow_html=True)
         else:
-            st.markdown("<p style='color: #94a3b8; font-size: 0.9rem; margin-top: 10px; margin-bottom: 15px; text-align: center;'>ℹ️ No document uploaded yet. Drag & drop or click browse above to start.</p>", unsafe_allow_html=True)
+            st.markdown("""
+                <div style="background: rgba(99, 102, 241, 0.04); border-left: 3px solid #6366f1; border-radius: 6px; padding: 10px 16px; margin: 15px 0; text-align: left; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.15rem;">💡</span>
+                    <span style="color: #475569; font-size: 0.9rem; font-weight: 500;">Ready to start? Drag & drop or browse to upload your document (PDF, Docx, PPTx, or Image).</span>
+                </div>
+            """, unsafe_allow_html=True)
         
-        st.markdown("<div style='border-top: 1px solid rgba(226, 232, 240, 0.6); margin: 15px 0;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 1px; background: linear-gradient(90deg, rgba(226,232,240,0.1) 0%, rgba(226,232,240,0.8) 50%, rgba(226,232,240,0.1) 100%); margin: 18px 0;'></div>", unsafe_allow_html=True)
         
         # 2. Controls & Actions Row (2 balanced columns: Left = Language Select, Right = Buttons)
         ctrl_col1, ctrl_col2 = st.columns([1, 1], gap="large")
