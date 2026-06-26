@@ -1,5 +1,12 @@
 import sys
 import warnings
+import ssl
+
+# Bypass SSL certificate verification for model downloads (e.g. on Streamlit Cloud)
+try:
+    ssl._create_default_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
 
 # Suppress non-critical warnings (like Google API Python 3.9 deprecation warnings)
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -33,6 +40,13 @@ st.set_page_config(
 @st.cache_resource(show_spinner=False)
 def initialize_models():
     """Starts model pre-warming in a strictly non-blocking background thread."""
+    import os
+    if os.environ.get("HOME") == "/home/adminuser":
+        # On Streamlit Cloud, we disable the background pre-warming thread
+        # to prevent downloading race conditions and lock-ups.
+        # The models will download safely in the main request thread when the first analysis starts.
+        return True
+
     import threading
     def background_task():
         try:
