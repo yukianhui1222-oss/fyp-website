@@ -2232,6 +2232,15 @@ def main():
             box-shadow: 0 15px 35px -8px rgba(99, 102, 241, 0.14) !important;
         }
         
+        /* Setup Labels Styling */
+        div[class*="st-key-setup_container"] label[data-testid="stWidgetLabel"] p,
+        div[class*="st-key-setup_expander"] label[data-testid="stWidgetLabel"] p {
+            font-size: 0.98rem !important;
+            font-weight: 700 !important;
+            color: #1e293b !important;
+            margin-bottom: 8px !important;
+        }
+
         /* Premium File Uploader Dropzone Styling */
         div[data-testid="stFileUploader"] {
             padding: 0 !important;
@@ -3362,7 +3371,7 @@ def main():
             )
             
         with ctrl_col2:
-            st.markdown("<label style='font-size: 0.8rem; font-weight: 600; color: #64748b; display: inline-block; margin-bottom: 8px;'>⚡ Actions</label>", unsafe_allow_html=True)
+            st.markdown("<label style='font-size: 0.98rem; font-weight: 700; color: #1e293b; display: inline-block; margin-bottom: 8px;'>⚡ Actions</label>", unsafe_allow_html=True)
             
             # Action Buttons Row
             btn_col1, btn_col2 = st.columns(2)
