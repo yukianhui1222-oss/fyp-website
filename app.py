@@ -3426,76 +3426,75 @@ def main():
                                 st.rerun()
                         st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
                 
-                # 1. Gamification Progress Header
-                if uid:
-                    current_xp = progression.get("xp", 0)
-                    current_level = progression.get("level", 1)
-                    badges = progression.get("badges", [])
-                    
-                    level_xp = current_xp % 500
-                    xp_percent = min(int((level_xp / 500) * 100), 100)
-                    
-                    badge_display_html = ""
-                    badge_meta = {
-                        "first_steps": ("🏅 First Steps", "Completed 1st quiz"),
-                        "perfectionist": ("🏆 Perfectionist", "10/10 on Medium/Hard"),
-                        "speed_demon": ("⚡ Speed Demon", "Quiz in <2 mins with >=8/10 score"),
-                        "persistence": ("💪 Persistence", "100% on Retry Wrong quiz"),
-                        "level_5_master": ("🎓 Level 5 Master", "Reached Level 5"),
-                        "level_10_legend": ("👑 Level 10 Legend", "Reached Level 10")
-                    }
-                    
-                    for b_id in badges:
-                        if b_id in badge_meta:
-                            name, desc = badge_meta[b_id]
-                            badge_display_html += f'<span class="badge-tag" title="{desc}">{name}</span>'
-                            
-                    st.markdown(f"""
-                        <style>
-                        .badge-tag {{
-                            background: rgba(99, 102, 241, 0.1);
-                            color: #6366f1;
-                            padding: 4px 10px;
-                            border-radius: 99px;
-                            font-size: 0.72rem;
-                            font-weight: 700;
-                            border: 1px solid rgba(99, 102, 241, 0.2);
-                            display: inline-block;
-                            margin-right: 6px;
-                            margin-bottom: 6px;
-                        }}
-                        .progression-card {{
-                            background: rgba(255, 255, 255, 0.6);
-                            border: 1px solid rgba(226, 232, 240, 0.8);
-                            border-radius: 16px;
-                            padding: 16px 20px;
-                            margin-bottom: 24px;
-                            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
-                        }}
-                        </style>
-                        <div class="progression-card">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <span style="font-size: 1.5rem; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">⚡ Level {current_level}</span>
-                                    <span style="font-size: 0.85rem; color: #64748b; font-weight: 600;">({current_xp} XP Total)</span>
+                # 1. Combined Progression & Configuration Card
+                with st.container(border=True):
+                    if uid:
+                        current_xp = progression.get("xp", 0)
+                        current_level = progression.get("level", 1)
+                        badges = progression.get("badges", [])
+                        
+                        level_xp = current_xp % 500
+                        xp_percent = min(int((level_xp / 500) * 100), 100)
+                        
+                        badge_display_html = ""
+                        badge_meta = {
+                            "first_steps": ("🏅 First Steps", "Completed 1st quiz"),
+                            "perfectionist": ("🏆 Perfectionist", "10/10 on Medium/Hard"),
+                            "speed_demon": ("⚡ Speed Demon", "Quiz in <2 mins with >=8/10 score"),
+                            "persistence": ("💪 Persistence", "100% on Retry Wrong quiz"),
+                            "level_5_master": ("🎓 Level 5 Master", "Reached Level 5"),
+                            "level_10_legend": ("👑 Level 10 Legend", "Reached Level 10")
+                        }
+                        
+                        for b_id in badges:
+                            if b_id in badge_meta:
+                                name, desc = badge_meta[b_id]
+                                badge_display_html += f'<span class="badge-tag" title="{desc}">{name}</span>'
+                                
+                        st.markdown(f"""
+                            <style>
+                            .badge-tag {{
+                                background: rgba(99, 102, 241, 0.1);
+                                color: #6366f1;
+                                padding: 3px 8px;
+                                border-radius: 99px;
+                                font-size: 0.72rem;
+                                font-weight: 700;
+                                border: 1px solid rgba(99, 102, 241, 0.2);
+                                display: inline-block;
+                                margin-left: 6px;
+                                margin-bottom: 2px;
+                            }}
+                            .progression-row {{
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                flex-wrap: wrap;
+                                gap: 12px;
+                                margin-bottom: 8px;
+                            }}
+                            </style>
+                            <div class="progression-row">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 1.25rem; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">⚡ Level {current_level}</span>
+                                    <span style="font-size: 0.8rem; color: #64748b; font-weight: 600;">({current_xp} XP Total)</span>
                                 </div>
                                 <div style="font-size: 0.8rem; color: #475569; font-weight: 700;">{level_xp} / 500 XP to next level</div>
                             </div>
-                            <div style="width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 99px; overflow: hidden; display: flex; margin-bottom: 14px;">
+                            <div style="width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 99px; overflow: hidden; display: flex; margin-bottom: 12px;">
                                 <div style="width: {xp_percent}%; height: 100%; background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%); border-radius: 99px;"></div>
                             </div>
-                            <div>
-                                <div style="font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 8px;">🏅 Earned Badges:</div>
-                                {badge_display_html if badge_display_html else '<span style="font-size: 0.72rem; color: #94a3b8; font-style: italic;">No badges unlocked yet. Complete quizzes to earn badges!</span>'}
+                            <div style="display: flex; align-items: center; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.78rem;">
+                                <span style="font-weight: 700; color: #475569;">🏅 Earned Badges:</span>
+                                {badge_display_html if badge_display_html else '<span style="color: #94a3b8; font-style: italic; margin-left: 6px;">No badges unlocked yet.</span>'}
                             </div>
-                        </div>
-                    """, unsafe_allow_html=True)
-                else:
-                    st.info("☁️ Log in to save your history, earn XP, and unlock badges!", icon="☁️")
+                            <div style="border-top: 1px solid rgba(226, 232, 240, 0.6); margin-bottom: 16px;"></div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.info("☁️ Log in to save your history, earn XP, and unlock badges!", icon="☁️")
+                        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
 
-                # 3. Configure and Generate New Quiz
-                with st.container(border=True):
-                    st.markdown("##### ⚙️ Configure New Custom Quiz")
+                    st.markdown("<h6 style='margin-top: 0; margin-bottom: 14px; color: #1e293b; font-family: \"Poppins\", sans-serif; font-weight: 700; font-size: 0.95rem;'>⚙️ Configure New Custom Quiz</h6>", unsafe_allow_html=True)
                     
                     config_col1, config_col2, config_col3 = st.columns([1, 1, 1])
                     
@@ -3507,6 +3506,7 @@ def main():
                         target_lang = st.selectbox("🌐 Translation Language", ["Chinese", "Malay", "Japanese", "French", "Spanish", "Korean", "German", "Tamil", "Hindi"])
                         
                     st.session_state.quiz_target_lang = target_lang
+                    st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
                     
                     if st.button("🚀 Generate Custom Quiz", type="primary", use_container_width=True, key="generate_quiz_action_btn"):
                         with st.spinner(f"AI is generating a [{quiz_difficulty}] quiz with [{timer_option}] time limit, please wait..."):
