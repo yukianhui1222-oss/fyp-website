@@ -2167,7 +2167,8 @@ def main():
         /* Specific button style references have been moved to the bottom of the stylesheet to ensure they cascade and override general button rules */
 
         /* Upload & Analyze Panel Custom Styling */
-        div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]) {
+        /* Setup Expander Styling (when results exist) */
+        div[class*="st-key-setup_expander"] {
             background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%) !important;
             border: 1px solid rgba(99, 102, 241, 0.2) !important;
             border-radius: 16px !important;
@@ -2175,14 +2176,14 @@ def main():
             transition: all 0.3s ease !important;
             overflow: hidden !important;
         }
-        div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]):hover {
+        div[class*="st-key-setup_expander"]:hover {
             border-color: rgba(99, 102, 241, 0.3) !important;
             box-shadow: 0 15px 35px -8px rgba(99, 102, 241, 0.14) !important;
         }
-        div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]) details[open] summary {
+        div[class*="st-key-setup_expander"] details[open] summary {
             border-bottom: 1px solid rgba(226, 232, 240, 0.6) !important;
         }
-        div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]) details summary {
+        div[class*="st-key-setup_expander"] details summary {
             border-bottom: none !important;
             background-color: transparent !important;
             padding: 14px 20px !important;
@@ -2190,11 +2191,12 @@ def main():
             font-weight: 700 !important;
             color: #1e293b !important;
         }
-        div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]) details summary:hover {
+        div[class*="st-key-setup_expander"] details summary:hover {
             background-color: rgba(99, 102, 241, 0.02) !important;
         }
         
-        div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-testid="stFileUploader"]) {
+        /* Setup Container Styling (when no results exist) */
+        div[class*="st-key-setup_container"] {
             background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%) !important;
             border: 1px solid rgba(99, 102, 241, 0.2) !important;
             border-radius: 16px !important;
@@ -2202,7 +2204,7 @@ def main():
             transition: all 0.3s ease !important;
             padding: 24px !important;
         }
-        div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-testid="stFileUploader"]):hover {
+        div[class*="st-key-setup_container"]:hover {
             border-color: rgba(99, 102, 241, 0.3) !important;
             box-shadow: 0 15px 35px -8px rgba(99, 102, 241, 0.14) !important;
         }
@@ -2211,14 +2213,16 @@ def main():
         div[data-testid="stFileUploader"] {
             padding: 0 !important;
         }
-        div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] {
+        div[class*="st-key-setup_container"] div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"],
+        div[class*="st-key-setup_expander"] div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] {
             background-color: rgba(255, 255, 255, 0.7) !important;
             border: 1.5px dashed rgba(99, 102, 241, 0.25) !important;
             border-radius: 12px !important;
             padding: 16px 20px !important;
             transition: all 0.2s ease !important;
         }
-        div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"]:hover {
+        div[class*="st-key-setup_container"] div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"]:hover,
+        div[class*="st-key-setup_expander"] div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"]:hover {
             border-color: #6366f1 !important;
             background-color: rgba(255, 255, 255, 0.9) !important;
         }
@@ -3277,9 +3281,9 @@ def main():
 
     # Render Setup & Upload container
     if has_results:
-        setup_container = st.expander("📤 Analyze New Document", expanded=False)
+        setup_container = st.expander("📤 Analyze New Document", expanded=False, key="setup_expander")
     else:
-        setup_container = st.container(border=True)
+        setup_container = st.container(border=True, key="setup_container")
         
     with setup_container:
         if not has_results:
