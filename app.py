@@ -1756,17 +1756,17 @@ def copy_to_clipboard(text, label="Copy"):
                 background-color: rgba(99, 102, 241, 0.05) !important;
                 color: #6366f1 !important;
                 border: 1px solid rgba(99, 102, 241, 0.25) !important;
-                border-radius: 8px !important;
-                padding: 0 12px !important;
-                height: 32px !important;
-                font-size: 0.8rem !important;
+                border-radius: 10px !important;
+                padding: 0 16px !important;
+                height: 38px !important;
+                font-size: 0.875rem !important;
                 font-weight: 600 !important;
                 cursor: pointer !important;
                 transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
                 display: inline-flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                gap: 6px !important;
+                gap: 8px !important;
                 margin: 0 !important;
                 font-family: 'Inter', sans-serif !important;
                 box-shadow: 0 2px 4px rgba(99, 102, 241, 0.02) !important;
@@ -1808,7 +1808,7 @@ def copy_to_clipboard(text, label="Copy"):
             }};
         </script>
     """
-    components.html(html_code, height=36)
+    components.html(html_code, height=44)
 
 def main():
 
