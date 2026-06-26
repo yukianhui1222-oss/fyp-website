@@ -1,0 +1,19 @@
+# Python temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+*.db
+
+# Streamlit secrets (contains API keys)
+.streamlit/secrets.toml
+
+# IDE configuration
+.vs/
+.idea/
+.vscode/
+
+# Local database or agent config files
+.gemini/
+.agents/

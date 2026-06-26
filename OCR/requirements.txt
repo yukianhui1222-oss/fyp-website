@@ -1,0 +1,26 @@
+# ============================================================
+# OCR Document Parser - Dependencies
+# ============================================================
+# Install:  pip install -r requirements.txt
+#
+# GPU Acceleration: If you have an NVIDIA GPU, follow this:
+# 1. pip install -r requirements.txt
+# 2. pip install paddlepaddle-gpu
+# ============================================================
+
+# --- OCR Engine ---
+paddlepaddle>=2.5.0
+paddleocr>=2.7.0
+
+# --- PDF Parsing ---
+PyMuPDF>=1.23.0
+pdfplumber>=0.10.0
+
+# --- Office Document Parsing ---
+python-docx>=1.0.0
+python-pptx>=0.6.23
+
+# --- Image Processing ---
+opencv-python>=4.8.0
+Pillow>=10.0.0
+numpy>=1.24.0

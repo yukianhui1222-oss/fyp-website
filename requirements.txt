@@ -1,0 +1,11 @@
+streamlit
+paddlepaddle
+paddleocr
+google-generativeai
+Pillow
+numpy
+opencv-python-headless
+pymupdf
+python-docx>=1.0.0
+python-pptx>=0.6.23
+pdfplumber>=0.10.0
