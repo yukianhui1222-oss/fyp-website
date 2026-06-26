@@ -2364,6 +2364,7 @@ def main():
         .hero-subtitle {
             font-size: 1.05rem !important;
             color: #4b5563 !important;
+            font-weight: 600 !important;
             max-width: 650px !important;
             margin: 0 auto 1.5rem auto !important;
             line-height: 1.6 !important;
@@ -2581,6 +2582,7 @@ def main():
         .feature-card-desc {
             font-size: 0.98rem !important;
             color: #4B5563 !important;
+            font-weight: 600 !important;
             line-height: 1.6 !important;
         }
 
