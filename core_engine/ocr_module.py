@@ -20,6 +20,7 @@ PaddleOCR 封装模块 (Sequential In-Process 版)
 
 import logging
 import os
+import threading
 from typing import Any, Callable, Dict, List, Optional, Union
 
 import numpy as np
@@ -28,6 +29,8 @@ from PIL import Image
 from .image_preprocessor import preprocess_image
 
 logger = logging.getLogger(__name__)
+
+_ocr_lock = threading.Lock()
 
 
 class OCRProcessor:
@@ -72,40 +75,44 @@ class OCRProcessor:
         if self._ocr is not None:
             return self._ocr
 
-        from paddleocr import PaddleOCR
-        
-        # 强制关闭 PaddleOCR 内部的日志器，防止在 Streamlit 线程中写向已关闭的 stdout 导致崩溃
-        logging.getLogger("ppocr").setLevel(logging.ERROR)
-        logging.getLogger("paddleocr").setLevel(logging.ERROR)
+        with _ocr_lock:
+            if self._ocr is not None:
+                return self._ocr
 
-        logger.info("Initializing PaddleOCR engine...")
+            from paddleocr import PaddleOCR
+            
+            # 强制关闭 PaddleOCR 内部的日志器，防止在 Streamlit 线程中写向已关闭的 stdout 导致崩溃
+            logging.getLogger("ppocr").setLevel(logging.ERROR)
+            logging.getLogger("paddleocr").setLevel(logging.ERROR)
 
-        # 优先尝试 2.x 参数
-        try:
-            self._ocr = PaddleOCR(
-                use_angle_cls=False,     # 禁用方向分类器（假设文档绝大多数偏正向），可提速 15%-20%
-                det_limit_side_len=736,  # 缩小输入分辨率上限（默认960），大幅降低卷积耗时，对普通字体不影响
-                use_gpu=self.use_gpu,
-                show_log=False,
-                lang="ch",
-            )
-            logger.info("PaddleOCR 2.x parameters initialized successfully")
-        except (TypeError, Exception) as e1:
-            logger.warning("2.x parameter initialization failed (%s), trying 3.x parameters...", e1)
+            logger.info("Initializing PaddleOCR engine...")
+
+            # 优先尝试 2.x 参数
             try:
                 self._ocr = PaddleOCR(
-                    use_textline_orientation=False,
-                    det_limit_side_len=736,
+                    use_angle_cls=False,     # 禁用方向分类器（假设文档绝大多数偏正向），可提速 15%-20%
+                    det_limit_side_len=736,  # 缩小输入分辨率上限（默认960），大幅降低卷积耗时，对普通字体不影响
+                    use_gpu=self.use_gpu,
                     show_log=False,
                     lang="ch",
                 )
-                logger.info("PaddleOCR 3.x parameters initialized successfully")
-            except Exception as e2:
-                logger.warning("3.x parameter initialization failed (%s), using minimal parameters...", e2)
-                self._ocr = PaddleOCR(show_log=False, lang="ch")
-                logger.info("PaddleOCR minimal parameters initialized successfully")
+                logger.info("PaddleOCR 2.x parameters initialized successfully")
+            except (TypeError, Exception) as e1:
+                logger.warning("2.x parameter initialization failed (%s), trying 3.x parameters...", e1)
+                try:
+                    self._ocr = PaddleOCR(
+                        use_textline_orientation=False,
+                        det_limit_side_len=736,
+                        show_log=False,
+                        lang="ch",
+                    )
+                    logger.info("PaddleOCR 3.x parameters initialized successfully")
+                except Exception as e2:
+                    logger.warning("3.x parameter initialization failed (%s), using minimal parameters...", e2)
+                    self._ocr = PaddleOCR(show_log=False, lang="ch")
+                    logger.info("PaddleOCR minimal parameters initialized successfully")
 
-        return self._ocr
+            return self._ocr
 
     # ------------------------------------------------------------------
     def _to_numpy(self, image: Union[np.ndarray, Image.Image]) -> np.ndarray:

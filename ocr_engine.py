@@ -95,6 +95,14 @@ _ocr_processor = None
 import threading
 _init_lock = threading.Lock()
 
+def _check_gpu_support() -> bool:
+    """Dynamically check if GPU is available and supported by Paddle."""
+    try:
+        import paddle
+        return bool(paddle.device.is_compiled_with_cuda() and paddle.device.cuda.device_count() > 0)
+    except Exception:
+        return False
+
 def _get_parser():
     """Lazy initialization of DocumentParser (singleton)."""
     global _parser
@@ -102,9 +110,10 @@ def _get_parser():
         with _init_lock:
             if _parser is None:
                 _setup_cuda()
+                use_gpu = _check_gpu_support()
                 from core_engine import DocumentParser
-                _parser = DocumentParser(use_gpu=True, preprocess=True)
-                logger.info("DocumentParser initialization complete | mode=auto-optimized")
+                _parser = DocumentParser(use_gpu=use_gpu, preprocess=True)
+                logger.info("DocumentParser initialization complete | use_gpu=%s | mode=auto-optimized", use_gpu)
     return _parser
 
 
@@ -117,9 +126,10 @@ def _get_ocr_processor():
         with _init_lock:
             if _ocr_processor is None:
                 _setup_cuda()
+                use_gpu = _check_gpu_support()
                 from core_engine.ocr_module import OCRProcessor
-                _ocr_processor = OCRProcessor(use_gpu=True, preprocess=True)
-                logger.info("OCRProcessor initialization complete | mode=auto-optimized")
+                _ocr_processor = OCRProcessor(use_gpu=use_gpu, preprocess=True)
+                logger.info("OCRProcessor initialization complete | use_gpu=%s | mode=auto-optimized", use_gpu)
     return _ocr_processor
 
 
