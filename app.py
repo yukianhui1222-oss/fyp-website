@@ -3289,14 +3289,18 @@ def main():
                     elif not saved_docs:
                         st.caption("No saved summaries yet.")
                     else:
+                        active_doc_id = st.session_state.ocr_results.get('id') if 'ocr_results' in st.session_state else None
                         for doc in saved_docs:
                             doc_title = doc.get("title", "Untitled")
                             doc_id = doc.get("id")
                             display_title = doc_title if len(doc_title) <= 22 else doc_title[:20] + "..."
                             
+                            is_active = (active_doc_id == doc_id)
+                            prefix = "🟢 " if is_active else "📄 "
+                            
                             h_col1, h_col2 = st.columns([5, 1.2])
                             with h_col1:
-                                if st.button(f"📄 {display_title}", key=f"load_doc_{doc_id}", use_container_width=True, help=doc_title):
+                                if st.button(f"{prefix}{display_title}", key=f"load_doc_{doc_id}", use_container_width=True, help=doc_title):
                                     st.session_state.ocr_results = {
                                         'id': doc_id,
                                         'raw_text': doc.get("raw_text", "Loaded from cloud account database."),
@@ -3677,6 +3681,16 @@ def main():
         header_col, export_col = st.columns([2, 1])
         with header_col:
             st.markdown("<h2 style='font-size: 2.0rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0; font-family: \"Poppins\", sans-serif; display: flex; align-items: center; gap: 10px;'>✨ Analysis Results</h2>", unsafe_allow_html=True)
+            
+            # Show selected courseware file name as a clean badge
+            filename = results.get('filename', 'Direct Upload')
+            st.markdown(
+                f"<div style='background-color: rgba(99, 102, 241, 0.08); color: #6366f1; font-size: 0.85rem; font-weight: 600; padding: 4px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; border: 1px solid rgba(99, 102, 241, 0.15);'>"
+                f"📂 Active Document: <strong>{filename}</strong>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+            
             db_badge_html = (
                 '  •  <span style="background-color: rgba(16, 185, 129, 0.1); color: #059669; font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; display: inline-flex; align-items: center; vertical-align: middle; gap: 4px;">'
                 '☁️ Cloud Saved'
