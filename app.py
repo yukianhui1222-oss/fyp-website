@@ -1741,25 +1741,31 @@ def copy_to_clipboard(text, label="Copy"):
     emoji_html = "" if has_emoji else '<span style="font-size: 0.95rem;">📋</span> '
     
     html_code = f"""
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            body {{
+            html, body {{
                 margin: 0;
                 padding: 0;
-                background-color: transparent;
+                background-color: transparent !important;
+                background: transparent !important;
                 overflow: hidden;
+                -webkit-text-size-adjust: 100% !important;
+                text-size-adjust: 100% !important;
             }}
             #{button_id} {{
                 background-color: rgba(99, 102, 241, 0.05) !important;
                 color: #6366f1 !important;
                 border: 1px solid rgba(99, 102, 241, 0.25) !important;
                 border-radius: 8px !important;
-                padding: 6px 12px !important;
+                padding: 0 12px !important;
+                height: 32px !important;
                 font-size: 0.8rem !important;
                 font-weight: 600 !important;
                 cursor: pointer !important;
                 transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
                 display: inline-flex !important;
                 align-items: center !important;
+                justify-content: center !important;
                 gap: 6px !important;
                 margin: 0 !important;
                 font-family: 'Inter', sans-serif !important;
@@ -1767,6 +1773,8 @@ def copy_to_clipboard(text, label="Copy"):
                 white-space: nowrap !important;
                 width: auto !important;
                 box-sizing: border-box !important;
+                -webkit-text-size-adjust: 100% !important;
+                text-size-adjust: 100% !important;
             }}
             #{button_id}:hover {{
                 background-color: #6366f1 !important;
@@ -2924,6 +2932,12 @@ def main():
         div[class*="export_document_popover"] button:hover *,
         div[class*="export-document-popover"] button:hover * {
             color: #FFFFFF !important;
+        }
+
+        /* Force iframe transparency to avoid solid white background boxes on iOS/Safari */
+        iframe {
+            background-color: transparent !important;
+            background: transparent !important;
         }
 
         /* AI Study Assistant Chatbot Card Container styling */
