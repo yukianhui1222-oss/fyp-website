@@ -1170,23 +1170,23 @@ def render_quiz_view():
         }
 
         /* Quiz View Primary Buttons */
-        button[data-testid="baseButton-primary"] {
+        button[data-testid="baseButton-primary"], button[data-testid="stBaseButton-primary"] {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
             color: #ffffff !important;
             border: none !important;
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
-            font-weight: 600 !important;
+            font-weight: 700 !important;
             border-radius: 10px !important;
             transition: all 0.2s ease !important;
         }
-        button[data-testid="baseButton-primary"]:hover {
+        button[data-testid="baseButton-primary"]:hover, button[data-testid="stBaseButton-primary"]:hover {
             background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
             box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35) !important;
             transform: translateY(-1px);
         }
         
         /* Quiz View Secondary Buttons */
-        button[data-testid="baseButton-secondary"] {
+        button[data-testid="baseButton-secondary"], button[data-testid="stBaseButton-secondary"] {
             background-color: #f8fafc !important;
             color: #475569 !important;
             border: 1px solid #e2e8f0 !important;
@@ -1195,7 +1195,7 @@ def render_quiz_view():
             transition: all 0.2s ease !important;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
         }
-        button[data-testid="baseButton-secondary"]:hover {
+        button[data-testid="baseButton-secondary"]:hover, button[data-testid="stBaseButton-secondary"]:hover {
             background-color: #f1f5f9 !important;
             color: #0f172a !important;
             border-color: #cbd5e1 !important;
@@ -1959,32 +1959,39 @@ def main():
         }
         
         /* Clean design for primary and secondary action buttons */
-        button[data-testid="baseButton-primary"] {
+        button[data-testid="baseButton-primary"], button[data-testid="stBaseButton-primary"] {
             background: #6366F1 !important;
             color: #FFFFFF !important;
             border-radius: 8px !important;
             border: none !important;
-            font-weight: 600 !important;
+            font-weight: 700 !important;
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1) !important;
             transition: all 0.2s ease !important;
         }
-        button[data-testid="baseButton-primary"]:hover {
+        button[data-testid="baseButton-primary"]:hover, button[data-testid="stBaseButton-primary"]:hover {
             background: #4F46E5 !important;
             box-shadow: 0 6px 16px rgba(99, 102, 241, 0.2) !important;
         }
-        button[data-testid="baseButton-secondary"] {
+        button[data-testid="baseButton-secondary"], button[data-testid="stBaseButton-secondary"] {
             background: #FFFFFF !important;
             color: #1F2937 !important;
             border-radius: 8px !important;
             border: 1px solid #E5E7EB !important;
-            font-weight: 500 !important;
+            font-weight: 600 !important;
             transition: all 0.2s ease !important;
             box-shadow: none !important;
         }
-        button[data-testid="baseButton-secondary"]:hover {
+        button[data-testid="baseButton-secondary"]:hover, button[data-testid="stBaseButton-secondary"]:hover {
             background: #F8FAFC !important;
             border-color: #A78BFA !important;
             color: #8B5CF6 !important;
+        }
+        
+        /* Generate Quiz Button Explicit Styles */
+        div[class*="st-key-generate_quiz_action_btn"] button,
+        .st-key-generate_quiz_action_btn button {
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
         }
 
         /* Sidebar buttons general styling */
@@ -3473,6 +3480,11 @@ def main():
                                 gap: 12px;
                                 margin-bottom: 8px;
                             }}
+                            div[class*="st-key-generate_quiz_action_btn"] button,
+                            .st-key-generate_quiz_action_btn button {
+                                color: #FFFFFF !important;
+                                font-weight: 700 !important;
+                            }
                             </style>
                             <div class="progression-row">
                                 <div style="display: flex; align-items: center; gap: 8px;">
