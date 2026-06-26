@@ -3458,7 +3458,7 @@ def main():
                                 color: #6366f1;
                                 padding: 3px 8px;
                                 border-radius: 99px;
-                                font-size: 0.72rem;
+                                font-size: 0.85rem;
                                 font-weight: 700;
                                 border: 1px solid rgba(99, 102, 241, 0.2);
                                 display: inline-block;
@@ -3476,15 +3476,15 @@ def main():
                             </style>
                             <div class="progression-row">
                                 <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 1.25rem; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">⚡ Level {current_level}</span>
-                                    <span style="font-size: 0.8rem; color: #64748b; font-weight: 600;">({current_xp} XP Total)</span>
+                                    <span style="font-size: 1.4rem; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">⚡ Level {current_level}</span>
+                                    <span style="font-size: 0.95rem; color: #64748b; font-weight: 600;">({current_xp} XP Total)</span>
                                 </div>
-                                <div style="font-size: 0.8rem; color: #475569; font-weight: 700;">{level_xp} / 500 XP to next level</div>
+                                <div style="font-size: 0.95rem; color: #475569; font-weight: 700;">{level_xp} / 500 XP to next level</div>
                             </div>
                             <div style="width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 99px; overflow: hidden; display: flex; margin-bottom: 12px;">
                                 <div style="width: {xp_percent}%; height: 100%; background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%); border-radius: 99px;"></div>
                             </div>
-                            <div style="display: flex; align-items: center; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.78rem;">
+                            <div style="display: flex; align-items: center; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.9rem;">
                                 <span style="font-weight: 700; color: #475569;">🏅 Earned Badges:</span>
                                 {badge_display_html if badge_display_html else '<span style="color: #94a3b8; font-style: italic; margin-left: 6px;">No badges unlocked yet.</span>'}
                             </div>
@@ -3494,7 +3494,7 @@ def main():
                         st.info("☁️ Log in to save your history, earn XP, and unlock badges!", icon="☁️")
                         st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
 
-                    st.markdown("<h6 style='margin-top: 0; margin-bottom: 14px; color: #1e293b; font-family: \"Poppins\", sans-serif; font-weight: 700; font-size: 0.95rem;'>⚙️ Configure New Custom Quiz</h6>", unsafe_allow_html=True)
+                    st.markdown("<h6 style='margin-top: 0; margin-bottom: 14px; color: #1e293b; font-family: \"Poppins\", sans-serif; font-weight: 700; font-size: 1.15rem;'>⚙️ Configure New Custom Quiz</h6>", unsafe_allow_html=True)
                     
                     config_col1, config_col2, config_col3 = st.columns([1, 1, 1])
                     
@@ -3635,7 +3635,7 @@ margin-bottom: 15px;
 .accuracy-bar-wrapper {{
 display: flex;
 width: 100%;
-height: 22px;
+height: 24px;
 border-radius: 99px;
 overflow: hidden;
 background: #f1f5f9;
@@ -3645,9 +3645,9 @@ margin: 12px 0;
 width: {correct_percent}%;
 background: linear-gradient(90deg, #10b981 0%, #059669 100%);
 color: white;
-font-size: 0.72rem;
+font-size: 0.9rem;
 font-weight: 700;
-line-height: 22px;
+line-height: 24px;
 text-align: center;
 transition: width 0.3s ease;
 }}
@@ -3655,9 +3655,9 @@ transition: width 0.3s ease;
 width: {incorrect_percent}%;
 background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
 color: white;
-font-size: 0.72rem;
+font-size: 0.9rem;
 font-weight: 700;
-line-height: 22px;
+line-height: 24px;
 text-align: center;
 transition: width 0.3s ease;
 }}
@@ -3675,12 +3675,12 @@ border-radius: 8px;
 border: 1px dashed #e2e8f0;
 }}
 .stat-val-mini {{
-font-size: 1.05rem;
+font-size: 1.3rem;
 font-weight: 800;
 color: #1e293b;
 }}
 .stat-lbl-mini {{
-font-size: 0.65rem;
+font-size: 0.82rem;
 color: #64748b;
 font-weight: 600;
 text-transform: uppercase;
@@ -3688,13 +3688,13 @@ text-transform: uppercase;
 </style>
 <div class="accuracy-container">
 <div style="display: flex; justify-content: space-between; align-items: center;">
-<span style="font-size: 0.82rem; font-weight: 700; color: #334155;">Answer Accuracy Breakdown</span>
-<span style="font-size: 0.75rem; font-weight: 800; color: #10b981;">{correct_percent:.1f}% Correct</span>
+<span style="font-size: 1.0rem; font-weight: 700; color: #334155;">Answer Accuracy Breakdown</span>
+<span style="font-size: 0.95rem; font-weight: 800; color: #10b981;">{correct_percent:.1f}% Correct</span>
 </div>
 <div class="accuracy-bar-wrapper">
 {"<div class='accuracy-bar-correct'>" + f"{total_correct} Correct</div>" if correct_percent > 0 else ""}
 {"<div class='accuracy-bar-incorrect'>" + f"{total_incorrect} Incorrect</div>" if incorrect_percent > 0 else ""}
-{"" if total_questions > 0 else "<div style='width: 100%; color: #94a3b8; font-size: 0.72rem; line-height: 22px; text-align: center; font-style: italic;'>No answers recorded yet</div>"}
+{"" if total_questions > 0 else "<div style='width: 100%; color: #94a3b8; font-size: 0.85rem; line-height: 24px; text-align: center; font-style: italic;'>No answers recorded yet</div>"}
 </div>
 <div class="stat-grid-mini">
 <div class="stat-item-mini">
@@ -3713,22 +3713,22 @@ text-transform: uppercase;
 </div>""", unsafe_allow_html=True)
                     
                     st.markdown(f"""<div style="display: flex; gap: 15px; margin-top: 10px;">
-<div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; text-align: center;">
-<div style="font-size: 0.72rem; color: #64748b; font-weight: 600;">Average Score</div>
-<div style="font-size: 1.1rem; font-weight: 800; color: #4f46e5;">{avg_score:.1f}/{avg_total:.0f}</div>
+<div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
+<div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Average Score</div>
+<div style="font-size: 1.35rem; font-weight: 800; color: #4f46e5;">{avg_score:.1f}/{avg_total:.0f}</div>
 </div>
-<div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; text-align: center;">
-<div style="font-size: 0.72rem; color: #64748b; font-weight: 600;">Total Quiz XP</div>
-<div style="font-size: 1.1rem; font-weight: 800; color: #8b5cf6;">{total_xp_earned} XP</div>
+<div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
+<div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Total Quiz XP</div>
+<div style="font-size: 1.35rem; font-weight: 800; color: #8b5cf6;">{total_xp_earned} XP</div>
 </div>
-<div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; text-align: center;">
-<div style="font-size: 0.72rem; color: #64748b; font-weight: 600;">High / Low Score</div>
-<div style="font-size: 1.1rem; font-weight: 800; color: #f59e0b;">{max(scores)} / {min(scores)}</div>
+<div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
+<div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">High / Low Score</div>
+<div style="font-size: 1.35rem; font-weight: 800; color: #f59e0b;">{max(scores)} / {min(scores)}</div>
 </div>
 </div>""", unsafe_allow_html=True)
                     
                     st.markdown("<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;'>", unsafe_allow_html=True)
-                    st.markdown("<div style='font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 10px;'>🎯 Topic Mastery & Study Guide</div>", unsafe_allow_html=True)
+                    st.markdown("<div style='font-size: 1.1rem; font-weight: 700; color: #475569; margin-bottom: 10px;'>🎯 Topic Mastery & Study Guide</div>", unsafe_allow_html=True)
                     
                     # Process wrong answers by topic_tag
                     topic_correct = {}
@@ -3764,8 +3764,8 @@ text-transform: uppercase;
                             with weak_cols[idx_w]:
                                 st.markdown(f"""
                                     <div style="background: rgba(239, 68, 68, 0.04); border-left: 3px solid #ef4444; border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; height: 100%;">
-                                        <div style="font-size: 0.8rem; font-weight: 700; color: #ef4444;">⚠️ Weak Topic: {tm['topic']} ({tm['mastery']:.0f}% mastery)</div>
-                                        <div style="font-size: 0.72rem; color: #64748b; margin-top: 3px;">Recommendation: Review related sections in the current document. Ask AI for detailed concept breakdown of '{tm['topic']}'.</div>
+                                        <div style="font-size: 0.95rem; font-weight: 700; color: #ef4444;">⚠️ Weak Topic: {tm['topic']} ({tm['mastery']:.0f}% mastery)</div>
+                                        <div style="font-size: 0.85rem; color: #64748b; margin-top: 3px;">Recommendation: Review related sections in the current document. Ask AI for detailed concept breakdown of '{tm['topic']}'.</div>
                                     </div>
                                 """, unsafe_allow_html=True)
                                 weak_count += 1
@@ -3792,16 +3792,16 @@ text-transform: uppercase;
                             margin-bottom: 8px;
                         }
                         .history-meta {
-                            font-size: 0.8rem;
+                            font-size: 0.92rem;
                             color: #64748b;
                         }
                         .history-title {
-                            font-size: 0.88rem;
+                            font-size: 1.05rem;
                             font-weight: 700;
                             color: #1e293b;
                         }
                         .history-score {
-                            font-size: 1rem;
+                            font-size: 1.25rem;
                             font-weight: 800;
                             color: #4f46e5;
                         }
@@ -3831,7 +3831,7 @@ text-transform: uppercase;
                             with col_h1:
                                 st.markdown(f"""
                                     <div style='padding-top: 4px;'>
-                                        <span class='history-title'>{att_topic}</span><span style='color: #6366f1; font-weight: 600; font-size: 0.78rem;'>{retry_label}</span>
+                                        <span class='history-title'>{att_topic}</span><span style='color: #6366f1; font-weight: 600; font-size: 0.9rem;'>{retry_label}</span>
                                         <div class='history-meta'>📅 {formatted_date} • 🎯 Difficulty: {att_difficulty}</div>
                                     </div>
                                 """, unsafe_allow_html=True)
