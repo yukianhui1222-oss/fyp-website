@@ -750,23 +750,114 @@ def render_edit_profile_view():
     
     # Title Banner for Profile
     st.markdown("""
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <h1 class="hero-title" style="margin: 0 !important; font-size: 3rem !important;">Account Profile</h1>
-            <p style="color: #475569; font-size: 1rem; margin-top: 0.5rem;">Manage your profile information and details</p>
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); padding: 40px 20px; border-radius: 24px; text-align: center; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);">
+            <h1 class="hero-title" style="margin: 0 !important; font-size: 3.2rem !important; background: linear-gradient(45deg, #f97316, #e11d48, #9f1239); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Account Profile</h1>
+            <p style="color: #94a3b8; font-size: 1.05rem; margin-top: 0.5rem; font-weight: 500; letter-spacing: 0.3px;">Manage your profile information and account details</p>
         </div>
     """, unsafe_allow_html=True)
 
     # Main edit container style
     st.markdown("""
         <style>
-        .profile-settings-card {
-            background: rgba(255, 255, 255, 0.7) !important;
+        /* Overall profile container card styling */
+        div[class*="st-key-profile_container"] {
+            background: rgba(255, 255, 255, 0.85) !important;
             border: 1px solid rgba(226, 232, 240, 0.8) !important;
-            border-radius: 20px !important;
-            padding: 30px 40px !important;
+            border-radius: 24px !important;
+            padding: 35px 40px !important;
             backdrop-filter: blur(20px) !important;
-            box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.05) !important;
+            box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.04) !important;
             margin-bottom: 2rem !important;
+        }
+
+        /* Style text inputs, textareas and selectbox buttons inside profile */
+        div[class*="st-key-profile_container"] div[data-testid="stTextInput"] input,
+        div[class*="st-key-profile_container"] div[data-testid="stTextArea"] textarea,
+        div[class*="st-key-profile_container"] div[data-testid="stSelectbox"] div[role="button"] {
+            border-radius: 12px !important;
+            border: 1px solid #cbd5e1 !important;
+            background-color: #ffffff !important;
+            padding: 10px 14px !important;
+            font-size: 0.92rem !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-profile_container"] div[data-testid="stTextInput"] input:focus,
+        div[class*="st-key-profile_container"] div[data-testid="stTextArea"] textarea:focus,
+        div[class*="st-key-profile_container"] div[data-testid="stSelectbox"] div[role="button"]:focus {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+            outline: none !important;
+        }
+        
+        /* Make read-only/disabled text inputs look distinct and clean */
+        div[class*="st-key-profile_container"] div[data-testid="stTextInput"] input:disabled {
+            background-color: #f8fafc !important;
+            color: #64748b !important;
+            border-color: #e2e8f0 !important;
+            cursor: not-allowed !important;
+        }
+
+        /* Style custom file uploader */
+        div[class*="st-key-profile_container"] div[data-testid="stFileUploader"] {
+            border: 2px dashed rgba(99, 102, 241, 0.25) !important;
+            background-color: rgba(99, 102, 241, 0.01) !important;
+            border-radius: 16px !important;
+            padding: 12px !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-profile_container"] div[data-testid="stFileUploader"]:hover {
+            border-color: #6366f1 !important;
+            background-color: rgba(99, 102, 241, 0.03) !important;
+        }
+
+        /* Action buttons style overrides */
+        div[class*="st-key-profile_cancel_btn"] button {
+            background-color: #ffffff !important;
+            color: #475569 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 12px !important;
+            padding: 10px 24px !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+            height: 44px !important;
+        }
+        div[class*="st-key-profile_cancel_btn"] button:hover {
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
+            border-color: #94a3b8 !important;
+        }
+
+        div[class*="st-key-profile_save_btn"] button {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 10px 24px !important;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.2) !important;
+            transition: all 0.2s ease !important;
+            height: 44px !important;
+        }
+        div[class*="st-key-profile_save_btn"] button:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3) !important;
+            transform: translateY(-1px);
+        }
+
+        /* Style the Remove Avatar button */
+        div[class*="st-key-remove_avatar_btn"] button {
+            background-color: rgba(239, 68, 68, 0.04) !important;
+            color: #ef4444 !important;
+            border: 1px solid rgba(239, 68, 68, 0.15) !important;
+            border-radius: 10px !important;
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+        }
+        div[class*="st-key-remove_avatar_btn"] button:hover {
+            background-color: #ef4444 !important;
+            color: #ffffff !important;
+            border-color: #ef4444 !important;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -791,26 +882,26 @@ def render_edit_profile_view():
         st.session_state.temp_avatar = user_profile.get('avatar', '')
     
     # Form layout inside streamlit container
-    with st.container():
+    with st.container(key="profile_container", border=True):
         # Avatar Profile Summary Header
         profile_avatar = st.session_state.temp_avatar
         initials = curr_name[0].upper() if curr_name else "U"
         
         avatar_header_html = ""
         if profile_avatar:
-            avatar_header_html = f'<img src="{profile_avatar}" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid #6366F1; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);">'
+            avatar_header_html = f'<img src="{profile_avatar}" style="width: 76px; height: 76px; border-radius: 50%; object-fit: cover; border: 3px solid #6366F1; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);">'
         else:
-            avatar_header_html = f'<div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 2rem; font-family: \'Poppins\', sans-serif; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);">{initials}</div>'
+            avatar_header_html = f'<div style="width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 2rem; font-family: \'Poppins\', sans-serif; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);">{initials}</div>'
             
         st.markdown(f"""
-            <div style="display: flex; align-items: center; gap: 24px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(226, 232, 240, 0.6); flex-wrap: wrap;">
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; display: flex; align-items: center; gap: 24px; margin-bottom: 24px; box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.03); flex-wrap: wrap;">
                 {avatar_header_html}
                 <div>
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: #0f172a; font-family: 'Poppins', sans-serif; line-height: 1.2;">{curr_name}</h2>
+                        <h2 style="margin: 0; font-size: 1.7rem; font-weight: 800; color: #0f172a; font-family: 'Poppins', sans-serif; line-height: 1.2;">{curr_name}</h2>
                         <span style="background: linear-gradient(45deg, #f97316, #e11d48, #9f1239); color: white; font-size: 0.72rem; font-weight: 700; padding: 2px 10px; border-radius: 99px; box-shadow: 0 4px 10px rgba(225, 29, 72, 0.15); display: inline-flex; align-items: center;">PRO MEMBER</span>
                     </div>
-                    <p style="margin: 6px 0 0 0; color: #64748b; font-size: 0.85rem;">Account: {curr_role} • Joined on {curr_joined_at}</p>
+                    <p style="margin: 6px 0 0 0; color: #64748b; font-size: 0.9rem; font-weight: 500;">Account: <span style="color:#6366f1; font-weight:600;">{curr_role}</span> • Joined on {curr_joined_at}</p>
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -819,41 +910,45 @@ def render_edit_profile_view():
         s_col1, s_col2, s_col3 = st.columns(3)
         with s_col1:
             st.markdown("""
-                <div style="background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(226, 232, 240, 0.6); border-radius: 12px; padding: 12px 16px; min-height: 70px; display: flex; flex-direction: column; justify-content: center;">
-                    <div style="font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">API Status</div>
-                    <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
-                        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
-                        <span style="font-size: 0.95rem; font-weight: 700; color: #0f172a;">Connected</span>
+                <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #bbf7d0; border-radius: 16px; padding: 16px 20px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.03); min-height: 75px;">
+                    <div style="font-size: 0.76rem; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 0.05em;">API Status</div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
+                        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                        <span style="font-size: 1.05rem; font-weight: 800; color: #14532d;">Connected</span>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
         with s_col2:
             st.markdown("""
-                <div style="background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(226, 232, 240, 0.6); border-radius: 12px; padding: 12px 16px; min-height: 70px; display: flex; flex-direction: column; justify-content: center;">
-                    <div style="font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Engine Tier</div>
-                    <div style="font-size: 0.95rem; font-weight: 700; color: #6366f1; margin-top: 4px;">Gemini Pro 1.5</div>
+                <div style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); border: 1px solid #e9d5ff; border-radius: 16px; padding: 16px 20px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.03); min-height: 75px;">
+                    <div style="font-size: 0.76rem; font-weight: 700; color: #581c87; text-transform: uppercase; letter-spacing: 0.05em;">Engine Tier</div>
+                    <div style="font-size: 1.05rem; font-weight: 800; color: #6b21a8; margin-top: 6px;">Gemini Pro 1.5</div>
                 </div>
             """, unsafe_allow_html=True)
         with s_col3:
             st.markdown("""
-                <div style="background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(226, 232, 240, 0.6); border-radius: 12px; padding: 12px 16px; min-height: 70px; display: flex; flex-direction: column; justify-content: center;">
-                    <div style="font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Account Status</div>
-                    <div style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-top: 4px;">Active Verified</div>
+                <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: 16px; padding: 16px 20px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.03); min-height: 75px;">
+                    <div style="font-size: 0.76rem; font-weight: 700; color: #075985; text-transform: uppercase; letter-spacing: 0.05em;">Account Status</div>
+                    <div style="font-size: 1.05rem; font-weight: 800; color: #0c4a6e; margin-top: 6px;">Active Verified</div>
                 </div>
             """, unsafe_allow_html=True)
 
-        st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 25px;'></div>", unsafe_allow_html=True)
         
         # Row 0: Customize Profile Avatar
-        st.markdown("<h4 style='font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-top: 10px; margin-bottom: 12px; font-family: \"Poppins\", sans-serif;'>🖼️ Customize Profile Avatar</h4>", unsafe_allow_html=True)
+        st.markdown("""
+            <div style="display: flex; align-items: center; gap: 8px; border-left: 4px solid #6366f1; padding-left: 12px; margin-top: 10px; margin-bottom: 18px;">
+                <h4 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Poppins', sans-serif;">🖼️ Customize Profile Avatar</h4>
+            </div>
+        """, unsafe_allow_html=True)
         
         avatar_col1, avatar_col2 = st.columns([1.5, 3.5])
         with avatar_col1:
-            # Render the preview cleanly in a single markdown block to prevent unclosed div tag parser issues
+            # Render the preview card cleanly
             if st.session_state.temp_avatar:
                 st.markdown(f"""
-                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 15px; margin-bottom: 10px;">
-                        <img src="{st.session_state.temp_avatar}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid #6366F1; box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02); min-height: 180px;">
+                        <img src="{st.session_state.temp_avatar}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #6366F1; box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12); margin-bottom: 12px;">
                     </div>
                 """, unsafe_allow_html=True)
                 if st.button("❌ Remove Avatar", use_container_width=True, key="remove_avatar_btn"):
@@ -863,8 +958,8 @@ def render_edit_profile_view():
                     st.rerun()
             else:
                 st.markdown(f"""
-                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 30px; margin-bottom: 30px;">
-                        <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 2.5rem; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);">{initials}</div>
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02); min-height: 180px;">
+                        <div style="width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 2.8rem; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12); margin-bottom: 12px;">{initials}</div>
                     </div>
                 """, unsafe_allow_html=True)
                     
@@ -905,7 +1000,12 @@ def render_edit_profile_view():
                         else:
                             st.error("Failed to process image. Please try another one.")
 
-        st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
+        # Personal Details Section Header
+        st.markdown("""
+            <div style="display: flex; align-items: center; gap: 8px; border-left: 4px solid #8b5cf6; padding-left: 12px; margin-top: 25px; margin-bottom: 18px;">
+                <h4 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Poppins', sans-serif;">📝 Personal Information</h4>
+            </div>
+        """, unsafe_allow_html=True)
         
         # Row 1: Display Name & Email Address
         r1_col1, r1_col2 = st.columns(2)
@@ -954,7 +1054,7 @@ def render_edit_profile_view():
         # Action buttons
         btn_col1, btn_col2 = st.columns([1, 4])
         with btn_col1:
-            if st.button("Cancel", use_container_width=True):
+            if st.button("Cancel", use_container_width=True, key="profile_cancel_btn"):
                 if 'temp_avatar' in st.session_state:
                     del st.session_state.temp_avatar
                 if 'last_processed_avatar' in st.session_state:
@@ -962,7 +1062,7 @@ def render_edit_profile_view():
                 st.session_state.edit_profile_active = False
                 st.rerun()
         with btn_col2:
-            if st.button("Save Changes ✓", type="primary", use_container_width=True):
+            if st.button("Save Changes ✓", type="primary", use_container_width=True, key="profile_save_btn"):
                 if not new_name.strip():
                     st.error("Display Name cannot be empty.")
                 else:
