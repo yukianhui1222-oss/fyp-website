@@ -34,49 +34,73 @@ class WordHandler:
         self.ocr = ocr_processor
 
     def _convert_doc_to_docx(self, doc_path: str) -> str:
-        """Use Word OLE automation to convert .doc to .docx (Windows only)"""
-        try:
-            import win32com.client
-        except ImportError:
-            logger.error("pywin32 not installed, cannot perform .doc conversion")
-            raise RuntimeError("System missing pywin32 library, cannot support .doc format. Please install pywin32 or upload .docx files directly.")
-
-        logger.info("Calling Word for format conversion: %s", doc_path)
-        
-        abs_doc_path = os.path.abspath(doc_path).replace('/', '\\')
-        
-        # 创建临时输出路径
-        temp_dir = tempfile.gettempdir()
-        base_name = os.path.basename(doc_path)
-        tmp_docx_path = os.path.join(temp_dir, f"conv_{base_name}x")
-        abs_docx_path = os.path.abspath(tmp_docx_path).replace('/', '\\')
-
-        word = None
-        document = None
-        try:
-            # 使用 CoInitialize 确保在某些多线程环境下正常运行
-            import pythoncom
-            pythoncom.CoInitialize()
-
-            word = win32com.client.DispatchEx("Word.Application")
-            word.Visible = False
-            # Open 参数说明: FileName, ReadOnly
-            document = word.Documents.Open(abs_doc_path, ReadOnly=True)
-            
-            # FileFormat 16 = wdFormatDocumentDefault (.docx)
-            document.SaveAs2(abs_docx_path, 16) 
-            return abs_docx_path
-        except Exception as e:
-            logger.error("Word conversion failed: %s", e)
-            raise RuntimeError(f"Word conversion failed. Please ensure Microsoft Word is installed and the file is not in use. Error: {e}")
-        finally:
+        """Use Word OLE automation or LibreOffice to convert .doc to .docx"""
+        # Try win32com first on Windows
+        if os.name == 'nt':
             try:
-                if document:
-                    document.Close()
-                if word:
-                    word.Quit()
-            except Exception:
-                pass
+                import win32com.client
+                logger.info("Using Word OLE automation for conversion: %s", doc_path)
+                abs_doc_path = os.path.abspath(doc_path).replace('/', '\\')
+                temp_dir = tempfile.gettempdir()
+                base_name = os.path.basename(doc_path)
+                tmp_docx_path = os.path.join(temp_dir, f"conv_{base_name}x")
+                abs_docx_path = os.path.abspath(tmp_docx_path).replace('/', '\\')
+
+                # Ensure CoInitialize
+                import pythoncom
+                pythoncom.CoInitialize()
+
+                word = win32com.client.DispatchEx("Word.Application")
+                word.Visible = False
+                # Open: FileName, ReadOnly
+                document = word.Documents.Open(abs_doc_path, ReadOnly=True)
+                document.SaveAs2(abs_docx_path, 16) # 16 = wdFormatDocumentDefault (.docx)
+                document.Close()
+                word.Quit()
+                return abs_docx_path
+            except Exception as e:
+                logger.warning("Word OLE automation failed or pywin32 missing: %s. Trying LibreOffice...", e)
+        
+        # Try LibreOffice conversion
+        try:
+            import subprocess
+            import shutil
+            soffice_path = shutil.which("soffice") or shutil.which("libreoffice")
+            if not soffice_path and os.name == 'nt':
+                standard_paths = [
+                    r"C:\Program Files\LibreOffice\program\soffice.exe",
+                    r"C:\Program Files (x86)\LibreOffice\program\soffice.exe"
+                ]
+                for p in standard_paths:
+                    if os.path.exists(p):
+                        soffice_path = p
+                        break
+            
+            if not soffice_path:
+                raise RuntimeError("LibreOffice/soffice executable not found in system PATH.")
+                
+            temp_dir = tempfile.gettempdir()
+            cmd = [soffice_path, "--headless", "--convert-to", "docx", doc_path, "--outdir", temp_dir]
+            logger.info("Running LibreOffice command: %s", " ".join(cmd))
+            
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=30)
+            if result.returncode != 0:
+                raise RuntimeError(f"LibreOffice failed with code {result.returncode}: {result.stderr}")
+                
+            base_name = os.path.basename(doc_path)
+            root_name, _ = os.path.splitext(base_name)
+            output_filename = f"{root_name}.docx"
+            output_path = os.path.join(temp_dir, output_filename)
+            
+            if not os.path.exists(output_path):
+                raise RuntimeError("Converted file not found at expected path.")
+                
+            return output_path
+        except Exception as e:
+            logger.error("All conversion methods failed: %s", e)
+            raise RuntimeError(
+                "System missing conversion libraries. Please ensure LibreOffice is installed (listed in packages.txt on Streamlit Cloud) or upload .docx files directly. Error details: " + str(e)
+            )
 
     # ------------------------------------------------------------------
     def process(self, file_path: str, progress_callback: Optional[Callable] = None) -> List[Dict[str, Any]]:
