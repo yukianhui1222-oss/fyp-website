@@ -2005,7 +2005,8 @@ def main():
         }
 
         /* Export Document Popover Button Styling */
-        div[class*="st-key-export_document_popover"] button {
+        div[class*="export_document_popover"] button,
+        div[class*="export-document-popover"] button {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
             border: none !important;
             color: #FFFFFF !important;
@@ -2014,19 +2015,22 @@ def main():
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
             transition: all 0.2s ease !important;
         }
-        div[class*="st-key-export_document_popover"] button * {
+        div[class*="export_document_popover"] button *,
+        div[class*="export-document-popover"] button * {
             color: #FFFFFF !important;
             font-weight: 700 !important;
             transition: all 0.2s ease !important;
         }
-        div[class*="st-key-export_document_popover"] button:hover {
+        div[class*="export_document_popover"] button:hover,
+        div[class*="export-document-popover"] button:hover {
             background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
             box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25) !important;
             transform: translateY(-1px);
         }
         
         /* Chat Clear Button - Coral Red */
-        div[class*="st-key-clear_chat_"] button {
+        div[class*="clear_chat"] button,
+        div[class*="clear-chat"] button {
             background-color: #ef4444 !important;
             color: #FFFFFF !important;
             border: none !important;
@@ -2035,19 +2039,22 @@ def main():
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15) !important;
             transition: all 0.2s ease !important;
         }
-        div[class*="st-key-clear_chat_"] button * {
+        div[class*="clear_chat"] button *,
+        div[class*="clear-chat"] button * {
             color: #FFFFFF !important;
             font-weight: 700 !important;
             transition: all 0.2s ease !important;
         }
-        div[class*="st-key-clear_chat_"] button:hover {
+        div[class*="clear_chat"] button:hover,
+        div[class*="clear-chat"] button:hover {
             background-color: #dc2626 !important;
             box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25) !important;
             transform: translateY(-1px);
         }
         
         /* Quick Prompt Simpler Button - Amber Yellow */
-        div[class*="st-key-quick_simpler_"] button {
+        div[class*="quick_simpler"] button,
+        div[class*="quick-simpler"] button {
             background-color: #f59e0b !important;
             color: #FFFFFF !important;
             border: none !important;
@@ -2056,19 +2063,22 @@ def main():
             box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15) !important;
             transition: all 0.2s ease !important;
         }
-        div[class*="st-key-quick_simpler_"] button * {
+        div[class*="quick_simpler"] button *,
+        div[class*="quick-simpler"] button * {
             color: #FFFFFF !important;
             font-weight: 700 !important;
             transition: all 0.2s ease !important;
         }
-        div[class*="st-key-quick_simpler_"] button:hover {
+        div[class*="quick_simpler"] button:hover,
+        div[class*="quick-simpler"] button:hover {
             background-color: #d97706 !important;
             box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25) !important;
             transform: translateY(-1px);
         }
         
         /* Quick Prompt Example Button - Emerald Green */
-        div[class*="st-key-quick_example_"] button {
+        div[class*="quick_example"] button,
+        div[class*="quick-example"] button {
             background-color: #10b981 !important;
             color: #FFFFFF !important;
             border: none !important;
@@ -2077,12 +2087,14 @@ def main():
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
             transition: all 0.2s ease !important;
         }
-        div[class*="st-key-quick_example_"] button * {
+        div[class*="quick_example"] button *,
+        div[class*="quick-example"] button * {
             color: #FFFFFF !important;
             font-weight: 700 !important;
             transition: all 0.2s ease !important;
         }
-        div[class*="st-key-quick_example_"] button:hover {
+        div[class*="quick_example"] button:hover,
+        div[class*="quick-example"] button:hover {
             background-color: #059669 !important;
             box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25) !important;
             transform: translateY(-1px);
