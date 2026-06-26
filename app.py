@@ -777,8 +777,8 @@ def render_edit_profile_view():
             border-radius: 12px !important;
             border: 1px solid #cbd5e1 !important;
             background-color: #ffffff !important;
-            padding: 10px 14px !important;
-            font-size: 0.92rem !important;
+            padding: 12px 16px !important;
+            font-size: 1.05rem !important;
             transition: all 0.2s ease !important;
         }
         div[class*="st-key-profile_container"] div[data-testid="stTextInput"] input:focus,
@@ -787,6 +787,14 @@ def render_edit_profile_view():
             border-color: #6366f1 !important;
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
             outline: none !important;
+        }
+        
+        /* Style input field labels */
+        div[class*="st-key-profile_container"] label[data-testid="stWidgetLabel"] p {
+            font-size: 1.08rem !important;
+            font-weight: 600 !important;
+            color: #334155 !important;
+            margin-bottom: 6px !important;
         }
         
         /* Make read-only/disabled text inputs look distinct and clean */
@@ -817,6 +825,7 @@ def render_edit_profile_view():
             border: 1px solid #cbd5e1 !important;
             border-radius: 12px !important;
             padding: 10px 24px !important;
+            font-size: 1.08rem !important;
             font-weight: 600 !important;
             transition: all 0.2s ease !important;
             height: 44px !important;
@@ -833,6 +842,7 @@ def render_edit_profile_view():
             border: none !important;
             border-radius: 12px !important;
             padding: 10px 24px !important;
+            font-size: 1.08rem !important;
             font-weight: 700 !important;
             box-shadow: 0 4px 14px rgba(99, 102, 241, 0.2) !important;
             transition: all 0.2s ease !important;
@@ -938,7 +948,7 @@ def render_edit_profile_view():
         # Row 0: Customize Profile Avatar
         st.markdown("""
             <div style="display: flex; align-items: center; gap: 8px; border-left: 4px solid #6366f1; padding-left: 12px; margin-top: 10px; margin-bottom: 18px;">
-                <h4 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Poppins', sans-serif;">🖼️ Customize Profile Avatar</h4>
+                <h4 style="font-size: 1.45rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Poppins', sans-serif;">🖼️ Customize Profile Avatar</h4>
             </div>
         """, unsafe_allow_html=True)
         
@@ -1003,7 +1013,7 @@ def render_edit_profile_view():
         # Personal Details Section Header
         st.markdown("""
             <div style="display: flex; align-items: center; gap: 8px; border-left: 4px solid #8b5cf6; padding-left: 12px; margin-top: 25px; margin-bottom: 18px;">
-                <h4 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Poppins', sans-serif;">📝 Personal Information</h4>
+                <h4 style="font-size: 1.45rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Poppins', sans-serif;">📝 Personal Information</h4>
             </div>
         """, unsafe_allow_html=True)
         
