@@ -29,6 +29,50 @@ import base64
 import json
 from datetime import datetime
 
+# Patch Streamlit's static index.html to disable the 'c' hotkey for clear cache (copy conflict)
+def patch_streamlit_index_html():
+    try:
+        import os
+        import streamlit as st
+        streamlit_dir = os.path.dirname(st.__file__)
+        index_path = os.path.join(streamlit_dir, "static", "index.html")
+        if os.path.exists(index_path):
+            with open(index_path, "r", encoding="utf-8") as f:
+                html = f.read()
+            if "preventClearCache" not in html and "</head>" in html:
+                script = """    <!-- Prevent Streamlit's default keyboard shortcuts (like 'c' to clear cache) from interrupting Ctrl+C copy operations -->
+    <script>
+      (function() {
+        const preventClearCache = function(e) {
+          if (e.key.toLowerCase() === 'c') {
+            const activeEl = document.activeElement;
+            const isInput = activeEl && (
+              activeEl.tagName === 'INPUT' ||
+              activeEl.tagName === 'TEXTAREA' ||
+              activeEl.isContentEditable ||
+              (activeEl.shadowRoot && activeEl.shadowRoot.activeElement && (
+                activeEl.shadowRoot.activeElement.tagName === 'INPUT' ||
+                activeEl.shadowRoot.activeElement.tagName === 'TEXTAREA'
+              ))
+            );
+            if (!isInput) {
+              e.stopImmediatePropagation();
+            }
+          }
+        };
+        window.addEventListener('keydown', preventClearCache, true);
+        document.addEventListener('keydown', preventClearCache, true);
+      })();
+    </script>
+  </head>"""
+                html = html.replace("</head>", script)
+                with open(index_path, "w", encoding="utf-8") as f:
+                    f.write(html)
+    except Exception:
+        pass
+
+patch_streamlit_index_html()
+
 # Page Configuration
 st.set_page_config(
     page_title="DocuMind MVP",
@@ -1612,38 +1656,6 @@ def copy_to_clipboard(text, label="Copy"):
     components.html(html_code, height=50)
 
 def main():
-    # Prevent Streamlit's default keyboard shortcuts (like 'c' to clear cache) from interrupting Ctrl+C copy operations
-    components.html("""
-        <script>
-            try {
-                const parentWin = window.parent;
-                if (!parentWin.__shortcutsPrevented) {
-                    parentWin.__shortcutsPrevented = true;
-                    const preventClearCache = function(e) {
-                        if (e.key.toLowerCase() === 'c') {
-                            const activeEl = parentWin.document.activeElement;
-                            const isInput = activeEl && (
-                                activeEl.tagName === 'INPUT' ||
-                                activeEl.tagName === 'TEXTAREA' ||
-                                activeEl.isContentEditable ||
-                                (activeEl.shadowRoot && activeEl.shadowRoot.activeElement && (
-                                    activeEl.shadowRoot.activeElement.tagName === 'INPUT' ||
-                                    activeEl.shadowRoot.activeElement.tagName === 'TEXTAREA'
-                                ))
-                            );
-                            if (!isInput) {
-                                e.stopImmediatePropagation();
-                            }
-                        }
-                    };
-                    parentWin.addEventListener('keydown', preventClearCache, true);
-                    parentWin.document.addEventListener('keydown', preventClearCache, true);
-                }
-            } catch (err) {
-                console.error("Error setting up shortcut preventer:", err);
-            }
-        </script>
-    """, height=0)
 
     # Initialize session state for auth
     if 'user' not in st.session_state:
