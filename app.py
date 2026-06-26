@@ -3280,18 +3280,18 @@ def main():
         is_saved = results.get('is_loaded_from_db', False)
 
         st.markdown("<div style='margin-top: 32px;'></div>", unsafe_allow_html=True)
-
+        
         # Header and dropdown Export button
         header_col, export_col = st.columns([2, 1])
         with header_col:
-            st.markdown("<h2 style='font-size: 1.75rem; font-weight: 800; color: #0f172a; margin: 0; font-family: \"Poppins\", \"Inter\", sans-serif;'>✨ Analysis Results</h2>", unsafe_allow_html=True)
+            st.markdown("<h2 style='font-size: 2.0rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0; font-family: \"Poppins\", sans-serif; display: flex; align-items: center; gap: 10px;'>✨ Analysis Results</h2>", unsafe_allow_html=True)
             db_badge_html = (
-                '  •  <span style="background-color: rgba(16, 185, 129, 0.1); color: #059669; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; display: inline-flex; align-items: center; vertical-align: middle; gap: 3px;">'
+                '  •  <span style="background-color: rgba(16, 185, 129, 0.1); color: #059669; font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; display: inline-flex; align-items: center; vertical-align: middle; gap: 4px;">'
                 '☁️ Cloud Saved'
                 '</span>'
             ) if is_saved else ""
             st.markdown(
-                f"<div style='font-size: 0.88rem; color: #6b7280; font-weight: 500; margin-top: 4px; margin-bottom: 24px;'>"
+                f"<div style='font-size: 0.98rem; color: #475569; font-weight: 500; margin-top: 0px; margin-bottom: 24px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;'>"
                 f"⏱️ {ocr_time:.2f}s  •  📊 {word_count} words  •  📄 {page_count} pages{db_badge_html}"
                 f"</div>",
                 unsafe_allow_html=True
