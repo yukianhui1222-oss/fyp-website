@@ -1632,7 +1632,6 @@ def main():
                 }
 
         # Load Gemini API Key from Streamlit Secrets or environment variables
-        import os
         api_key = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY", ""))
         
     st.markdown("""
