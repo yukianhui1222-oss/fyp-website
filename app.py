@@ -1179,6 +1179,10 @@ def render_quiz_view():
             border-radius: 10px !important;
             transition: all 0.2s ease !important;
         }
+        button[data-testid="baseButton-primary"] *, button[data-testid="stBaseButton-primary"] * {
+            color: #ffffff !important;
+            font-weight: 700 !important;
+        }
         button[data-testid="baseButton-primary"]:hover, button[data-testid="stBaseButton-primary"]:hover {
             background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
             box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35) !important;
@@ -1968,6 +1972,10 @@ def main():
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1) !important;
             transition: all 0.2s ease !important;
         }
+        button[data-testid="baseButton-primary"] *, button[data-testid="stBaseButton-primary"] * {
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+        }
         button[data-testid="baseButton-primary"]:hover, button[data-testid="stBaseButton-primary"]:hover {
             background: #4F46E5 !important;
             box-shadow: 0 6px 16px rgba(99, 102, 241, 0.2) !important;
@@ -1989,7 +1997,9 @@ def main():
         
         /* Generate Quiz Button Explicit Styles */
         div[class*="st-key-generate_quiz_action_btn"] button,
-        .st-key-generate_quiz_action_btn button {
+        div[class*="st-key-generate_quiz_action_btn"] button *,
+        .st-key-generate_quiz_action_btn button,
+        .st-key-generate_quiz_action_btn button * {
             color: #FFFFFF !important;
             font-weight: 700 !important;
         }
@@ -3481,7 +3491,9 @@ def main():
                                 margin-bottom: 8px;
                             }}
                             div[class*="st-key-generate_quiz_action_btn"] button,
-                            .st-key-generate_quiz_action_btn button {{
+                            div[class*="st-key-generate_quiz_action_btn"] button *,
+                            .st-key-generate_quiz_action_btn button,
+                            .st-key-generate_quiz_action_btn button * {{
                                 color: #FFFFFF !important;
                                 font-weight: 700 !important;
                             }}
