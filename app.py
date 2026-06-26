@@ -750,9 +750,9 @@ def render_edit_profile_view():
     
     # Title Banner for Profile
     st.markdown("""
-        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); padding: 40px 20px; border-radius: 24px; text-align: center; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);">
-            <h1 class="hero-title" style="margin: 0 !important; font-size: 3.2rem !important; background: linear-gradient(45deg, #f97316, #e11d48, #9f1239); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Account Profile</h1>
-            <p style="color: #94a3b8; font-size: 1.05rem; margin-top: 0.5rem; font-weight: 500; letter-spacing: 0.3px;">Manage your profile information and account details</p>
+        <div style="background: linear-gradient(135deg, #e0e7ff 0%, #e9d5ff 50%, #fae8ff 100%); padding: 35px 20px; border-radius: 24px; text-align: center; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 15px 35px -5px rgba(99, 102, 241, 0.08);">
+            <h1 class="hero-title" style="margin: 0 !important; font-size: 3.2rem !important; background: linear-gradient(45deg, #f97316, #e11d48, #9f1239); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1;">Account Profile</h1>
+            <p style="color: #4338ca; font-size: 1.05rem; margin-top: 0.6rem; font-weight: 600; letter-spacing: 0.3px;">Manage your profile information and account details</p>
         </div>
     """, unsafe_allow_html=True)
 
