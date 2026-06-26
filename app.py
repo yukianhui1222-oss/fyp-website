@@ -1612,6 +1612,38 @@ def copy_to_clipboard(text, label="Copy"):
     components.html(html_code, height=50)
 
 def main():
+    # Prevent Streamlit's default keyboard shortcuts (like 'c' to clear cache) from interrupting Ctrl+C copy operations
+    components.html("""
+        <script>
+            try {
+                const parentWin = window.parent;
+                if (!parentWin.__shortcutsPrevented) {
+                    parentWin.__shortcutsPrevented = true;
+                    const preventClearCache = function(e) {
+                        if (e.key.toLowerCase() === 'c') {
+                            const activeEl = parentWin.document.activeElement;
+                            const isInput = activeEl && (
+                                activeEl.tagName === 'INPUT' ||
+                                activeEl.tagName === 'TEXTAREA' ||
+                                activeEl.isContentEditable ||
+                                (activeEl.shadowRoot && activeEl.shadowRoot.activeElement && (
+                                    activeEl.shadowRoot.activeElement.tagName === 'INPUT' ||
+                                    activeEl.shadowRoot.activeElement.tagName === 'TEXTAREA'
+                                ))
+                            );
+                            if (!isInput) {
+                                e.stopImmediatePropagation();
+                            }
+                        }
+                    };
+                    parentWin.addEventListener('keydown', preventClearCache, true);
+                    parentWin.document.addEventListener('keydown', preventClearCache, true);
+                }
+            } catch (err) {
+                console.error("Error setting up shortcut preventer:", err);
+            }
+        </script>
+    """, height=0)
 
     # Initialize session state for auth
     if 'user' not in st.session_state:
