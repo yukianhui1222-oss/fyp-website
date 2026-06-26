@@ -2168,7 +2168,7 @@ def main():
 
         /* Upload & Analyze Panel Custom Styling */
         div[data-testid="stExpander"]:has(div[data-testid="stFileUploader"]) {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%), #FFFFFF !important;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(139, 92, 246, 0.04) 100%), #FFFFFF !important;
             border: 1px solid rgba(99, 102, 241, 0.15) !important;
             border-radius: 16px !important;
             box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.08) !important;
@@ -2195,7 +2195,7 @@ def main():
         }
         
         div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-testid="stFileUploader"]) {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%), #FFFFFF !important;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(139, 92, 246, 0.04) 100%), #FFFFFF !important;
             border: 1px solid rgba(99, 102, 241, 0.15) !important;
             border-radius: 16px !important;
             box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.08) !important;
@@ -2212,7 +2212,7 @@ def main():
             padding: 0 !important;
         }
         div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] {
-            background-color: rgba(255, 255, 255, 0.8) !important;
+            background-color: rgba(99, 102, 241, 0.03) !important;
             border: 1.5px dashed rgba(99, 102, 241, 0.25) !important;
             border-radius: 12px !important;
             padding: 16px 20px !important;
@@ -2220,7 +2220,7 @@ def main():
         }
         div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"]:hover {
             border-color: #6366f1 !important;
-            background-color: rgba(99, 102, 241, 0.02) !important;
+            background-color: rgba(99, 102, 241, 0.07) !important;
         }
         div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] svg {
             fill: #6366f1 !important;
