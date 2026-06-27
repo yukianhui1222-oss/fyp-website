@@ -257,6 +257,51 @@ def save_chat_history_to_firestore(uid, doc_id, chat_history_list, id_token=None
     except Exception as e:
         return False, str(e)
 
+def rename_document_title(uid, doc_id, new_title, id_token=None):
+    """
+    Updates the 'title' field of a saved summary document in Firestore.
+    Uses PATCH with updateMask to only touch the title field.
+    """
+    import urllib.parse
+    quoted_doc_id = urllib.parse.quote(doc_id)
+    url = (
+        f"https://firestore.googleapis.com/v1/projects/fyp1-2772c/databases/(default)/documents"
+        f"/users/{uid}/summaries/{quoted_doc_id}?updateMask.fieldPaths=title"
+    )
+    data = {
+        "fields": {
+            "title": {"stringValue": new_title}
+        }
+    }
+    headers = {"Content-Type": "application/json; charset=utf-8"}
+    if id_token:
+        headers["Authorization"] = f"Bearer {id_token}"
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(data, ensure_ascii=False).encode("utf-8"),
+        headers=headers,
+        method="PATCH"
+    )
+    ctx = ssl._create_unverified_context()
+    try:
+        with urllib.request.urlopen(req, context=ctx, timeout=10):
+            return True, None
+    except urllib.error.HTTPError as e:
+        err_msg = e.read().decode("utf-8")
+        try:
+            req_pub = urllib.request.Request(
+                url,
+                data=json.dumps(data, ensure_ascii=False).encode("utf-8"),
+                headers={"Content-Type": "application/json; charset=utf-8"},
+                method="PATCH"
+            )
+            with urllib.request.urlopen(req_pub, context=ctx, timeout=10):
+                return True, None
+        except Exception:
+            return False, f"Database Error: {err_msg}"
+    except Exception as e:
+        return False, f"Connection Error: {str(e)}"
+
 def fetch_saved_summaries(uid, id_token=None):
     """
     Fetches all saved summaries from the Firestore database via the REST API.
@@ -4023,14 +4068,61 @@ def main():
         with header_col:
             st.markdown("<h2 style='font-size: 2.0rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0; font-family: \"Poppins\", sans-serif; display: flex; align-items: center; gap: 10px;'>✨ Analysis Results</h2>", unsafe_allow_html=True)
             
-            # Show selected courseware file name as a clean badge
+            # Show selected courseware file name as a clean badge — with rename support if cloud-saved
             filename = results.get('filename', 'Direct Upload')
-            st.markdown(
-                f"<div style='background-color: rgba(99, 102, 241, 0.08); color: #6366f1; font-size: 0.85rem; font-weight: 600; padding: 4px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; border: 1px solid rgba(99, 102, 241, 0.15);'>"
-                f"📂 Active Document: <strong>{filename}</strong>"
-                f"</div>",
-                unsafe_allow_html=True
-            )
+            doc_id = results.get('id', '')
+            rename_key = f"renaming_doc_{doc_id}"
+            new_name_key = f"rename_value_{doc_id}"
+
+            if is_saved and st.session_state.get(rename_key, False):
+                # --- INLINE RENAME MODE ---
+                r_col1, r_col2, r_col3 = st.columns([4, 1, 1])
+                with r_col1:
+                    new_name = st.text_input(
+                        "Rename document",
+                        value=st.session_state.get(new_name_key, filename),
+                        key=new_name_key,
+                        label_visibility="collapsed",
+                        placeholder="Enter new document name..."
+                    )
+                with r_col2:
+                    if st.button("✅ Save", key=f"rename_confirm_{doc_id}", use_container_width=True, type="primary"):
+                        if new_name and new_name.strip():
+                            user_info = st.session_state.get("user")
+                            uid = user_info.get("uid") if user_info else None
+                            id_token = user_info.get("idToken") if user_info else None
+                            if uid and doc_id:
+                                ok, err = rename_document_title(uid, doc_id, new_name.strip(), id_token)
+                                if ok:
+                                    st.session_state.ocr_results['filename'] = new_name.strip()
+                                    st.session_state[rename_key] = False
+                                    st.toast(f"✅ Renamed to \"{new_name.strip()}\"", icon="✏️")
+                                    st.rerun()
+                                else:
+                                    st.error(f"Rename failed: {err}")
+                            else:
+                                st.warning("Cannot rename: document not saved to cloud yet.")
+                with r_col3:
+                    if st.button("✖ Cancel", key=f"rename_cancel_{doc_id}", use_container_width=True):
+                        st.session_state[rename_key] = False
+                        st.rerun()
+            else:
+                # --- DISPLAY MODE (badge + pencil button) ---
+                badge_col, pencil_col = st.columns([6, 1])
+                with badge_col:
+                    st.markdown(
+                        f"<div style='background-color: rgba(99, 102, 241, 0.08); color: #6366f1; font-size: 0.85rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 4px; border: 1px solid rgba(99, 102, 241, 0.15);'>"
+                        f"📂 Active Document: <strong>{filename}</strong>"
+                        f"</div>",
+                        unsafe_allow_html=True
+                    )
+                with pencil_col:
+                    if is_saved:
+                        if st.button("✏️", key=f"rename_btn_{doc_id}", help="Rename this document"):
+                            st.session_state[rename_key] = True
+                            st.session_state[new_name_key] = filename
+                            st.rerun()
+
             
             db_badge_html = (
                 '  •  <span style="background-color: rgba(16, 185, 129, 0.1); color: #059669; font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; display: inline-flex; align-items: center; vertical-align: middle; gap: 4px;">'
