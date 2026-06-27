@@ -4085,6 +4085,12 @@ def main():
                     with f_col2:
                         cancelled = st.form_submit_button("✖ Cancel", use_container_width=True)
 
+                # Show debug info
+                user_info_dbg = st.session_state.get("user") or {}
+                uid_dbg = user_info_dbg.get("uid", "❌ MISSING")
+                token_dbg = "✅ present" if user_info_dbg.get("idToken") else "❌ MISSING"
+                st.caption(f"🔍 doc_id: `{doc_id or '❌ EMPTY'}` | uid: `{uid_dbg[:12]}...` | token: {token_dbg}")
+
                 if submitted:
                     new_name = typed_name.strip()
                     if new_name:
@@ -4101,7 +4107,7 @@ def main():
                             else:
                                 st.error(f"❌ Rename failed — {err}")
                         else:
-                            st.warning(f"Cannot rename: doc_id='{doc_id}', uid='{uid_r}'")
+                            st.warning(f"Cannot rename: doc_id='{doc_id}' | uid='{uid_r}'")
                     else:
                         st.warning("Name cannot be empty.")
 
