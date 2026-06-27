@@ -1273,12 +1273,10 @@ def render_leaderboard_view():
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Title Banner for Leaderboard
-    st.markdown("""
-        <div style="background: linear-gradient(135deg, #e0e7ff 0%, #e9d5ff 50%, #fae8ff 100%); padding: 35px 20px; border-radius: 24px; text-align: center; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 15px 35px -5px rgba(99, 102, 241, 0.08);">
-            <h1 class="hero-title" style="margin: 0 !important; font-size: 3.2rem !important; background: linear-gradient(45deg, #6366f1, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1;">🏆 Global Leaderboard</h1>
-            <p style="color: #4f46e5; font-size: 1.05rem; margin-top: 0.6rem; font-weight: 600; letter-spacing: 0.3px;">Real-time ranking of top scholars. Complete quizzes to climb the board!</p>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""<div style="background: linear-gradient(135deg, #e0e7ff 0%, #e9d5ff 50%, #fae8ff 100%); padding: 35px 20px; border-radius: 24px; text-align: center; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 15px 35px -5px rgba(99, 102, 241, 0.08);">
+    <h1 class="hero-title" style="margin: 0 !important; font-size: 3.2rem !important; background: linear-gradient(45deg, #6366f1, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1;">🏆 Global Leaderboard</h1>
+    <p style="color: #4f46e5; font-size: 1.05rem; margin-top: 0.6rem; font-weight: 600; letter-spacing: 0.3px;">Real-time ranking of top scholars. Complete quizzes to climb the board!</p>
+</div>""", unsafe_allow_html=True)
     
     user_info = st.session_state.get("user")
     uid = user_info.get("uid") if user_info else None
@@ -1334,70 +1332,66 @@ def render_leaderboard_view():
 
     # Top Section: User's Standing Card (Dashboard style)
     gap_text = f"🔥 {points_gap} XP gap to next rank" if points_gap and points_gap > 0 else "👑 You are at the top!"
-    st.markdown(f"""
-        <div style="background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-around; gap: 20px; align-items: center;">
-            <div style="text-align: center; min-width: 120px;">
-                <div style="font-size: 0.85rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Your Rank</div>
-                <div style="font-size: 2.2rem; font-weight: 800; color: #6366f1;">#{user_rank}</div>
-            </div>
-            <div style="width: 1px; height: 50px; background-color: #E2E8F0; display: inline-block;"></div>
-            <div style="text-align: center; min-width: 120px;">
-                <div style="font-size: 0.85rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Total Points</div>
-                <div style="font-size: 2.2rem; font-weight: 800; color: #0f172a;">{user_points} <span style="font-size: 1.1rem; color: #8b5cf6; font-weight: 700;">XP</span></div>
-            </div>
-            <div style="width: 1px; height: 50px; background-color: #E2E8F0; display: inline-block;"></div>
-            <div style="text-align: center; min-width: 120px;">
-                <div style="font-size: 0.85rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Quizzes Completed</div>
-                <div style="font-size: 2.2rem; font-weight: 800; color: #10b981;">{user_quizzes}</div>
-            </div>
-            <div style="width: 1px; height: 50px; background-color: #E2E8F0; display: inline-block;"></div>
-            <div style="text-align: center; min-width: 180px;">
-                <div style="font-size: 0.85rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Standing Status</div>
-                <div style="font-size: 1.05rem; font-weight: 700; color: #f97316; margin-top: 10px;">{gap_text}</div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f"""<div style="background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-around; gap: 20px; align-items: center;">
+    <div style="text-align: center; min-width: 120px;">
+        <div style="font-size: 0.85rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Your Rank</div>
+        <div style="font-size: 2.2rem; font-weight: 800; color: #6366f1;">#{user_rank}</div>
+    </div>
+    <div style="width: 1px; height: 50px; background-color: #E2E8F0; display: inline-block;"></div>
+    <div style="text-align: center; min-width: 120px;">
+        <div style="font-size: 0.85rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Total Points</div>
+        <div style="font-size: 2.2rem; font-weight: 800; color: #0f172a;">{user_points} <span style="font-size: 1.1rem; color: #8b5cf6; font-weight: 700;">XP</span></div>
+    </div>
+    <div style="width: 1px; height: 50px; background-color: #E2E8F0; display: inline-block;"></div>
+    <div style="text-align: center; min-width: 120px;">
+        <div style="font-size: 0.85rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Quizzes Completed</div>
+        <div style="font-size: 2.2rem; font-weight: 800; color: #10b981;">{user_quizzes}</div>
+    </div>
+    <div style="width: 1px; height: 50px; background-color: #E2E8F0; display: inline-block;"></div>
+    <div style="text-align: center; min-width: 180px;">
+        <div style="font-size: 0.85rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Standing Status</div>
+        <div style="font-size: 1.05rem; font-weight: 700; color: #f97316; margin-top: 10px;">{gap_text}</div>
+    </div>
+</div>""", unsafe_allow_html=True)
     
     # Leaderboard Table Card
-    st.markdown("""
-        <style>
-        .leaderboard-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-            font-size: 1rem;
-            text-align: left;
-        }
-        .leaderboard-table th {
-            background-color: #f8fafc;
-            color: #475569;
-            font-weight: 700;
-            padding: 14px 20px;
-            border-bottom: 2px solid #e2e8f0;
-            text-transform: uppercase;
-            font-size: 0.82rem;
-            letter-spacing: 0.5px;
-        }
-        .leaderboard-table td {
-            padding: 16px 20px;
-            border-bottom: 1px solid #f1f5f9;
-            color: #0f172a;
-            font-size: 0.95rem;
-        }
-        .leaderboard-row-active {
-            background-color: rgba(99, 102, 241, 0.05) !important;
-            border-left: 4px solid #6366f1 !important;
-        }
-        .leaderboard-row-active td {
-            font-weight: 700 !important;
-            color: #4f46e5 !important;
-        }
-        .rank-medal {
-            font-size: 1.3rem;
-            margin-right: 4px;
-        }
-        </style>
-    """, unsafe_allow_html=True)
+    st.markdown("""<style>
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 1rem;
+    text-align: left;
+}
+.leaderboard-table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 700;
+    padding: 14px 20px;
+    border-bottom: 2px solid #e2e8f0;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+    letter-spacing: 0.5px;
+}
+.leaderboard-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #0f172a;
+    font-size: 0.95rem;
+}
+.leaderboard-row-active {
+    background-color: rgba(99, 102, 241, 0.05) !important;
+    border-left: 4px solid #6366f1 !important;
+}
+.leaderboard-row-active td {
+    font-weight: 700 !important;
+    color: #4f46e5 !important;
+}
+.rank-medal {
+    font-size: 1.3rem;
+    margin-right: 4px;
+}
+</style>""", unsafe_allow_html=True)
 
     # Construct Leaderboard Table HTML
     table_rows_html = ""
@@ -1428,34 +1422,30 @@ def render_leaderboard_view():
         else:
             rank_display = f"{rank}"
             
-        table_rows_html += f"""
-            <tr{row_class}>
-                <td>{rank_display}</td>
-                <td>{username} {' (You)' if is_current_user else ''}</td>
-                <td><strong>{points}</strong> XP</td>
-                <td>{quizzes}</td>
-                <td style="color: #64748b; font-size: 0.85rem;">{formatted_date}</td>
-            </tr>
-        """
+        table_rows_html += f"""<tr{row_class}>
+    <td>{rank_display}</td>
+    <td>{username} {' (You)' if is_current_user else ''}</td>
+    <td><strong>{points}</strong> XP</td>
+    <td>{quizzes}</td>
+    <td style="color: #64748b; font-size: 0.85rem;">{formatted_date}</td>
+</tr>"""
         
-    leaderboard_card_html = f"""
-        <div style="background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 24px; padding: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03); overflow-x: auto; margin-bottom: 24px;">
-            <table class="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th style="width: 12%;">Rank</th>
-                        <th style="width: 33%;">User</th>
-                        <th style="width: 20%;">Total Points</th>
-                        <th style="width: 15%;">Quizzes</th>
-                        <th style="width: 20%;">Last Updated</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {table_rows_html}
-                </tbody>
-            </table>
-        </div>
-    """
+    leaderboard_card_html = f"""<div style="background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 24px; padding: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03); overflow-x: auto; margin-bottom: 24px;">
+    <table class="leaderboard-table">
+        <thead>
+            <tr>
+                <th style="width: 12%;">Rank</th>
+                <th style="width: 33%;">User</th>
+                <th style="width: 20%;">Total Points</th>
+                <th style="width: 15%;">Quizzes</th>
+                <th style="width: 20%;">Last Updated</th>
+            </tr>
+        </thead>
+        <tbody>
+{table_rows_html}
+        </tbody>
+    </table>
+</div>"""
     st.markdown(leaderboard_card_html, unsafe_allow_html=True)
     
     # Back to home navigation button
