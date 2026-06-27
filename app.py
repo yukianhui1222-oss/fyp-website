@@ -532,6 +532,7 @@ def fetch_user_progression(uid, id_token=None):
     import urllib.request
     import json
     import ssl
+    from datetime import datetime
     
     url = f"https://firestore.googleapis.com/v1/projects/fyp1-2772c/databases/(default)/documents/users/{uid}"
     headers = {}
@@ -552,14 +553,19 @@ def fetch_user_progression(uid, id_token=None):
             badges_val = fields.get("badges", {}).get("arrayValue", {}).get("values", [])
             badges = [b.get("stringValue", "") for b in badges_val if b.get("stringValue")]
             
+            completed_quizzes = int(fields.get("completed_quizzes", {}).get("integerValue", "0"))
+            last_updated = fields.get("last_updated", {}).get("stringValue", datetime.now().isoformat())
+            
             return {
                 "xp": xp,
                 "level": level,
-                "badges": badges
+                "badges": badges,
+                "completed_quizzes": completed_quizzes,
+                "last_updated": last_updated
             }, None
     except urllib.error.HTTPError as e:
         if e.code == 404:
-            return {"xp": 0, "level": 1, "badges": []}, None
+            return {"xp": 0, "level": 1, "badges": [], "completed_quizzes": 0, "last_updated": datetime.now().isoformat()}, None
         try:
             req_public = urllib.request.Request(url, method="GET")
             with urllib.request.urlopen(req_public, context=ctx, timeout=10) as response:
@@ -569,28 +575,32 @@ def fetch_user_progression(uid, id_token=None):
                 level = int(fields.get("level", {}).get("integerValue", "1"))
                 badges_val = fields.get("badges", {}).get("arrayValue", {}).get("values", [])
                 badges = [b.get("stringValue", "") for b in badges_val if b.get("stringValue")]
-                return {"xp": xp, "level": level, "badges": badges}, None
+                completed_quizzes = int(fields.get("completed_quizzes", {}).get("integerValue", "0"))
+                last_updated = fields.get("last_updated", {}).get("stringValue", datetime.now().isoformat())
+                return {"xp": xp, "level": level, "badges": badges, "completed_quizzes": completed_quizzes, "last_updated": last_updated}, None
         except Exception as e_pub:
-            return {"xp": 0, "level": 1, "badges": []}, str(e_pub)
+            return {"xp": 0, "level": 1, "badges": [], "completed_quizzes": 0, "last_updated": datetime.now().isoformat()}, str(e_pub)
     except Exception as e:
-        return {"xp": 0, "level": 1, "badges": []}, str(e)
+        return {"xp": 0, "level": 1, "badges": [], "completed_quizzes": 0, "last_updated": datetime.now().isoformat()}, str(e)
 
-def update_user_xp_level(uid, id_token, additional_xp, new_badge=None):
+def update_user_xp_level(uid, id_token, additional_xp, new_badge=None, increment_quizzes=False):
     """
     Updates the user's XP, level, and badges in the database.
     """
     import urllib.request
     import json
     import ssl
+    from datetime import datetime
     
     progression, err = fetch_user_progression(uid, id_token)
     if err:
         return False, f"Failed to fetch progression: {err}"
     if not progression:
-        progression = {"xp": 0, "level": 1, "badges": []}
+        progression = {"xp": 0, "level": 1, "badges": [], "completed_quizzes": 0, "last_updated": datetime.now().isoformat()}
         
-    current_xp = progression["xp"]
-    badges = progression["badges"]
+    current_xp = progression.get("xp", 0)
+    badges = progression.get("badges", [])
+    completed_quizzes = progression.get("completed_quizzes", 0)
     
     # Calculate new XP
     updated_xp = current_xp + additional_xp
@@ -608,8 +618,11 @@ def update_user_xp_level(uid, id_token, additional_xp, new_badge=None):
     if updated_level >= 10 and "level_10_legend" not in badges:
         badges.append("level_10_legend")
         
+    if increment_quizzes:
+        completed_quizzes += 1
+        
     # Update document with updateMask
-    url = f"https://firestore.googleapis.com/v1/projects/fyp1-2772c/databases/(default)/documents/users/{uid}?updateMask.fieldPaths=xp&updateMask.fieldPaths=level&updateMask.fieldPaths=badges"
+    url = f"https://firestore.googleapis.com/v1/projects/fyp1-2772c/databases/(default)/documents/users/{uid}?updateMask.fieldPaths=xp&updateMask.fieldPaths=level&updateMask.fieldPaths=badges&updateMask.fieldPaths=completed_quizzes&updateMask.fieldPaths=last_updated"
     
     data = {
         "fields": {
@@ -619,7 +632,9 @@ def update_user_xp_level(uid, id_token, additional_xp, new_badge=None):
                 "arrayValue": {
                     "values": [{"stringValue": b} for b in badges]
                 }
-            }
+            },
+            "completed_quizzes": {"integerValue": str(completed_quizzes)},
+            "last_updated": {"stringValue": datetime.now().isoformat()}
         }
     }
     
@@ -638,9 +653,11 @@ def update_user_xp_level(uid, id_token, additional_xp, new_badge=None):
                 "xp": updated_xp,
                 "level": updated_level,
                 "badges": badges,
+                "completed_quizzes": completed_quizzes,
+                "last_updated": datetime.now().isoformat(),
                 "xp_added": additional_xp,
-                "level_up": (updated_level > progression["level"]),
-                "badge_unlocked": (new_badge if new_badge and new_badge not in progression["badges"] else None)
+                "level_up": (updated_level > progression.get("level", 1)),
+                "badge_unlocked": (new_badge if new_badge and new_badge not in progression.get("badges", []) else None)
             }
     except Exception as e:
         try:
@@ -650,12 +667,124 @@ def update_user_xp_level(uid, id_token, additional_xp, new_badge=None):
                     "xp": updated_xp,
                     "level": updated_level,
                     "badges": badges,
+                    "completed_quizzes": completed_quizzes,
+                    "last_updated": datetime.now().isoformat(),
                     "xp_added": additional_xp,
-                    "level_up": (updated_level > progression["level"]),
-                    "badge_unlocked": (new_badge if new_badge and new_badge not in progression["badges"] else None)
+                    "level_up": (updated_level > progression.get("level", 1)),
+                    "badge_unlocked": (new_badge if new_badge and new_badge not in progression.get("badges", []) else None)
                 }
         except Exception as e_pub:
             return False, str(e_pub)
+
+def update_points(uid, id_token, points_to_add, increment_quizzes=False):
+    """
+    Wrapper function to update the user's total points (XP) in Firestore.
+    """
+    return update_user_xp_level(uid, id_token, points_to_add, increment_quizzes=increment_quizzes)
+
+def fetch_leaderboard(id_token=None):
+    """
+    Fetches all user documents from Firestore to build a real-time leaderboard.
+    """
+    import urllib.request
+    import json
+    import ssl
+    from datetime import datetime
+    
+    url = "https://firestore.googleapis.com/v1/projects/fyp1-2772c/databases/(default)/documents/users?pageSize=100"
+    headers = {}
+    if id_token:
+        headers["Authorization"] = f"Bearer {id_token}"
+        
+    req = urllib.request.Request(url, headers=headers, method="GET")
+    ctx = ssl._create_unverified_context()
+    
+    try:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
+            res_data = json.loads(response.read().decode("utf-8"))
+            documents = res_data.get("documents", [])
+            leaderboard_data = []
+            
+            for doc in documents:
+                name_path = doc.get("name", "")
+                uid = name_path.split("/")[-1] if name_path else ""
+                if not uid:
+                    continue
+                    
+                fields = doc.get("fields", {})
+                
+                # Fetch name, fallback to email prefix or anonymous if not set
+                username = fields.get("name", {}).get("stringValue", "")
+                if not username:
+                    email_val = fields.get("email", {}).get("stringValue", "")
+                    username = email_val.split("@")[0] if email_val else "Anonymous User"
+                
+                # Fetch points (stored as xp in progression)
+                total_points = int(fields.get("xp", {}).get("integerValue", "0"))
+                
+                # Fetch completed quizzes count
+                completed_quizzes = int(fields.get("completed_quizzes", {}).get("integerValue", "0"))
+                
+                # Fetch last updated time
+                last_updated = fields.get("last_updated", {}).get("stringValue", "")
+                if not last_updated:
+                    # Fallback to document updateTime
+                    last_updated = doc.get("updateTime", datetime.now().isoformat())
+                
+                leaderboard_data.append({
+                    "user_id": uid,
+                    "username": username,
+                    "total_points": total_points,
+                    "completed_quizzes": completed_quizzes,
+                    "last_updated": last_updated
+                })
+            
+            # Sort ranking rules:
+            # 1. Total Points from high to low.
+            # 2. If same points, then by Last Updated from newest to oldest.
+            leaderboard_data.sort(
+                key=lambda x: (x["total_points"], x["last_updated"]),
+                reverse=True
+            )
+            return leaderboard_data, None
+            
+    except Exception as e:
+        # Fallback to public request if token fails
+        try:
+            req_public = urllib.request.Request(url, method="GET")
+            with urllib.request.urlopen(req_public, context=ctx, timeout=10) as response:
+                res_data = json.loads(response.read().decode("utf-8"))
+                documents = res_data.get("documents", [])
+                leaderboard_data = []
+                for doc in documents:
+                    name_path = doc.get("name", "")
+                    uid = name_path.split("/")[-1] if name_path else ""
+                    if not uid:
+                        continue
+                    fields = doc.get("fields", {})
+                    username = fields.get("name", {}).get("stringValue", "")
+                    if not username:
+                        email_val = fields.get("email", {}).get("stringValue", "")
+                        username = email_val.split("@")[0] if email_val else "Anonymous User"
+                    total_points = int(fields.get("xp", {}).get("integerValue", "0"))
+                    completed_quizzes = int(fields.get("completed_quizzes", {}).get("integerValue", "0"))
+                    last_updated = fields.get("last_updated", {}).get("stringValue", "")
+                    if not last_updated:
+                        last_updated = doc.get("updateTime", datetime.now().isoformat())
+                    leaderboard_data.append({
+                        "user_id": uid,
+                        "username": username,
+                        "total_points": total_points,
+                        "completed_quizzes": completed_quizzes,
+                        "last_updated": last_updated
+                    })
+                leaderboard_data.sort(
+                    key=lambda x: (x["total_points"], x["last_updated"]),
+                    reverse=True
+                )
+                return leaderboard_data, None
+        except Exception as e_pub:
+            return [], str(e_pub)
 
 def fetch_user_details(uid, id_token=None):
     """
@@ -1136,6 +1265,206 @@ def render_edit_profile_view():
                         else:
                             st.error(msg)
 
+def render_leaderboard_view():
+    import streamlit as st
+    from datetime import datetime
+    import time
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Title Banner for Leaderboard
+    st.markdown("""
+        <div style="background: linear-gradient(135deg, #e0e7ff 0%, #e9d5ff 50%, #fae8ff 100%); padding: 35px 20px; border-radius: 24px; text-align: center; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 15px 35px -5px rgba(99, 102, 241, 0.08);">
+            <h1 class="hero-title" style="margin: 0 !important; font-size: 3.2rem !important; background: linear-gradient(45deg, #6366f1, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1;">🏆 Global Leaderboard</h1>
+            <p style="color: #4f46e5; font-size: 1.05rem; margin-top: 0.6rem; font-weight: 600; letter-spacing: 0.3px;">Real-time ranking of top scholars. Complete quizzes to climb the board!</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    user_info = st.session_state.get("user")
+    uid = user_info.get("uid") if user_info else None
+    id_token = user_info.get("idToken") if user_info else None
+    
+    if not uid:
+        st.warning("⚠️ You must be logged in to view the leaderboard.")
+        if st.button("↩️ Back to Home", use_container_width=True, key="lbl_back_home_guest"):
+            st.session_state.leaderboard_active = False
+            st.rerun()
+        return
+        
+    with st.spinner("Fetching leaderboard data from cloud..."):
+        leaderboard_data, err = fetch_leaderboard(id_token)
+        
+    if err:
+        st.error(f"Failed to load leaderboard: {err}")
+        if st.button("↩️ Back to Home", use_container_width=True, key="lbl_back_home_err"):
+            st.session_state.leaderboard_active = False
+            st.rerun()
+        return
+
+    # Find current user's stats
+    user_rank = None
+    user_points = 0
+    user_quizzes = 0
+    points_gap = None
+    
+    # Look up in the sorted rankings
+    for index, u in enumerate(leaderboard_data):
+        if u["user_id"] == uid:
+            user_rank = index + 1
+            user_points = u["total_points"]
+            user_quizzes = u["completed_quizzes"]
+            
+            # Find gap with the user above them
+            if index > 0:
+                above_user = leaderboard_data[index - 1]
+                points_gap = above_user["total_points"] - user_points
+            break
+
+    # If user has no record in the leaderboard yet, they are 0 points and unranked (or at the bottom)
+    if user_rank is None:
+        user_points = 0
+        user_quizzes = 0
+        if leaderboard_data:
+            # Put them at the end
+            user_rank = len(leaderboard_data) + 1
+            points_gap = leaderboard_data[-1]["total_points"] - user_points
+        else:
+            user_rank = 1
+            points_gap = 0
+
+    # Top Section: User's Standing Card (Dashboard style)
+    gap_text = f"🔥 {points_gap} XP gap to next rank" if points_gap and points_gap > 0 else "👑 You are at the top!"
+    st.markdown(f"""
+        <div style="background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-around; gap: 20px; align-items: center;">
+            <div style="text-align: center; min-width: 120px;">
+                <div style="font-size: 0.85rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Your Rank</div>
+                <div style="font-size: 2.2rem; font-weight: 800; color: #6366f1;">#{user_rank}</div>
+            </div>
+            <div style="width: 1px; height: 50px; background-color: #E2E8F0; display: inline-block;"></div>
+            <div style="text-align: center; min-width: 120px;">
+                <div style="font-size: 0.85rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Total Points</div>
+                <div style="font-size: 2.2rem; font-weight: 800; color: #0f172a;">{user_points} <span style="font-size: 1.1rem; color: #8b5cf6; font-weight: 700;">XP</span></div>
+            </div>
+            <div style="width: 1px; height: 50px; background-color: #E2E8F0; display: inline-block;"></div>
+            <div style="text-align: center; min-width: 120px;">
+                <div style="font-size: 0.85rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Quizzes Completed</div>
+                <div style="font-size: 2.2rem; font-weight: 800; color: #10b981;">{user_quizzes}</div>
+            </div>
+            <div style="width: 1px; height: 50px; background-color: #E2E8F0; display: inline-block;"></div>
+            <div style="text-align: center; min-width: 180px;">
+                <div style="font-size: 0.85rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Standing Status</div>
+                <div style="font-size: 1.05rem; font-weight: 700; color: #f97316; margin-top: 10px;">{gap_text}</div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Leaderboard Table Card
+    st.markdown("""
+        <style>
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 1rem;
+            text-align: left;
+        }
+        .leaderboard-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            padding: 14px 20px;
+            border-bottom: 2px solid #e2e8f0;
+            text-transform: uppercase;
+            font-size: 0.82rem;
+            letter-spacing: 0.5px;
+        }
+        .leaderboard-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #0f172a;
+            font-size: 0.95rem;
+        }
+        .leaderboard-row-active {
+            background-color: rgba(99, 102, 241, 0.05) !important;
+            border-left: 4px solid #6366f1 !important;
+        }
+        .leaderboard-row-active td {
+            font-weight: 700 !important;
+            color: #4f46e5 !important;
+        }
+        .rank-medal {
+            font-size: 1.3rem;
+            margin-right: 4px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Construct Leaderboard Table HTML
+    table_rows_html = ""
+    for index, u in enumerate(leaderboard_data):
+        rank = index + 1
+        username = u["username"]
+        points = u["total_points"]
+        quizzes = u["completed_quizzes"]
+        
+        # Format last updated timestamp to human readable
+        last_updated_str = u["last_updated"]
+        try:
+            dt = datetime.fromisoformat(last_updated_str.replace("Z", "+00:00"))
+            formatted_date = dt.strftime("%b %d, %I:%M %p")
+        except Exception:
+            formatted_date = last_updated_str[:16].replace("T", " ")
+            
+        is_current_user = (u["user_id"] == uid)
+        row_class = ' class="leaderboard-row-active"' if is_current_user else ""
+        
+        # Rank Medal / Icons
+        if rank == 1:
+            rank_display = '<span class="rank-medal">🥇</span> 1'
+        elif rank == 2:
+            rank_display = '<span class="rank-medal">🥈</span> 2'
+        elif rank == 3:
+            rank_display = '<span class="rank-medal">🥉</span> 3'
+        else:
+            rank_display = f"{rank}"
+            
+        table_rows_html += f"""
+            <tr{row_class}>
+                <td>{rank_display}</td>
+                <td>{username} {' (You)' if is_current_user else ''}</td>
+                <td><strong>{points}</strong> XP</td>
+                <td>{quizzes}</td>
+                <td style="color: #64748b; font-size: 0.85rem;">{formatted_date}</td>
+            </tr>
+        """
+        
+    leaderboard_card_html = f"""
+        <div style="background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 24px; padding: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03); overflow-x: auto; margin-bottom: 24px;">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th style="width: 12%;">Rank</th>
+                        <th style="width: 33%;">User</th>
+                        <th style="width: 20%;">Total Points</th>
+                        <th style="width: 15%;">Quizzes</th>
+                        <th style="width: 20%;">Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {table_rows_html}
+                </tbody>
+            </table>
+        </div>
+    """
+    st.markdown(leaderboard_card_html, unsafe_allow_html=True)
+    
+    # Back to home navigation button
+    col_back, col_spacer = st.columns([1, 3])
+    with col_back:
+        if st.button("↩️ Back to Home", use_container_width=True, type="secondary", key="lbl_back_home_btn"):
+            st.session_state.leaderboard_active = False
+            st.rerun()
+
 @st.fragment
 def render_left_panel(raw_text, summary_result, api_key, results):
     # Retrieve or initialize chat history for this specific document
@@ -1502,7 +1831,7 @@ def render_quiz_view():
                     # Save attempt
                     save_quiz_attempt(uid, id_token, attempt_data)
                     # Update XP and Level
-                    update_user_xp_level(uid, id_token, xp_earned, badge_to_unlock)
+                    update_user_xp_level(uid, id_token, xp_earned, badge_to_unlock, increment_quizzes=True)
                 else:
                     # Guest user: save in local session state
                     if 'guest_quiz_attempts' not in st.session_state:
@@ -3237,7 +3566,7 @@ def main():
                         for g_att in guest_attempts:
                             save_quiz_attempt(g_uid, g_token, g_att)
                             # Award XP
-                            update_user_xp_level(g_uid, g_token, g_att.get("xp_earned", 0))
+                            update_user_xp_level(g_uid, g_token, g_att.get("xp_earned", 0), increment_quizzes=True)
                         st.session_state.guest_quiz_attempts = []
                         st.toast("⚡ Guest quiz attempts synchronized to your account!", icon="🚀")
                         time.sleep(1)
@@ -3251,6 +3580,10 @@ def main():
 
     if st.session_state.get('edit_profile_active', False):
         render_edit_profile_view()
+        return
+
+    if st.session_state.get('leaderboard_active', False):
+        render_leaderboard_view()
         return
 
     if st.session_state.get('quiz_mode_active', False):
@@ -3407,6 +3740,15 @@ def main():
                 if st.button("⚙️ Edit Profile", key="nav_edit_profile_btn", use_container_width=True):
                     st.session_state.edit_profile_active = True
                     st.session_state.quiz_mode_active = False
+                    st.session_state.leaderboard_active = False
+                    st.rerun()
+                    
+                st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+                
+                if st.button("🏆 Global Leaderboard", key="nav_leaderboard_btn", use_container_width=True):
+                    st.session_state.leaderboard_active = True
+                    st.session_state.edit_profile_active = False
+                    st.session_state.quiz_mode_active = False
                     st.rerun()
                     
                 st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
@@ -3421,6 +3763,7 @@ def main():
                         del st.session_state.quiz_data
                     st.session_state.quiz_mode_active = False
                     st.session_state.edit_profile_active = False
+                    st.session_state.leaderboard_active = False
                     st.session_state.quiz_finished = False
                     st.session_state.quiz_submitted = False
                     st.session_state.guest_quiz_attempts = []
