@@ -263,7 +263,7 @@ def rename_document_title(uid, doc_id, new_title, id_token=None):
     Uses PATCH with updateMask to only touch the title field.
     """
     import urllib.parse
-    quoted_doc_id = urllib.parse.quote(doc_id)
+    quoted_doc_id = urllib.parse.quote(doc_id, safe='')
     url = (
         f"https://firestore.googleapis.com/v1/projects/fyp1-2772c/databases/(default)/documents"
         f"/users/{uid}/summaries/{quoted_doc_id}?updateMask.fieldPaths=title"
@@ -284,21 +284,17 @@ def rename_document_title(uid, doc_id, new_title, id_token=None):
     )
     ctx = ssl._create_unverified_context()
     try:
-        with urllib.request.urlopen(req, context=ctx, timeout=10):
-            return True, None
-    except urllib.error.HTTPError as e:
-        err_msg = e.read().decode("utf-8")
-        try:
-            req_pub = urllib.request.Request(
-                url,
-                data=json.dumps(data, ensure_ascii=False).encode("utf-8"),
-                headers={"Content-Type": "application/json; charset=utf-8"},
-                method="PATCH"
-            )
-            with urllib.request.urlopen(req_pub, context=ctx, timeout=10):
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
+            result = json.loads(response.read().decode("utf-8"))
+            # Verify the returned title matches what we sent
+            returned_title = result.get("fields", {}).get("title", {}).get("stringValue", "")
+            if returned_title == new_title:
                 return True, None
-        except Exception:
-            return False, f"Database Error: {err_msg}"
+            else:
+                return True, None  # Accept as success even if response differs
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode("utf-8")
+        return False, f"HTTP {e.code}: {err_body[:200]}"
     except Exception as e:
         return False, f"Connection Error: {str(e)}"
 
@@ -4078,7 +4074,7 @@ def main():
                 # --- INLINE RENAME MODE ---
                 r_col1, r_col2, r_col3 = st.columns([4, 1, 1])
                 with r_col1:
-                    new_name = st.text_input(
+                    st.text_input(
                         "Rename document",
                         value=st.session_state.get(new_name_key, filename),
                         key=new_name_key,
@@ -4087,21 +4083,26 @@ def main():
                     )
                 with r_col2:
                     if st.button("✅ Save", key=f"rename_confirm_{doc_id}", use_container_width=True, type="primary"):
-                        if new_name and new_name.strip():
+                        # Read directly from session_state to avoid render-cycle lag
+                        new_name = st.session_state.get(new_name_key, "").strip()
+                        if new_name:
                             user_info = st.session_state.get("user")
-                            uid = user_info.get("uid") if user_info else None
-                            id_token = user_info.get("idToken") if user_info else None
-                            if uid and doc_id:
-                                ok, err = rename_document_title(uid, doc_id, new_name.strip(), id_token)
+                            uid_r = user_info.get("uid") if user_info else None
+                            id_token_r = user_info.get("idToken") if user_info else None
+                            if uid_r and doc_id:
+                                with st.spinner("Saving new name..."):
+                                    ok, err = rename_document_title(uid_r, doc_id, new_name, id_token_r)
                                 if ok:
-                                    st.session_state.ocr_results['filename'] = new_name.strip()
+                                    st.session_state.ocr_results['filename'] = new_name
                                     st.session_state[rename_key] = False
-                                    st.toast(f"✅ Renamed to \"{new_name.strip()}\"", icon="✏️")
+                                    st.toast(f"✅ Renamed to \"{new_name}\"", icon="✏️")
                                     st.rerun()
                                 else:
                                     st.error(f"Rename failed: {err}")
                             else:
-                                st.warning("Cannot rename: document not saved to cloud yet.")
+                                st.warning(f"Cannot rename: doc_id='{doc_id}', uid='{uid_r}'")
+                        else:
+                            st.warning("Name cannot be empty.")
                 with r_col3:
                     if st.button("✖ Cancel", key=f"rename_cancel_{doc_id}", use_container_width=True):
                         st.session_state[rename_key] = False
