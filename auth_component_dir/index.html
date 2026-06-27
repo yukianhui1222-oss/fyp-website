@@ -453,6 +453,98 @@
       font-weight: 600;
       font-size: 1.1rem;
     }
+    .link-account-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.55);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .link-account-overlay.visible {
+      display: flex;
+    }
+    .link-account-box {
+      background: white;
+      border-radius: 20px;
+      padding: 36px 32px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    .link-account-box .link-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+    .link-account-box h3 {
+      color: #0f172a;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+    }
+    .link-account-box p {
+      color: #64748b;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin: 0 0 20px 0;
+    }
+    .link-account-box .link-email-badge {
+      display: inline-block;
+      background: #f1f5f9;
+      color: #334155;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .link-account-box input {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      margin-bottom: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .link-account-box input:focus {
+      border-color: #6366f1;
+    }
+    .link-account-box .link-error {
+      color: #ef4444;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      display: none;
+    }
+    .link-btn-row {
+      display: flex;
+      gap: 10px;
+    }
+    .link-btn-row button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-link-confirm {
+      background: #6366f1;
+      color: white;
+    }
+    .btn-link-confirm:hover { background: #4f46e5; }
+    .btn-link-cancel {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+    .btn-link-cancel:hover { background: #e2e8f0; }
   </style>
 
   <!-- Firebase Compat Configuration -->
@@ -614,6 +706,22 @@
         </div>
       </div>
     </div>
+    </div>
+  </div>
+
+  <!-- Account Linking Modal -->
+  <div class="link-account-overlay" id="link-account-overlay">
+    <div class="link-account-box">
+      <div class="link-icon">🔗</div>
+      <h3>Connect Your Accounts</h3>
+      <p>This Gmail address is already registered with an email &amp; password. Enter your existing password below to connect your Google account — after linking, you can use either method to sign in!</p>
+      <div class="link-email-badge" id="link-email-display"></div>
+      <input type="password" id="link-password-input" placeholder="🔒 Your existing password" />
+      <div class="link-error" id="link-error"></div>
+      <div class="link-btn-row">
+        <button class="btn-link-cancel" onclick="hideLinkOverlay()">Cancel</button>
+        <button class="btn-link-confirm" id="btn-link-confirm" onclick="handleLinkAccount()">Connect &amp; Sign In</button>
+      </div>
     </div>
   </div>
 
@@ -818,6 +926,60 @@
     // Auth Logic
     const googleProvider = new firebase.auth.GoogleAuthProvider();
     const facebookProvider = new firebase.auth.FacebookAuthProvider();
+    
+    // Pending Google credential for account linking
+    let pendingGoogleCredential = null;
+    let pendingEmail = '';
+
+    function showLinkOverlay(email) {
+      pendingEmail = email;
+      document.getElementById('link-email-display').innerText = email;
+      document.getElementById('link-password-input').value = '';
+      document.getElementById('link-error').style.display = 'none';
+      document.getElementById('link-account-overlay').classList.add('visible');
+      setTimeout(() => setFrameHeight(), 100);
+    }
+
+    function hideLinkOverlay() {
+      document.getElementById('link-account-overlay').classList.remove('visible');
+      pendingGoogleCredential = null;
+      pendingEmail = '';
+    }
+
+    async function handleLinkAccount() {
+      const password = document.getElementById('link-password-input').value;
+      const errEl = document.getElementById('link-error');
+      const btn = document.getElementById('btn-link-confirm');
+      if (!password) {
+        errEl.innerText = 'Please enter your password.';
+        errEl.style.display = 'block';
+        return;
+      }
+      btn.disabled = true;
+      btn.innerText = 'Connecting...';
+      errEl.style.display = 'none';
+      try {
+        // Sign in with existing email/password
+        const userCredential = await auth.signInWithEmailAndPassword(pendingEmail, password);
+        // Link the Google credential so both methods now work
+        if (pendingGoogleCredential) {
+          await userCredential.user.linkWithCredential(pendingGoogleCredential);
+        }
+        hideLinkOverlay();
+        showTransitionOverlay();
+        syncUserToStreamlit(userCredential.user);
+      } catch (error) {
+        btn.disabled = false;
+        btn.innerText = 'Connect & Sign In';
+        if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+          errEl.innerText = 'Incorrect password. Please try again.';
+        } else {
+          errEl.innerText = error.message;
+        }
+        errEl.style.display = 'block';
+      }
+    }
+
     async function handleGoogleLogin() {
       toggleLoader('btn-google-login', true);
       try {
@@ -839,10 +1001,10 @@
         syncUserToStreamlit(user);
       } catch (error) {
         toggleLoader('btn-google-login', false);
-        // Special handling: email already registered with password
+        // Email already registered with email+password — offer to link accounts
         if (error.code === 'auth/account-exists-with-different-credential') {
-          const email = error.email || '';
-          showError(`This email (${email}) is already registered with email & password. Please sign in using the email/password form above instead.`);
+          pendingGoogleCredential = error.credential;
+          showLinkOverlay(error.email || pendingEmail);
         } else {
           showError(error.message);
         }
@@ -1009,7 +1171,29 @@
         if (!emailCheck.empty) {
           const existingData = emailCheck.docs[0].data();
           if (existingData.provider === 'google') {
-            throw new Error("This email is already registered via Google. Please use the Google sign-in button on the Sign In tab.");
+            // Offer to add password to existing Google account via account linking
+            isSigningUp = false;
+            toggleLoader('btn-signup', false);
+            // Trigger Google login + link a new email/password credential
+            try {
+              const googleResult = await auth.signInWithPopup(googleProvider);
+              const emailCred = firebase.auth.EmailAuthProvider.credential(email, pass);
+              await googleResult.user.linkWithCredential(emailCred);
+              // Update Firestore with the provided name/details
+              await db.collection("users").doc(googleResult.user.uid).update({
+                name: name,
+                phoneNumber: phone || null,
+                gender: gender,
+                birthday: bday,
+                password: hashedPass
+              });
+              localStorage.setItem('user_name_' + googleResult.user.uid, name);
+              showTransitionOverlay();
+              syncUserToStreamlit(googleResult.user);
+            } catch (linkErr) {
+              showError("Could not link accounts: " + linkErr.message);
+            }
+            return;
           } else if (existingData.provider === 'facebook') {
             throw new Error("This email is already registered via Facebook. Please use the Facebook sign-in button on the Sign In tab.");
           } else {
