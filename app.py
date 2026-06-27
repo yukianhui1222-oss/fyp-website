@@ -583,7 +583,7 @@ def fetch_user_progression(uid, id_token=None):
     except Exception as e:
         return {"xp": 0, "level": 1, "badges": [], "completed_quizzes": 0, "last_updated": datetime.now().isoformat()}, str(e)
 
-def update_user_xp_level(uid, id_token, additional_xp, new_badge=None, increment_quizzes=False):
+def update_user_xp_level(uid, id_token, additional_xp, new_badge=None, increment_quizzes=False, force_quizzes_count=None):
     """
     Updates the user's XP, level, and badges in the database.
     """
@@ -618,7 +618,9 @@ def update_user_xp_level(uid, id_token, additional_xp, new_badge=None, increment
     if updated_level >= 10 and "level_10_legend" not in badges:
         badges.append("level_10_legend")
         
-    if increment_quizzes:
+    if force_quizzes_count is not None:
+        completed_quizzes = force_quizzes_count
+    elif increment_quizzes:
         completed_quizzes += 1
         
     # Update document with updateMask
@@ -676,11 +678,11 @@ def update_user_xp_level(uid, id_token, additional_xp, new_badge=None, increment
         except Exception as e_pub:
             return False, str(e_pub)
 
-def update_points(uid, id_token, points_to_add, increment_quizzes=False):
+def update_points(uid, id_token, points_to_add, increment_quizzes=False, force_quizzes_count=None):
     """
     Wrapper function to update the user's total points (XP) in Firestore.
     """
-    return update_user_xp_level(uid, id_token, points_to_add, increment_quizzes=increment_quizzes)
+    return update_user_xp_level(uid, id_token, points_to_add, increment_quizzes=increment_quizzes, force_quizzes_count=force_quizzes_count)
 
 def fetch_leaderboard(id_token=None):
     """

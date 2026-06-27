@@ -838,8 +838,14 @@
         showTransitionOverlay();
         syncUserToStreamlit(user);
       } catch (error) {
-        showError(error.message);
         toggleLoader('btn-google-login', false);
+        // Special handling: email already registered with password
+        if (error.code === 'auth/account-exists-with-different-credential') {
+          const email = error.email || '';
+          showError(`This email (${email}) is already registered with email & password. Please sign in using the email/password form above instead.`);
+        } else {
+          showError(error.message);
+        }
       }
     }
 
@@ -895,11 +901,22 @@
           }
           const data = snap.docs[0].data();
           if (data.provider === 'google' || data.provider === 'facebook') {
-            showError(`Please sign in with ${data.provider} instead.`);
+            showError(`This account was registered with ${data.provider}. Please use the ${data.provider} sign-in button below.`);
             toggleLoader('btn-login', false);
             return;
           }
           email = data.email;
+        } else {
+          // Email entered directly — check if this email is a social-only account
+          const snap = await db.collection('users').where('email', '==', identifier).limit(1).get();
+          if (!snap.empty) {
+            const data = snap.docs[0].data();
+            if (data.provider === 'google' || data.provider === 'facebook') {
+              showError(`This email was registered via ${data.provider}. Please use the ${data.provider} sign-in button below.`);
+              toggleLoader('btn-login', false);
+              return;
+            }
+          }
         }
 
         const userCredential = await auth.signInWithEmailAndPassword(email, pass);
@@ -907,7 +924,11 @@
         syncUserToStreamlit(userCredential.user);
       } catch (error) {
         console.error("Login failed:", error);
-        showError("Invalid account or password.");
+        if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+          showError("Invalid email or password.");
+        } else {
+          showError("Login failed: " + error.message);
+        }
         toggleLoader('btn-login', false);
       }
     }
@@ -985,7 +1006,16 @@
         if (!nameCheck.empty) throw new Error("Username already taken.");
         
         const emailCheck = await db.collection("users").where("email", "==", email).limit(1).get();
-        if (!emailCheck.empty) throw new Error("Email already registered.");
+        if (!emailCheck.empty) {
+          const existingData = emailCheck.docs[0].data();
+          if (existingData.provider === 'google') {
+            throw new Error("This email is already registered via Google. Please use the Google sign-in button on the Sign In tab.");
+          } else if (existingData.provider === 'facebook') {
+            throw new Error("This email is already registered via Facebook. Please use the Facebook sign-in button on the Sign In tab.");
+          } else {
+            throw new Error("Email already registered. Please sign in instead.");
+          }
+        }
 
         if (phone) {
           const phoneCheck = await db.collection("users").where("phoneNumber", "==", phone).limit(1).get();
