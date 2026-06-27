@@ -4071,42 +4071,43 @@ def main():
             new_name_key = f"rename_value_{doc_id}"
 
             if is_saved and st.session_state.get(rename_key, False):
-                # --- INLINE RENAME MODE ---
-                r_col1, r_col2, r_col3 = st.columns([4, 1, 1])
-                with r_col1:
-                    st.text_input(
-                        "Rename document",
-                        value=st.session_state.get(new_name_key, filename),
-                        key=new_name_key,
+                # --- INLINE RENAME MODE (use st.form for atomic capture) ---
+                with st.form(key=f"rename_form_{doc_id}", clear_on_submit=False):
+                    typed_name = st.text_input(
+                        "New document name",
+                        value=filename,
                         label_visibility="collapsed",
                         placeholder="Enter new document name..."
                     )
-                with r_col2:
-                    if st.button("✅ Save", key=f"rename_confirm_{doc_id}", use_container_width=True, type="primary"):
-                        # Read directly from session_state to avoid render-cycle lag
-                        new_name = st.session_state.get(new_name_key, "").strip()
-                        if new_name:
-                            user_info = st.session_state.get("user")
-                            uid_r = user_info.get("uid") if user_info else None
-                            id_token_r = user_info.get("idToken") if user_info else None
-                            if uid_r and doc_id:
-                                with st.spinner("Saving new name..."):
-                                    ok, err = rename_document_title(uid_r, doc_id, new_name, id_token_r)
-                                if ok:
-                                    st.session_state.ocr_results['filename'] = new_name
-                                    st.session_state[rename_key] = False
-                                    st.toast(f"✅ Renamed to \"{new_name}\"", icon="✏️")
-                                    st.rerun()
-                                else:
-                                    st.error(f"Rename failed: {err}")
+                    f_col1, f_col2 = st.columns([1, 1])
+                    with f_col1:
+                        submitted = st.form_submit_button("✅ Save", use_container_width=True, type="primary")
+                    with f_col2:
+                        cancelled = st.form_submit_button("✖ Cancel", use_container_width=True)
+
+                if submitted:
+                    new_name = typed_name.strip()
+                    if new_name:
+                        user_info = st.session_state.get("user")
+                        uid_r = user_info.get("uid") if user_info else None
+                        id_token_r = user_info.get("idToken") if user_info else None
+                        if uid_r and doc_id:
+                            ok, err = rename_document_title(uid_r, doc_id, new_name, id_token_r)
+                            if ok:
+                                st.session_state.ocr_results['filename'] = new_name
+                                st.session_state[rename_key] = False
+                                st.toast(f"✅ Renamed to \"{new_name}\"", icon="✏️")
+                                st.rerun()
                             else:
-                                st.warning(f"Cannot rename: doc_id='{doc_id}', uid='{uid_r}'")
+                                st.error(f"❌ Rename failed — {err}")
                         else:
-                            st.warning("Name cannot be empty.")
-                with r_col3:
-                    if st.button("✖ Cancel", key=f"rename_cancel_{doc_id}", use_container_width=True):
-                        st.session_state[rename_key] = False
-                        st.rerun()
+                            st.warning(f"Cannot rename: doc_id='{doc_id}', uid='{uid_r}'")
+                    else:
+                        st.warning("Name cannot be empty.")
+
+                if cancelled:
+                    st.session_state[rename_key] = False
+                    st.rerun()
             else:
                 # --- DISPLAY MODE (badge + pencil button) ---
                 badge_col, pencil_col = st.columns([6, 1])
@@ -4121,7 +4122,6 @@ def main():
                     if is_saved:
                         if st.button("✏️", key=f"rename_btn_{doc_id}", help="Rename this document"):
                             st.session_state[rename_key] = True
-                            st.session_state[new_name_key] = filename
                             st.rerun()
 
             
