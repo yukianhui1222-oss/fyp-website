@@ -4057,21 +4057,25 @@ def main():
         word_count = len(raw_text.split())
         is_saved = results.get('is_loaded_from_db', False)
 
-        st.markdown("<div style='margin-top: 32px;'></div>", unsafe_allow_html=True)
-        
-        # Header, badge+pencil row, and Export button
-        header_col, export_mid_col, spacer_col = st.columns([3.5, 1.2, 0.1])
-        with header_col:
-            st.markdown("<h2 style='font-size: 2.0rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0; font-family: \"Poppins\", sans-serif; display: flex; align-items: center; gap: 10px;'>✨ Analysis Results</h2>", unsafe_allow_html=True)
-            
-            # Show selected courseware file name as a clean badge — with rename support if cloud-saved
-            filename = results.get('filename', 'Direct Upload')
-            doc_id = results.get('id', '')
-            rename_key = f"renaming_doc_{doc_id}"
-            new_name_key = f"rename_value_{doc_id}"
+        # ── Row 1: Title (full width) ──────────────────────────────────
+        st.markdown("<h2 style='font-size: 2.0rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0; font-family: \"Poppins\", sans-serif; display: flex; align-items: center; gap: 10px;'>✨ Analysis Results</h2>", unsafe_allow_html=True)
 
-            if is_saved and st.session_state.get(rename_key, False):
-                # --- INLINE RENAME MODE ---
+        # Prepare data for Export popover (needed regardless of rename mode)
+        from doc_generator import generate_docx
+        docx_data = generate_docx(summary_result, translation_result, result_lang)
+        md_text = f"# {results.get('filename', 'DocuMind Summary')}\n\n{summary_result}"
+        if translation_result:
+            md_text += f"\n\n---\n\n## Translation ({result_lang})\n\n{translation_result}"
+        md_data = md_text.encode('utf-8')
+
+        filename = results.get('filename', 'Direct Upload')
+        doc_id = results.get('id', '')
+        rename_key = f"renaming_doc_{doc_id}"
+
+        if is_saved and st.session_state.get(rename_key, False):
+            # ── INLINE RENAME MODE ──────────────────────────────────────
+            rename_col, export_col_r, spacer_r = st.columns([3, 1.2, 1.5])
+            with rename_col:
                 with st.form(key=f"rename_form_{doc_id}", clear_on_submit=False):
                     typed_name = st.text_input(
                         "New document name",
@@ -4108,64 +4112,49 @@ def main():
                 if cancelled:
                     st.session_state[rename_key] = False
                     st.rerun()
-            else:
-                # --- DISPLAY MODE: badge with pencil button right beside it ---
-                badge_col, pencil_col = st.columns([9, 1], gap="small", vertical_alignment="center")
-                with badge_col:
-                    st.markdown(
-                        f"<div style='background-color: rgba(99, 102, 241, 0.08); color: #6366f1; font-size: 0.85rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 4px; border: 1px solid rgba(99, 102, 241, 0.15);'>"
-                        f"📂 Active Document: <strong>{filename}</strong>"
-                        f"</div>",
-                        unsafe_allow_html=True
-                    )
-                with pencil_col:
-                    if is_saved:
-                        if st.button("✏️", key=f"rename_btn_{doc_id}", help="Rename this document"):
-                            st.session_state[rename_key] = True
-                            st.rerun()
-
-            db_badge_html = (
-                '  •  <span style="background-color: rgba(16, 185, 129, 0.1); color: #059669; font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; display: inline-flex; align-items: center; vertical-align: middle; gap: 4px;">'
-                '☁️ Cloud Saved'
-                '</span>'
-            ) if is_saved else ""
-            st.markdown(
-                f"<div style='font-size: 0.98rem; color: #475569; font-weight: 500; margin-top: 0px; margin-bottom: 24px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;'>"
-                f"⏱️ {ocr_time:.2f}s  •  📊 {word_count} words  •  📄 {page_count} pages{db_badge_html}"
-                f"</div>",
-                unsafe_allow_html=True
+            with export_col_r:
+                st.markdown("<div style='margin-top: 4px;'></div>", unsafe_allow_html=True)
+                with st.popover("📤 Export Document", use_container_width=True, key="export_document_popover"):
+                    st.download_button(label="📄 Export as Word (.docx)", data=docx_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", use_container_width=True, key="export_word_btn")
+                    st.download_button(label="📝 Export as Markdown (.md)", data=md_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.md", mime="text/markdown", use_container_width=True, key="export_md_btn")
+                    copy_to_clipboard(summary_result, "Copy Summary Markdown")
+        else:
+            # ── Row 2: [badge] [✏️] [Export Document] [spacer] ──────────
+            badge_col, pencil_col, export_col, spacer_col = st.columns(
+                [2.2, 0.22, 1.2, 2.1], gap="small", vertical_alignment="center"
             )
-        with export_mid_col:
-            from doc_generator import generate_docx
-            docx_data = generate_docx(summary_result, translation_result, result_lang)
-            
-            # Convert summary to Markdown bytes
-            md_text = f"# {results.get('filename', 'DocuMind Summary')}\n\n{summary_result}"
-            if translation_result:
-                md_text += f"\n\n---\n\n## Translation ({result_lang})\n\n{translation_result}"
-            md_data = md_text.encode('utf-8')
-            
-            st.markdown("<div style='margin-top: 12px;'></div>", unsafe_allow_html=True)
-            with st.popover("📤 Export Document", use_container_width=True, key="export_document_popover"):
-                st.download_button(
-                    label="📄 Export as Word (.docx)",
-                    data=docx_data,
-                    file_name=f"{results.get('filename', 'DocuMind')}_Summary.docx",
-                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    use_container_width=True,
-                    key="export_word_btn"
+            with badge_col:
+                st.markdown(
+                    f"<div style='background-color: rgba(99, 102, 241, 0.08); color: #6366f1; font-size: 0.85rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(99, 102, 241, 0.15);'>"
+                    f"📂 Active Document: <strong>{filename}</strong>"
+                    f"</div>",
+                    unsafe_allow_html=True
                 )
-                st.download_button(
-                    label="📝 Export as Markdown (.md)",
-                    data=md_data,
-                    file_name=f"{results.get('filename', 'DocuMind')}_Summary.md",
-                    mime="text/markdown",
-                    use_container_width=True,
-                    key="export_md_btn"
-                )
-                copy_to_clipboard(summary_result, "Copy Summary Markdown")
+            with pencil_col:
+                if is_saved:
+                    if st.button("✏️", key=f"rename_btn_{doc_id}", help="Rename this document"):
+                        st.session_state[rename_key] = True
+                        st.rerun()
+            with export_col:
+                with st.popover("📤 Export Document", use_container_width=True, key="export_document_popover"):
+                    st.download_button(label="📄 Export as Word (.docx)", data=docx_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", use_container_width=True, key="export_word_btn")
+                    st.download_button(label="📝 Export as Markdown (.md)", data=md_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.md", mime="text/markdown", use_container_width=True, key="export_md_btn")
+                    copy_to_clipboard(summary_result, "Copy Summary Markdown")
 
-        
+        # ── Row 3: Stats bar ─────────────────────────────────────────────
+        db_badge_html = (
+            '  •  <span style="background-color: rgba(16, 185, 129, 0.1); color: #059669; font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; display: inline-flex; align-items: center; vertical-align: middle; gap: 4px;">'
+            '☁️ Cloud Saved'
+            '</span>'
+        ) if is_saved else ""
+        st.markdown(
+            f"<div style='font-size: 0.98rem; color: #475569; font-weight: 500; margin-top: 8px; margin-bottom: 24px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;'>"
+            f"⏱️ {ocr_time:.2f}s  •  📊 {word_count} words  •  📄 {page_count} pages{db_badge_html}"
+            f"</div>",
+            unsafe_allow_html=True
+        )
+
+
         # Cloud Database Saving UI (Flat layout Notion-style)
         if not is_saved:
             with st.container():
