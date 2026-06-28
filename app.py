@@ -4059,8 +4059,8 @@ def main():
 
         st.markdown("<div style='margin-top: 32px;'></div>", unsafe_allow_html=True)
         
-        # Header and dropdown Export button
-        header_col, export_col = st.columns([2, 1])
+        # Header, badge+pencil row, and Export button
+        header_col, export_mid_col, spacer_col = st.columns([3.5, 1.2, 0.1])
         with header_col:
             st.markdown("<h2 style='font-size: 2.0rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0; font-family: \"Poppins\", sans-serif; display: flex; align-items: center; gap: 10px;'>✨ Analysis Results</h2>", unsafe_allow_html=True)
             
@@ -4071,7 +4071,7 @@ def main():
             new_name_key = f"rename_value_{doc_id}"
 
             if is_saved and st.session_state.get(rename_key, False):
-                # --- INLINE RENAME MODE (use st.form for atomic capture) ---
+                # --- INLINE RENAME MODE ---
                 with st.form(key=f"rename_form_{doc_id}", clear_on_submit=False):
                     typed_name = st.text_input(
                         "New document name",
@@ -4084,12 +4084,6 @@ def main():
                         submitted = st.form_submit_button("✅ Save", use_container_width=True, type="primary")
                     with f_col2:
                         cancelled = st.form_submit_button("✖ Cancel", use_container_width=True)
-
-                # Show debug info
-                user_info_dbg = st.session_state.get("user") or {}
-                uid_dbg = user_info_dbg.get("uid", "❌ MISSING")
-                token_dbg = "✅ present" if user_info_dbg.get("idToken") else "❌ MISSING"
-                st.caption(f"🔍 doc_id: `{doc_id or '❌ EMPTY'}` | uid: `{uid_dbg[:12]}...` | token: {token_dbg}")
 
                 if submitted:
                     new_name = typed_name.strip()
@@ -4115,8 +4109,8 @@ def main():
                     st.session_state[rename_key] = False
                     st.rerun()
             else:
-                # --- DISPLAY MODE (badge + pencil button) ---
-                badge_col, pencil_col = st.columns([6, 1])
+                # --- DISPLAY MODE: badge with pencil button right beside it ---
+                badge_col, pencil_col = st.columns([9, 1], gap="small", vertical_alignment="center")
                 with badge_col:
                     st.markdown(
                         f"<div style='background-color: rgba(99, 102, 241, 0.08); color: #6366f1; font-size: 0.85rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 4px; border: 1px solid rgba(99, 102, 241, 0.15);'>"
@@ -4130,7 +4124,6 @@ def main():
                             st.session_state[rename_key] = True
                             st.rerun()
 
-            
             db_badge_html = (
                 '  •  <span style="background-color: rgba(16, 185, 129, 0.1); color: #059669; font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; display: inline-flex; align-items: center; vertical-align: middle; gap: 4px;">'
                 '☁️ Cloud Saved'
@@ -4142,7 +4135,7 @@ def main():
                 f"</div>",
                 unsafe_allow_html=True
             )
-        with export_col:
+        with export_mid_col:
             from doc_generator import generate_docx
             docx_data = generate_docx(summary_result, translation_result, result_lang)
             
@@ -4152,6 +4145,7 @@ def main():
                 md_text += f"\n\n---\n\n## Translation ({result_lang})\n\n{translation_result}"
             md_data = md_text.encode('utf-8')
             
+            st.markdown("<div style='margin-top: 12px;'></div>", unsafe_allow_html=True)
             with st.popover("📤 Export Document", use_container_width=True, key="export_document_popover"):
                 st.download_button(
                     label="📄 Export as Word (.docx)",
@@ -4170,6 +4164,7 @@ def main():
                     key="export_md_btn"
                 )
                 copy_to_clipboard(summary_result, "Copy Summary Markdown")
+
         
         # Cloud Database Saving UI (Flat layout Notion-style)
         if not is_saved:
