@@ -2726,23 +2726,40 @@ def main():
             width: 100% !important;
         }
 
-        /* Rename pencil button: collapse left padding so it hugs the badge */
+        /* Rename pencil button: hug the badge and vertically center */
         div[class*="st-key-rename_btn_"] {
             padding-left: 0 !important;
             margin-left: -8px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        div[class*="st-key-rename_btn_"] > div,
+        div[class*="st-key-rename_btn_"] [data-testid="stVerticalBlock"],
+        div[class*="st-key-rename_btn_"] [data-testid="stButtonGroup"],
+        div[class*="st-key-rename_btn_"] .element-container,
+        div[class*="st-key-rename_btn_"] .stButton {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            height: 100% !important;
         }
         div[class*="st-key-rename_btn_"] button {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
-            padding: 4px 6px !important;
-            font-size: 1rem !important;
+            padding: 2px 6px !important;
+            font-size: 1.05rem !important;
+            line-height: 1 !important;
             min-height: unset !important;
             height: auto !important;
+            width: auto !important;
             color: #f97316 !important;
+            margin: 0 !important;
         }
         div[class*="st-key-rename_btn_"] button:hover {
-            background: rgba(249, 115, 22, 0.08) !important;
+            background: rgba(249, 115, 22, 0.1) !important;
             border-radius: 6px !important;
         }
 
