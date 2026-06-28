@@ -4139,34 +4139,22 @@ def main():
                     st.download_button(label="📝 Export as Markdown (.md)", data=md_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.md", mime="text/markdown", use_container_width=True, key="export_md_btn")
                     copy_to_clipboard(summary_result, "Copy Summary Markdown")
         else:
-            # ── Row 2: badge + pencil (tightly combined) then Export ──────
-            # CSS injection to collapse the pencil column's left padding so it hugs the badge
-            st.markdown("""
-            <style>
-            div[class*="st-key-pencil_tight_col"] > div[data-testid="column"] {
-                padding-left: 0 !important;
-                padding-right: 0 !important;
-                min-width: 0 !important;
-            }
-            div[class*="st-key-badge_tight_col"] > div[data-testid="column"] {
-                padding-right: 0 !important;
-            }
-            </style>
-            """, unsafe_allow_html=True)
-
-            badge_col, pencil_col, export_col, spacer_col = st.columns(
-                [1.5, 0.14, 1.2, 3.0], gap="small", vertical_alignment="center"
+            # ── Row 2: [badge][pencil] then spacer then [Export] far right ──
+            badge_col, pencil_col, spacer_col, export_col = st.columns(
+                [1.8, 0.14, 2.7, 1.2], gap="small", vertical_alignment="center"
             )
             with badge_col:
+                # Truncate very long filenames for display
+                display_filename = filename if len(filename) <= 35 else filename[:33] + '...'
                 st.markdown(
-                    f"<div style='background-color: rgba(99, 102, 241, 0.08); color: #6366f1; font-size: 0.85rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(99, 102, 241, 0.15); white-space: nowrap;'>"
-                    f"📂 Active Document: <strong>{filename}</strong>"
+                    f"<div style='background-color: rgba(99, 102, 241, 0.08); color: #6366f1; font-size: 0.85rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(99, 102, 241, 0.15); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;' title='{filename}'>"
+                    f"📂 Active Document: <strong>{display_filename}</strong>"
                     f"</div>",
                     unsafe_allow_html=True
                 )
             with pencil_col:
                 if is_saved:
-                    if st.button("✏️", key=f"rename_btn_{doc_id}", help="Rename this document"):
+                    if st.button("✏️", key=f"rename_btn_{doc_id}", help=f"Rename: {filename}"):
                         st.session_state[rename_key] = True
                         st.rerun()
             with export_col:
@@ -4174,6 +4162,7 @@ def main():
                     st.download_button(label="📄 Export as Word (.docx)", data=docx_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", use_container_width=True, key="export_word_btn")
                     st.download_button(label="📝 Export as Markdown (.md)", data=md_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.md", mime="text/markdown", use_container_width=True, key="export_md_btn")
                     copy_to_clipboard(summary_result, "Copy Summary Markdown")
+
 
 
         # ── Row 3: Stats bar ─────────────────────────────────────────────
