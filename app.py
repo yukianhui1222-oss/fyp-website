@@ -4060,7 +4060,7 @@ def main():
         # ── Row 1: Title (full width) ──────────────────────────────────
         st.markdown("<h2 style='font-size: 2.0rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0; font-family: \"Poppins\", sans-serif; display: flex; align-items: center; gap: 10px;'>✨ Analysis Results</h2>", unsafe_allow_html=True)
 
-        # Prepare data for Export popover (needed regardless of rename mode)
+        # Prepare export data (needed regardless of rename mode)
         from doc_generator import generate_docx
         docx_data = generate_docx(summary_result, translation_result, result_lang)
         md_text = f"# {results.get('filename', 'DocuMind Summary')}\n\n{summary_result}"
@@ -4071,11 +4071,35 @@ def main():
         filename = results.get('filename', 'Direct Upload')
         doc_id = results.get('id', '')
         rename_key = f"renaming_doc_{doc_id}"
+        # CSS-safe doc_id for selector
+        doc_id_css = doc_id.replace(" ", "_").replace(".", "_").replace("/", "_")
+
+        # ── CSS injection: make badge column shrink to content width ────
+        # This ensures the ✏️ pencil button sits IMMEDIATELY next to the badge text
+        st.markdown(f"""<style>
+        div[data-testid="stHorizontalBlock"]:has(.st-key-rename_btn_{doc_id_css}) {{
+            display: flex;
+            align-items: center;
+            gap: 0px;
+        }}
+        div[data-testid="stHorizontalBlock"]:has(.st-key-rename_btn_{doc_id_css}) > div[data-testid="column"]:first-child {{
+            flex: 0 0 auto !important;
+            width: auto !important;
+            min-width: 0 !important;
+            padding-right: 2px !important;
+        }}
+        div[data-testid="stHorizontalBlock"]:has(.st-key-rename_btn_{doc_id_css}) > div[data-testid="column"]:nth-child(2) {{
+            flex: 0 0 auto !important;
+            width: auto !important;
+            min-width: 0 !important;
+        }}
+        </style>""", unsafe_allow_html=True)
 
         if is_saved and st.session_state.get(rename_key, False):
             # ── INLINE RENAME MODE ──────────────────────────────────────
-            rename_col, export_col_r, spacer_r = st.columns([3, 1.2, 1.5])
-            with rename_col:
+            # Mirror the [1.6, 1.0] main/chat split so export stays in main_col zone
+            rename_input_col, export_rename_col, spacer_rename = st.columns([1.2, 0.4, 1.0], vertical_alignment="center")
+            with rename_input_col:
                 with st.form(key=f"rename_form_{doc_id}", clear_on_submit=False):
                     typed_name = st.text_input(
                         "New document name",
@@ -4112,30 +4136,32 @@ def main():
                 if cancelled:
                     st.session_state[rename_key] = False
                     st.rerun()
-            with export_col_r:
-                st.markdown("<div style='margin-top: 4px;'></div>", unsafe_allow_html=True)
+            with export_rename_col:
                 with st.popover("📤 Export Document", use_container_width=True, key="export_document_popover"):
                     st.download_button(label="📄 Export as Word (.docx)", data=docx_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", use_container_width=True, key="export_word_btn")
                     st.download_button(label="📝 Export as Markdown (.md)", data=md_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.md", mime="text/markdown", use_container_width=True, key="export_md_btn")
                     copy_to_clipboard(summary_result, "Copy Summary Markdown")
         else:
-            # ── Row 2: [badge] [✏️] [Export Document] [spacer] ──────────
-            badge_col, pencil_col, export_col, spacer_col = st.columns(
-                [2.2, 0.22, 1.2, 2.1], gap="small", vertical_alignment="center"
-            )
-            with badge_col:
-                st.markdown(
-                    f"<div style='background-color: rgba(99, 102, 241, 0.08); color: #6366f1; font-size: 0.85rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(99, 102, 241, 0.15);'>"
-                    f"📂 Active Document: <strong>{filename}</strong>"
-                    f"</div>",
-                    unsafe_allow_html=True
-                )
-            with pencil_col:
-                if is_saved:
-                    if st.button("✏️", key=f"rename_btn_{doc_id}", help="Rename this document"):
-                        st.session_state[rename_key] = True
-                        st.rerun()
-            with export_col:
+            # ── Row 2: badge [✏️] ───── [Export Document] ─── (chat spacer) ─
+            # Outer layout mirrors [main_col=1.6, chat_col=1.0] below
+            # badge+pencil on far left (auto-sized via CSS), export at end of main_col zone
+            left_zone, export_zone, chat_zone = st.columns([1.6, 0.5, 1.0], vertical_alignment="center")
+            with left_zone:
+                # Inner sub-columns: badge auto-width, pencil tiny — CSS makes them truly adjacent
+                badge_inner, pencil_inner = st.columns([1, 0.15], gap="small", vertical_alignment="center")
+                with badge_inner:
+                    st.markdown(
+                        f"<div style='background-color: rgba(99, 102, 241, 0.08); color: #6366f1; font-size: 0.85rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(99, 102, 241, 0.15);'>"
+                        f"📂 Active Document: <strong>{filename}</strong>"
+                        f"</div>",
+                        unsafe_allow_html=True
+                    )
+                with pencil_inner:
+                    if is_saved:
+                        if st.button("✏️", key=f"rename_btn_{doc_id_css}", help="Rename this document"):
+                            st.session_state[rename_key] = True
+                            st.rerun()
+            with export_zone:
                 with st.popover("📤 Export Document", use_container_width=True, key="export_document_popover"):
                     st.download_button(label="📄 Export as Word (.docx)", data=docx_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", use_container_width=True, key="export_word_btn")
                     st.download_button(label="📝 Export as Markdown (.md)", data=md_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.md", mime="text/markdown", use_container_width=True, key="export_md_btn")
