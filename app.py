@@ -4181,22 +4181,59 @@ def main():
         doc_id = results.get('id', '')
         rename_key = f"renaming_doc_{doc_id}"
 
+        # CSS injection to style the glass_control_panel container beautifully in both light and dark modes
+        st.markdown("""
+        <style>
+        div[class*="st-key-glass_control_panel"] {
+            background: rgba(255, 255, 255, 0.03) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(226, 232, 240, 0.12) !important;
+            border-radius: 16px !important;
+            padding: 20px 24px !important;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.02) !important;
+            margin-top: 10px !important;
+            margin-bottom: 24px !important;
+        }
+        div[class*="st-key-glass_control_panel"] div[data-testid="column"] {
+            display: flex !important;
+            align-items: center !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        db_badge_html = (
+            '<span style="background-color: rgba(16, 185, 129, 0.1); color: #059669; font-size: 0.78rem; font-weight: 700; padding: 4px 10px; border-radius: 99px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid rgba(16, 185, 129, 0.15);">☁️ Cloud Saved</span>'
+        ) if is_saved else '<span style="background-color: rgba(245, 158, 11, 0.1); color: #d97706; font-size: 0.78rem; font-weight: 700; padding: 4px 10px; border-radius: 99px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid rgba(245, 158, 11, 0.15);">💾 Unsaved Local Draft</span>'
+
         if is_saved and st.session_state.get(rename_key, False):
-            # ── INLINE RENAME MODE ──────────────────────────────────────
-            rename_col, export_col_r, spacer_r = st.columns([3, 1.2, 1.5])
-            with rename_col:
-                with st.form(key=f"rename_form_{doc_id}", clear_on_submit=False):
-                    typed_name = st.text_input(
-                        "New document name",
-                        value=filename,
-                        label_visibility="collapsed",
-                        placeholder="Enter new document name..."
+            # ── INLINE RENAME MODE (Unified Card) ────────────────────────
+            with st.container(key="glass_control_panel"):
+                rename_col, line_col_r, export_col_r = st.columns([3.0, 4.0, 1.5], gap="small", vertical_alignment="center")
+                with rename_col:
+                    with st.form(key=f"rename_form_{doc_id}", clear_on_submit=False):
+                        typed_name = st.text_input(
+                            "New document name",
+                            value=filename,
+                            label_visibility="collapsed",
+                            placeholder="Enter new document name..."
+                        )
+                        f_col1, f_col2 = st.columns([1, 1])
+                        with f_col1:
+                            submitted = st.form_submit_button("✅ Save", use_container_width=True, type="primary")
+                        with f_col2:
+                            cancelled = st.form_submit_button("✖ Cancel", use_container_width=True)
+
+                with line_col_r:
+                    st.markdown(
+                        "<div style='flex-grow: 1; border-bottom: 2px dashed rgba(99, 102, 241, 0.15); margin: 0 15px; height: 1px;'></div>",
+                        unsafe_allow_html=True
                     )
-                    f_col1, f_col2 = st.columns([1, 1])
-                    with f_col1:
-                        submitted = st.form_submit_button("✅ Save", use_container_width=True, type="primary")
-                    with f_col2:
-                        cancelled = st.form_submit_button("✖ Cancel", use_container_width=True)
+                with export_col_r:
+                    with st.popover("📤 Export Document", use_container_width=True, key="export_document_popover"):
+                        st.download_button(label="📄 Export as Word (.docx)", data=docx_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", use_container_width=True, key="export_word_btn")
+                        st.download_button(label="📝 Export as Markdown (.md)", data=md_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.md", mime="text/markdown", use_container_width=True, key="export_md_btn")
+                        copy_to_clipboard(summary_result, "Copy Summary Markdown")
 
                 if submitted:
                     new_name = typed_name.strip()
@@ -4238,51 +4275,61 @@ def main():
                 if cancelled:
                     st.session_state[rename_key] = False
                     st.rerun()
-            with export_col_r:
-                st.markdown("<div style='margin-top: 4px;'></div>", unsafe_allow_html=True)
-                with st.popover("📤 Export Document", use_container_width=True, key="export_document_popover"):
-                    st.download_button(label="📄 Export as Word (.docx)", data=docx_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", use_container_width=True, key="export_word_btn")
-                    st.download_button(label="📝 Export as Markdown (.md)", data=md_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.md", mime="text/markdown", use_container_width=True, key="export_md_btn")
-                    copy_to_clipboard(summary_result, "Copy Summary Markdown")
-        else:
-            # ── Row 2: [badge][pencil] then spacer then [Export] far right ──
-            badge_col, pencil_col, spacer_col, export_col = st.columns(
-                [1.8, 0.14, 2.7, 1.2], gap="small", vertical_alignment="center"
-            )
-            with badge_col:
-                # Truncate very long filenames for display
-                display_filename = filename if len(filename) <= 35 else filename[:33] + '...'
+
+                # Divider & Stats Row inside the card
+                st.markdown("<div style='border-top: 1px solid rgba(226, 232, 240, 0.12); margin: 16px 0 12px 0;'></div>", unsafe_allow_html=True)
                 st.markdown(
-                    f"<div style='background-color: rgba(99, 102, 241, 0.08); color: #6366f1; font-size: 0.85rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(99, 102, 241, 0.15); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;' title='{filename}'>"
-                    f"📂 Active Document: <strong>{display_filename}</strong>"
+                    f"<div style='font-size: 0.85rem; color: #475569; font-weight: 500; display: flex; align-items: center; flex-wrap: wrap; gap: 12px;'>"
+                    f"<span style='background: rgba(99, 102, 241, 0.04); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.08); display: inline-flex; align-items: center; gap: 4px;'>⏱️ {ocr_time:.2f}s</span>"
+                    f"<span style='background: rgba(99, 102, 241, 0.04); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.08); display: inline-flex; align-items: center; gap: 4px;'>📊 {word_count} words</span>"
+                    f"<span style='background: rgba(99, 102, 241, 0.04); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.08); display: inline-flex; align-items: center; gap: 4px;'>📄 {page_count} pages</span>"
+                    f"{db_badge_html}"
                     f"</div>",
                     unsafe_allow_html=True
                 )
-            with pencil_col:
-                if is_saved:
-                    if st.button("✏️", key=f"rename_btn_{doc_id}", help=f"Rename: {filename}"):
-                        st.session_state[rename_key] = True
-                        st.rerun()
-            with export_col:
-                with st.popover("📤 Export Document", use_container_width=True, key="export_document_popover"):
-                    st.download_button(label="📄 Export as Word (.docx)", data=docx_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", use_container_width=True, key="export_word_btn")
-                    st.download_button(label="📝 Export as Markdown (.md)", data=md_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.md", mime="text/markdown", use_container_width=True, key="export_md_btn")
-                    copy_to_clipboard(summary_result, "Copy Summary Markdown")
+        else:
+            # ── DISPLAY MODE (Unified Card) ─────────────────────────────
+            with st.container(key="glass_control_panel"):
+                badge_col, pencil_col, line_col, export_col = st.columns(
+                    [2.0, 0.2, 4.8, 1.5], gap="small", vertical_alignment="center"
+                )
+                with badge_col:
+                    # Truncate very long filenames for display
+                    display_filename = filename if len(filename) <= 35 else filename[:33] + '...'
+                    st.markdown(
+                        f"<div style='background-color: rgba(99, 102, 241, 0.08); color: #6366f1; font-size: 0.85rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(99, 102, 241, 0.15); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;' title='{filename}'>"
+                        f"📂 Active Document: <strong>{display_filename}</strong>"
+                        f"</div>",
+                        unsafe_allow_html=True
+                    )
+                with pencil_col:
+                    if is_saved:
+                        if st.button("✏️", key=f"rename_btn_{doc_id}", help=f"Rename: {filename}"):
+                            st.session_state[rename_key] = True
+                            st.rerun()
+                with line_col:
+                    st.markdown(
+                        "<div style='flex-grow: 1; border-bottom: 2px dashed rgba(99, 102, 241, 0.15); margin: 0 15px; height: 1px;'></div>",
+                        unsafe_allow_html=True
+                    )
+                with export_col:
+                    with st.popover("📤 Export Document", use_container_width=True, key="export_document_popover"):
+                        st.download_button(label="📄 Export as Word (.docx)", data=docx_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", use_container_width=True, key="export_word_btn")
+                        st.download_button(label="📝 Export as Markdown (.md)", data=md_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.md", mime="text/markdown", use_container_width=True, key="export_md_btn")
+                        copy_to_clipboard(summary_result, "Copy Summary Markdown")
 
+                # Divider & Stats Row inside the card
+                st.markdown("<div style='border-top: 1px solid rgba(226, 232, 240, 0.12); margin: 16px 0 12px 0;'></div>", unsafe_allow_html=True)
+                st.markdown(
+                    f"<div style='font-size: 0.85rem; color: #475569; font-weight: 500; display: flex; align-items: center; flex-wrap: wrap; gap: 12px;'>"
+                    f"<span style='background: rgba(99, 102, 241, 0.04); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.08); display: inline-flex; align-items: center; gap: 4px;'>⏱️ {ocr_time:.2f}s</span>"
+                    f"<span style='background: rgba(99, 102, 241, 0.04); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.08); display: inline-flex; align-items: center; gap: 4px;'>📊 {word_count} words</span>"
+                    f"<span style='background: rgba(99, 102, 241, 0.04); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.08); display: inline-flex; align-items: center; gap: 4px;'>📄 {page_count} pages</span>"
+                    f"{db_badge_html}"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
 
-
-        # ── Row 3: Stats bar ─────────────────────────────────────────────
-        db_badge_html = (
-            '  •  <span style="background-color: rgba(16, 185, 129, 0.1); color: #059669; font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; display: inline-flex; align-items: center; vertical-align: middle; gap: 4px;">'
-            '☁️ Cloud Saved'
-            '</span>'
-        ) if is_saved else ""
-        st.markdown(
-            f"<div style='font-size: 0.98rem; color: #475569; font-weight: 500; margin-top: 8px; margin-bottom: 24px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;'>"
-            f"⏱️ {ocr_time:.2f}s  •  📊 {word_count} words  •  📄 {page_count} pages{db_badge_html}"
-            f"</div>",
-            unsafe_allow_html=True
-        )
 
 
         # Cloud Database Saving UI (Flat layout Notion-style)
