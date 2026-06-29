@@ -259,44 +259,116 @@ def save_chat_history_to_firestore(uid, doc_id, chat_history_list, id_token=None
 
 def rename_document_title(uid, doc_id, new_title, id_token=None):
     """
-    Updates the 'title' field of a saved summary document in Firestore.
-    Uses PATCH with updateMask to only touch the title field.
+    Renames a document in Firestore by:
+    1. Fetching the existing document fields.
+    2. Creating a new document with the new document ID containing the updated title.
+    3. Deleting the old document.
+    Returns (True, new_doc_id) on success, or (False, error_message) on failure.
     """
     import urllib.parse
-    quoted_doc_id = urllib.parse.quote(doc_id, safe='')
-    url = (
-        f"https://firestore.googleapis.com/v1/projects/fyp1-2772c/databases/(default)/documents"
-        f"/users/{uid}/summaries/{quoted_doc_id}?updateMask.fieldPaths=title"
-    )
-    data = {
-        "fields": {
-            "title": {"stringValue": new_title}
-        }
-    }
-    headers = {"Content-Type": "application/json; charset=utf-8"}
+    import re
+    
+    quoted_old_doc_id = urllib.parse.quote(doc_id)
+    get_url = f"https://firestore.googleapis.com/v1/projects/fyp1-2772c/databases/(default)/documents/users/{uid}/summaries/{quoted_old_doc_id}"
+    
+    headers = {}
     if id_token:
         headers["Authorization"] = f"Bearer {id_token}"
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(data, ensure_ascii=False).encode("utf-8"),
-        headers=headers,
-        method="PATCH"
-    )
+        
+    req_get = urllib.request.Request(get_url, headers=headers, method="GET")
     ctx = ssl._create_unverified_context()
+    
+    # 1. Fetch old document
     try:
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
-            result = json.loads(response.read().decode("utf-8"))
-            # Verify the returned title matches what we sent
-            returned_title = result.get("fields", {}).get("title", {}).get("stringValue", "")
-            if returned_title == new_title:
-                return True, None
-            else:
-                return True, None  # Accept as success even if response differs
+        with urllib.request.urlopen(req_get, context=ctx, timeout=10) as response:
+            old_doc = json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
-        err_body = e.read().decode("utf-8")
-        return False, f"HTTP {e.code}: {err_body[:200]}"
+        # Fallback to public GET
+        try:
+            req_get_pub = urllib.request.Request(get_url, method="GET")
+            with urllib.request.urlopen(req_get_pub, context=ctx, timeout=10) as response:
+                old_doc = json.loads(response.read().decode("utf-8"))
+        except Exception as ex:
+            return False, f"Failed to fetch document: {str(ex)}"
     except Exception as e:
-        return False, f"Connection Error: {str(e)}"
+        return False, f"Failed to fetch document: {str(e)}"
+        
+    # 2. Extract fields and update title
+    fields = old_doc.get("fields", {})
+    fields["title"] = {"stringValue": new_title}
+    fields["timestamp"] = {"stringValue": datetime.now().isoformat()}
+    
+    # 3. Construct new doc ID
+    sanitized = new_title.replace("/", "-").replace("\\", "-").strip()
+    if not sanitized:
+        sanitized = "Summary"
+    elif sanitized in (".", ".."):
+        sanitized = f"doc_{sanitized}"
+    elif sanitized.startswith("__") and sanitized.endswith("__"):
+        sanitized = sanitized.strip("_")
+        
+    ts_match = re.search(r'_(\d{8}_\d{6})$', doc_id)
+    if ts_match:
+        ts_suffix = ts_match.group(1)
+    else:
+        ts_suffix = datetime.now().strftime('%Y%m%d_%H%M%S')
+    new_doc_id = f"{sanitized}_{ts_suffix}"
+    
+    # 4. Create new document
+    quoted_new_doc_id = urllib.parse.quote(new_doc_id)
+    create_url = f"https://firestore.googleapis.com/v1/projects/fyp1-2772c/databases/(default)/documents/users/{uid}/summaries?documentId={quoted_new_doc_id}"
+    
+    create_data = {"fields": fields}
+    headers_post = {"Content-Type": "application/json; charset=utf-8"}
+    if id_token:
+        headers_post["Authorization"] = f"Bearer {id_token}"
+        
+    req_post = urllib.request.Request(
+        create_url,
+        data=json.dumps(create_data, ensure_ascii=False).encode("utf-8"),
+        headers=headers_post,
+        method="POST"
+    )
+    
+    try:
+        with urllib.request.urlopen(req_post, context=ctx, timeout=10) as response:
+            pass
+    except urllib.error.HTTPError as e:
+        # Fallback to public POST
+        try:
+            req_post_pub = urllib.request.Request(
+                create_url,
+                data=json.dumps(create_data, ensure_ascii=False).encode("utf-8"),
+                headers={"Content-Type": "application/json; charset=utf-8"},
+                method="POST"
+            )
+            with urllib.request.urlopen(req_post_pub, context=ctx, timeout=10) as response:
+                pass
+        except Exception as ex:
+            return False, f"Failed to create new document: {str(ex)}"
+    except Exception as e:
+        return False, f"Failed to create new document: {str(e)}"
+        
+    # 5. Delete old document
+    delete_url = f"https://firestore.googleapis.com/v1/projects/fyp1-2772c/databases/(default)/documents/users/{uid}/summaries/{quoted_old_doc_id}"
+    req_del = urllib.request.Request(delete_url, headers=headers, method="DELETE")
+    
+    try:
+        with urllib.request.urlopen(req_del, context=ctx, timeout=10) as response:
+            pass
+    except urllib.error.HTTPError as e:
+        # Fallback to public DELETE
+        try:
+            req_del_pub = urllib.request.Request(delete_url, method="DELETE")
+            with urllib.request.urlopen(req_del_pub, context=ctx, timeout=10) as response:
+                pass
+        except Exception:
+            pass
+    except Exception:
+        pass
+        
+    return True, new_doc_id
+
 
 def fetch_saved_summaries(uid, id_token=None):
     """
@@ -4133,14 +4205,31 @@ def main():
                         uid_r = user_info.get("uid") if user_info else None
                         id_token_r = user_info.get("idToken") if user_info else None
                         if uid_r and doc_id:
-                            ok, err = rename_document_title(uid_r, doc_id, new_name, id_token_r)
+                            ok, res = rename_document_title(uid_r, doc_id, new_name, id_token_r)
                             if ok:
+                                new_doc_id = res
+                                # Update ocr_results
+                                st.session_state.ocr_results['id'] = new_doc_id
                                 st.session_state.ocr_results['filename'] = new_name
+                                
+                                # Move chat history key in session state
+                                old_chat_key = f"chat_history_{doc_id}"
+                                new_chat_key = f"chat_history_{new_doc_id}"
+                                if old_chat_key in st.session_state:
+                                    st.session_state[new_chat_key] = st.session_state[old_chat_key]
+                                    try:
+                                        del st.session_state[old_chat_key]
+                                    except Exception:
+                                        pass
+                                
+                                # Clear renaming state for both old and new ID
                                 st.session_state[rename_key] = False
+                                st.session_state[f"renaming_doc_{new_doc_id}"] = False
+                                
                                 st.toast(f"✅ Renamed to \"{new_name}\"", icon="✏️")
                                 st.rerun()
                             else:
-                                st.error(f"❌ Rename failed — {err}")
+                                st.error(f"❌ Rename failed — {res}")
                         else:
                             st.warning(f"Cannot rename: doc_id='{doc_id}' | uid='{uid_r}'")
                     else:
