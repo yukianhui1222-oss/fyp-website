@@ -27,6 +27,7 @@ import time
 import os
 import base64
 import json
+import urllib.parse
 from datetime import datetime
 
 # Patch Streamlit's static index.html to disable the 'c' hotkey for clear cache (copy conflict)
@@ -1023,17 +1024,28 @@ def render_edit_profile_view():
         </div>
     """, unsafe_allow_html=True)
 
+    # Title Banner for Profile
+    st.markdown("""
+        <div style="background: linear-gradient(135deg, rgba(224, 231, 255, 0.7) 0%, rgba(233, 213, 255, 0.7) 50%, rgba(250, 232, 255, 0.7) 100%); backdrop-filter: blur(16px); padding: 32px 24px; border-radius: 24px; text-align: center; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.12);">
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(99, 102, 241, 0.12); color: #4f46e5; padding: 4px 14px; border-radius: 99px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; border: 1px solid rgba(99, 102, 241, 0.2);">
+                <span>✨</span> User Profile Settings
+            </div>
+            <h1 class="hero-title" style="margin: 0 !important; font-size: 2.8rem !important; background: linear-gradient(45deg, #f97316, #e11d48, #9f1239); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.15; font-weight: 800;">Account Profile</h1>
+            <p style="color: #4338ca; font-size: 0.98rem; margin-top: 0.5rem; font-weight: 600; letter-spacing: 0.2px;">Manage your personal identity, avatar branding, and preferences</p>
+        </div>
+    """, unsafe_allow_html=True)
+
     # Main edit container style
     st.markdown("""
         <style>
         /* Overall profile container card styling */
         div[class*="st-key-profile_container"] {
-            background: rgba(255, 255, 255, 0.85) !important;
-            border: 1px solid rgba(226, 232, 240, 0.8) !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid rgba(226, 232, 240, 0.9) !important;
             border-radius: 24px !important;
-            padding: 35px 40px !important;
+            padding: 32px 36px !important;
             backdrop-filter: blur(20px) !important;
-            box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.04) !important;
+            box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.08) !important;
             margin-bottom: 2rem !important;
         }
 
@@ -1041,27 +1053,39 @@ def render_edit_profile_view():
         div[class*="st-key-profile_container"] div[data-testid="stTextInput"] input,
         div[class*="st-key-profile_container"] div[data-testid="stTextArea"] textarea,
         div[class*="st-key-profile_container"] div[data-testid="stSelectbox"] div[role="button"] {
-            border-radius: 12px !important;
-            border: 1px solid #cbd5e1 !important;
+            border-radius: 14px !important;
+            border: 1.5px solid #e2e8f0 !important;
             background-color: #ffffff !important;
-            padding: 12px 16px !important;
-            font-size: 1.05rem !important;
-            transition: all 0.2s ease !important;
+            padding: 12px 18px !important;
+            font-size: 0.98rem !important;
+            color: #1e293b !important;
+            font-weight: 500 !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) !important;
+        }
+        div[class*="st-key-profile_container"] div[data-testid="stTextInput"] input:hover,
+        div[class*="st-key-profile_container"] div[data-testid="stTextArea"] textarea:hover,
+        div[class*="st-key-profile_container"] div[data-testid="stSelectbox"] div[role="button"]:hover {
+            border-color: #a5b4fc !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.06) !important;
         }
         div[class*="st-key-profile_container"] div[data-testid="stTextInput"] input:focus,
         div[class*="st-key-profile_container"] div[data-testid="stTextArea"] textarea:focus,
         div[class*="st-key-profile_container"] div[data-testid="stSelectbox"] div[role="button"]:focus {
             border-color: #6366f1 !important;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
             outline: none !important;
         }
         
         /* Style input field labels */
         div[class*="st-key-profile_container"] label[data-testid="stWidgetLabel"] p {
-            font-size: 1.08rem !important;
-            font-weight: 600 !important;
-            color: #334155 !important;
+            font-size: 0.95rem !important;
+            font-weight: 700 !important;
+            color: #1e293b !important;
             margin-bottom: 6px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
         }
         
         /* Make read-only/disabled text inputs look distinct and clean */
@@ -1070,71 +1094,79 @@ def render_edit_profile_view():
             color: #64748b !important;
             border-color: #e2e8f0 !important;
             cursor: not-allowed !important;
+            font-weight: 500 !important;
         }
 
         /* Style custom file uploader */
         div[class*="st-key-profile_container"] div[data-testid="stFileUploader"] {
-            border: 2px dashed rgba(99, 102, 241, 0.25) !important;
-            background-color: rgba(99, 102, 241, 0.01) !important;
+            border: 2px dashed rgba(99, 102, 241, 0.3) !important;
+            background: linear-gradient(135deg, rgba(238, 242, 255, 0.4) 0%, rgba(245, 243, 255, 0.4) 100%) !important;
             border-radius: 16px !important;
-            padding: 12px !important;
-            transition: all 0.2s ease !important;
+            padding: 14px !important;
+            transition: all 0.25s ease !important;
         }
         div[class*="st-key-profile_container"] div[data-testid="stFileUploader"]:hover {
             border-color: #6366f1 !important;
-            background-color: rgba(99, 102, 241, 0.03) !important;
+            background: linear-gradient(135deg, rgba(238, 242, 255, 0.8) 0%, rgba(245, 243, 255, 0.8) 100%) !important;
+            box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.1) !important;
         }
 
         /* Action buttons style overrides */
         div[class*="st-key-profile_cancel_btn"] button {
-            background-color: #ffffff !important;
+            background: #ffffff !important;
             color: #475569 !important;
-            border: 1px solid #cbd5e1 !important;
-            border-radius: 12px !important;
+            border: 1.5px solid #cbd5e1 !important;
+            border-radius: 14px !important;
             padding: 10px 24px !important;
-            font-size: 1.08rem !important;
+            font-size: 1.02rem !important;
             font-weight: 600 !important;
             transition: all 0.2s ease !important;
-            height: 44px !important;
+            height: 48px !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
         }
         div[class*="st-key-profile_cancel_btn"] button:hover {
             background-color: #f8fafc !important;
             color: #0f172a !important;
             border-color: #94a3b8 !important;
+            transform: translateY(-1px);
         }
 
         div[class*="st-key-profile_save_btn"] button {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
             color: #ffffff !important;
             border: none !important;
-            border-radius: 12px !important;
+            border-radius: 14px !important;
             padding: 10px 24px !important;
-            font-size: 1.08rem !important;
+            font-size: 1.05rem !important;
             font-weight: 700 !important;
-            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.2) !important;
-            transition: all 0.2s ease !important;
-            height: 44px !important;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25) !important;
+            transition: all 0.25s ease !important;
+            height: 48px !important;
+            letter-spacing: 0.2px !important;
         }
         div[class*="st-key-profile_save_btn"] button:hover {
             background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3) !important;
-            transform: translateY(-1px);
+            box-shadow: 0 12px 28px rgba(99, 102, 241, 0.35) !important;
+            transform: translateY(-2px);
         }
 
         /* Style the Remove Avatar button */
         div[class*="st-key-remove_avatar_btn"] button {
-            background-color: rgba(239, 68, 68, 0.04) !important;
+            background-color: rgba(239, 68, 68, 0.06) !important;
             color: #ef4444 !important;
-            border: 1px solid rgba(239, 68, 68, 0.15) !important;
-            border-radius: 10px !important;
+            border: 1.5px solid rgba(239, 68, 68, 0.2) !important;
+            border-radius: 12px !important;
             font-size: 0.85rem !important;
             font-weight: 600 !important;
+            padding: 6px 14px !important;
             transition: all 0.2s ease !important;
+            margin-top: 8px !important;
         }
         div[class*="st-key-remove_avatar_btn"] button:hover {
             background-color: #ef4444 !important;
             color: #ffffff !important;
             border-color: #ef4444 !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25) !important;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -1166,19 +1198,19 @@ def render_edit_profile_view():
         
         avatar_header_html = ""
         if profile_avatar:
-            avatar_header_html = f'<img src="{profile_avatar}" style="width: 76px; height: 76px; border-radius: 50%; object-fit: cover; border: 3px solid #6366F1; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);">'
+            avatar_header_html = f'<img src="{profile_avatar}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #6366F1; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);">'
         else:
-            avatar_header_html = f'<div style="width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 2rem; font-family: \'Poppins\', sans-serif; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);">{initials}</div>'
+            avatar_header_html = f'<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 2.2rem; font-family: \'Poppins\', sans-serif; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);">{initials}</div>'
             
         st.markdown(f"""
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; display: flex; align-items: center; gap: 24px; margin-bottom: 24px; box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.03); flex-wrap: wrap;">
+            <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%); border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px 28px; display: flex; align-items: center; gap: 24px; margin-bottom: 24px; box-shadow: 0 12px 30px -8px rgba(99, 102, 241, 0.06); flex-wrap: wrap;">
                 {avatar_header_html}
-                <div>
+                <div style="flex-grow: 1;">
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <h2 style="margin: 0; font-size: 1.7rem; font-weight: 800; color: #0f172a; font-family: 'Poppins', sans-serif; line-height: 1.2;">{curr_name}</h2>
-                        <span style="background: linear-gradient(45deg, #f97316, #e11d48, #9f1239); color: white; font-size: 0.72rem; font-weight: 700; padding: 2px 10px; border-radius: 99px; box-shadow: 0 4px 10px rgba(225, 29, 72, 0.15); display: inline-flex; align-items: center;">PRO MEMBER</span>
+                        <h2 style="margin: 0; font-size: 1.8rem; font-weight: 800; color: #0f172a; font-family: 'Poppins', sans-serif; line-height: 1.2;">{curr_name}</h2>
+                        <span style="background: linear-gradient(45deg, #f97316, #e11d48, #9f1239); color: white; font-size: 0.74rem; font-weight: 700; padding: 3px 12px; border-radius: 99px; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.2); display: inline-flex; align-items: center;">PRO MEMBER</span>
                     </div>
-                    <p style="margin: 6px 0 0 0; color: #64748b; font-size: 0.9rem; font-weight: 500;">Account: <span style="color:#6366f1; font-weight:600;">{curr_role}</span> • Joined on {curr_joined_at}</p>
+                    <p style="margin: 6px 0 0 0; color: #64748b; font-size: 0.92rem; font-weight: 500;">Role: <span style="color:#6366f1; font-weight:700; background: rgba(99, 102, 241, 0.08); padding: 2px 8px; border-radius: 6px;">{curr_role}</span> • Joined on {curr_joined_at}</p>
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -1187,45 +1219,52 @@ def render_edit_profile_view():
         s_col1, s_col2, s_col3 = st.columns(3)
         with s_col1:
             st.markdown("""
-                <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #bbf7d0; border-radius: 16px; padding: 16px 20px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.03); min-height: 75px;">
-                    <div style="font-size: 0.76rem; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 0.05em;">API Status</div>
+                <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1.5px solid #bbf7d0; border-radius: 18px; padding: 18px 22px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.06); min-height: 80px;">
+                    <div style="font-size: 0.76rem; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 6px;">
+                        <span>🌐</span> API Status
+                    </div>
                     <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
-                        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
-                        <span style="font-size: 1.05rem; font-weight: 800; color: #14532d;">Connected</span>
+                        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 10px #10b981;"></span>
+                        <span style="font-size: 1.1rem; font-weight: 800; color: #14532d;">Connected</span>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
         with s_col2:
             st.markdown("""
-                <div style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); border: 1px solid #e9d5ff; border-radius: 16px; padding: 16px 20px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.03); min-height: 75px;">
-                    <div style="font-size: 0.76rem; font-weight: 700; color: #581c87; text-transform: uppercase; letter-spacing: 0.05em;">Engine Tier</div>
-                    <div style="font-size: 1.05rem; font-weight: 800; color: #6b21a8; margin-top: 6px;">Gemini Pro 1.5</div>
+                <div style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); border: 1.5px solid #e9d5ff; border-radius: 18px; padding: 18px 22px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.06); min-height: 80px;">
+                    <div style="font-size: 0.76rem; font-weight: 700; color: #581c87; text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 6px;">
+                        <span>⚡</span> Engine Tier
+                    </div>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #6b21a8; margin-top: 6px;">Gemini Pro 1.5</div>
                 </div>
             """, unsafe_allow_html=True)
         with s_col3:
             st.markdown("""
-                <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: 16px; padding: 16px 20px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.03); min-height: 75px;">
-                    <div style="font-size: 0.76rem; font-weight: 700; color: #075985; text-transform: uppercase; letter-spacing: 0.05em;">Account Status</div>
-                    <div style="font-size: 1.05rem; font-weight: 800; color: #0c4a6e; margin-top: 6px;">Active Verified</div>
+                <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1.5px solid #bae6fd; border-radius: 18px; padding: 18px 22px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 6px 20px rgba(59, 130, 246, 0.06); min-height: 80px;">
+                    <div style="font-size: 0.76rem; font-weight: 700; color: #075985; text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 6px;">
+                        <span>🛡️</span> Account Status
+                    </div>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #0c4a6e; margin-top: 6px;">Active Verified</div>
                 </div>
             """, unsafe_allow_html=True)
 
         st.markdown("<div style='height: 25px;'></div>", unsafe_allow_html=True)
         
-        # Row 0: Customize Profile Avatar
+        # Row 0: Customize Profile Avatar Section
         st.markdown("""
-            <div style="display: flex; align-items: center; gap: 8px; border-left: 4px solid #6366f1; padding-left: 12px; margin-top: 10px; margin-bottom: 18px;">
-                <h4 style="font-size: 1.45rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Poppins', sans-serif;">🖼️ Customize Profile Avatar</h4>
+            <div style="display: flex; align-items: center; gap: 10px; background: linear-gradient(90deg, rgba(99, 102, 241, 0.08) 0%, transparent 100%); padding: 8px 14px; border-radius: 10px; border-left: 4px solid #6366f1; margin-bottom: 18px;">
+                <span style="font-size: 1.2rem;">🖼️</span>
+                <h4 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Poppins', sans-serif;">Customize Profile Avatar</h4>
             </div>
         """, unsafe_allow_html=True)
         
-        avatar_col1, avatar_col2 = st.columns([1.5, 3.5])
+        avatar_col1, avatar_col2 = st.columns([1.6, 3.4])
         with avatar_col1:
-            # Render the preview card cleanly
             if st.session_state.temp_avatar:
                 st.markdown(f"""
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02); min-height: 180px;">
-                        <img src="{st.session_state.temp_avatar}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #6366F1; box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12); margin-bottom: 12px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1.5px solid #e2e8f0; border-radius: 20px; padding: 22px 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03); min-height: 190px;">
+                        <img src="{st.session_state.temp_avatar}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #6366F1; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2); margin-bottom: 10px;">
+                        <span style="font-size: 0.78rem; font-weight: 700; color: #6366f1; background: rgba(99, 102, 241, 0.08); padding: 2px 10px; border-radius: 99px;">Custom Avatar</span>
                     </div>
                 """, unsafe_allow_html=True)
                 if st.button("❌ Remove Avatar", use_container_width=True, key="remove_avatar_btn"):
@@ -1235,8 +1274,9 @@ def render_edit_profile_view():
                     st.rerun()
             else:
                 st.markdown(f"""
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02); min-height: 180px;">
-                        <div style="width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 2.8rem; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12); margin-bottom: 12px;">{initials}</div>
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1.5px solid #e2e8f0; border-radius: 20px; padding: 22px 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03); min-height: 190px;">
+                        <div style="width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 2.8rem; font-family: 'Poppins', sans-serif; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2); margin-bottom: 10px;">{initials}</div>
+                        <span style="font-size: 0.78rem; font-weight: 700; color: #64748b; background: #f1f5f9; padding: 2px 10px; border-radius: 99px;">Default Initials</span>
                     </div>
                 """, unsafe_allow_html=True)
                     
@@ -1279,8 +1319,9 @@ def render_edit_profile_view():
 
         # Personal Details Section Header
         st.markdown("""
-            <div style="display: flex; align-items: center; gap: 8px; border-left: 4px solid #8b5cf6; padding-left: 12px; margin-top: 25px; margin-bottom: 18px;">
-                <h4 style="font-size: 1.45rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Poppins', sans-serif;">📝 Personal Information</h4>
+            <div style="display: flex; align-items: center; gap: 10px; background: linear-gradient(90deg, rgba(139, 92, 246, 0.08) 0%, transparent 100%); padding: 8px 14px; border-radius: 10px; border-left: 4px solid #8b5cf6; margin-top: 25px; margin-bottom: 18px;">
+                <span style="font-size: 1.2rem;">📝</span>
+                <h4 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Poppins', sans-serif;">Personal Information</h4>
             </div>
         """, unsafe_allow_html=True)
         
@@ -1289,7 +1330,7 @@ def render_edit_profile_view():
         with r1_col1:
             new_name = st.text_input("👤 Display Name", value=curr_name, placeholder="Enter your full name", help="Your custom display name shown in the sidebar.")
         with r1_col2:
-            st.text_input("✉️ Email Address (Read-Only)", value=curr_email, disabled=True, help="Your account login email (cannot be modified).")
+            st.text_input("🔒 Email Address (Read-Only)", value=curr_email, disabled=True, help="Your account login email (cannot be modified).")
         
         # Row 2: Contact Number & Gender
         r2_col1, r2_col2 = st.columns(2)
@@ -1319,7 +1360,7 @@ def render_edit_profile_view():
         # Row 4: Registration Date & Biography
         r4_col1, r4_col2 = st.columns(2)
         with r4_col1:
-            st.text_input("📅 Registration Date (Read-Only)", value=curr_joined_at, disabled=True, help="The date your account profile was created.")
+            st.text_input("🔒 Registration Date (Read-Only)", value=curr_joined_at, disabled=True, help="The date your account profile was created.")
         with r4_col2:
             st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
             
@@ -1329,7 +1370,7 @@ def render_edit_profile_view():
         st.markdown("<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0;'>", unsafe_allow_html=True)
         
         # Action buttons
-        btn_col1, btn_col2 = st.columns([1, 4])
+        btn_col1, btn_col2 = st.columns([1, 3.5])
         with btn_col1:
             if st.button("Cancel", use_container_width=True, key="profile_cancel_btn"):
                 if 'temp_avatar' in st.session_state:
@@ -2254,6 +2295,59 @@ def copy_to_clipboard(text, label="Copy"):
         </script>
     """
     components.html(html_code, height=44)
+
+def render_export_and_share_popover(docx_data, md_data, results, summary_result, key_suffix=""):
+    """Renders download buttons and instant WhatsApp/Email share links inside a popover."""
+    with st.popover("📤 Export Document", use_container_width=True, key=f"export_document_popover{key_suffix}"):
+        st.markdown("<div style='font-size: 0.88rem; font-weight: 700; color: #1e293b; margin-bottom: 8px;'>💾 Download Files</div>", unsafe_allow_html=True)
+        doc_fname = results.get('filename', 'DocuMind')
+        st.download_button(
+            label="📄 Export as Word (.docx)",
+            data=docx_data,
+            file_name=f"{doc_fname}_Summary.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            use_container_width=True,
+            key=f"export_word_btn{key_suffix}"
+        )
+        st.download_button(
+            label="📝 Export as Markdown (.md)",
+            data=md_data,
+            file_name=f"{doc_fname}_Summary.md",
+            mime="text/markdown",
+            use_container_width=True,
+            key=f"export_md_btn{key_suffix}"
+        )
+        copy_to_clipboard(summary_result, "Copy Summary Markdown")
+        
+        # --- Instant Social & Email Sharing Section ---
+        st.markdown("<hr style='margin: 14px 0 10px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 0.88rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;'><span>⚡</span> Quick Share with Friends</div>", unsafe_allow_html=True)
+        
+        # Clean and safely truncate summary for URL sharing limits
+        clean_summary = summary_result.strip() if summary_result else ""
+        if len(clean_summary) > 1200:
+            share_summary_text = clean_summary[:1180] + "...\n\n(Full summary available in DocuMind Pro)"
+        else:
+            share_summary_text = clean_summary
+            
+        wa_text = f"📚 *DocuMind Pro - Study Summary*\n📄 *Document:* {doc_fname}\n\n{share_summary_text}\n\n✨ _Generated by DocuMind Pro 🚀_"
+        wa_url = f"https://api.whatsapp.com/send?text={urllib.parse.quote(wa_text)}"
+        
+        mail_subject = f"[DocuMind Pro] Study Summary: {doc_fname}"
+        mail_body = f"Hi,\n\nHere is the study summary generated by DocuMind Pro for '{doc_fname}':\n\n----------------------------------------\n{share_summary_text}\n----------------------------------------\n\nBest regards,\nDocuMind Pro 🚀"
+        mail_url = f"mailto:?subject={urllib.parse.quote(mail_subject)}&body={urllib.parse.quote(mail_body)}"
+        
+        share_html = f"""
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px; padding-bottom: 4px;">
+                <a href="{wa_url}" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 9px 12px; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: #ffffff !important; text-decoration: none !important; border-radius: 10px; font-weight: 600; font-size: 0.86rem; box-shadow: 0 3px 8px rgba(37, 211, 102, 0.25); transition: transform 0.15s ease; box-sizing: border-box;">
+                    <span style="font-size: 1.05rem;">💬</span> Share via WhatsApp
+                </a>
+                <a href="{mail_url}" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 9px 12px; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: #ffffff !important; text-decoration: none !important; border-radius: 10px; font-weight: 600; font-size: 0.86rem; box-shadow: 0 3px 8px rgba(79, 70, 229, 0.25); transition: transform 0.15s ease; box-sizing: border-box;">
+                    <span style="font-size: 1.05rem;">✉️</span> Share via Email
+                </a>
+            </div>
+        """
+        st.markdown(share_html, unsafe_allow_html=True)
 
 def main():
 
@@ -4240,10 +4334,7 @@ def main():
                     st.rerun()
             with export_col_r:
                 st.markdown("<div style='margin-top: 4px;'></div>", unsafe_allow_html=True)
-                with st.popover("📤 Export Document", use_container_width=True, key="export_document_popover"):
-                    st.download_button(label="📄 Export as Word (.docx)", data=docx_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", use_container_width=True, key="export_word_btn")
-                    st.download_button(label="📝 Export as Markdown (.md)", data=md_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.md", mime="text/markdown", use_container_width=True, key="export_md_btn")
-                    copy_to_clipboard(summary_result, "Copy Summary Markdown")
+                render_export_and_share_popover(docx_data, md_data, results, summary_result, key_suffix="_r")
         else:
             # ── Row 2: [badge][pencil] then spacer then [Export] far right ──
             badge_col, pencil_col, spacer_col, export_col = st.columns(
@@ -4264,10 +4355,7 @@ def main():
                         st.session_state[rename_key] = True
                         st.rerun()
             with export_col:
-                with st.popover("📤 Export Document", use_container_width=True, key="export_document_popover"):
-                    st.download_button(label="📄 Export as Word (.docx)", data=docx_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", use_container_width=True, key="export_word_btn")
-                    st.download_button(label="📝 Export as Markdown (.md)", data=md_data, file_name=f"{results.get('filename', 'DocuMind')}_Summary.md", mime="text/markdown", use_container_width=True, key="export_md_btn")
-                    copy_to_clipboard(summary_result, "Copy Summary Markdown")
+                render_export_and_share_popover(docx_data, md_data, results, summary_result, key_suffix="_main")
 
 
 
@@ -4359,6 +4447,39 @@ def main():
                     copy_to_clipboard(summary_result, "Copy Summary")
                 
                 st.markdown(summary_result)
+                
+                # --- Quick Share Bar in Summary Tab ---
+                doc_fname = results.get('filename', 'DocuMind')
+                clean_summary = summary_result.strip() if summary_result else ""
+                if len(clean_summary) > 1200:
+                    share_summary_text = clean_summary[:1180] + "...\n\n(Full summary available in DocuMind Pro)"
+                else:
+                    share_summary_text = clean_summary
+
+                wa_text = f"📚 *DocuMind Pro - Study Summary*\n📄 *Document:* {doc_fname}\n\n{share_summary_text}\n\n✨ _Generated by DocuMind Pro 🚀_"
+                wa_url = f"https://api.whatsapp.com/send?text={urllib.parse.quote(wa_text)}"
+
+                mail_subject = f"[DocuMind Pro] Study Summary: {doc_fname}"
+                mail_body = f"Hi,\n\nHere is the study summary generated by DocuMind Pro for '{doc_fname}':\n\n----------------------------------------\n{share_summary_text}\n----------------------------------------\n\nBest regards,\nDocuMind Pro 🚀"
+                mail_url = f"mailto:?subject={urllib.parse.quote(mail_subject)}&body={urllib.parse.quote(mail_body)}"
+
+                st.markdown(f"""
+                    <div style="background: linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(241, 245, 249, 0.8) 100%); border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 16px; margin: 16px 0 8px 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1.05rem;">⚡</span>
+                            <span style="font-size: 0.86rem; font-weight: 700; color: #334155;">Share Summary with Friends:</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <a href="{wa_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: #ffffff !important; text-decoration: none !important; border-radius: 8px; font-weight: 600; font-size: 0.82rem; box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25); transition: transform 0.15s ease;">
+                                <span style="font-size: 0.95rem;">💬</span> WhatsApp
+                            </a>
+                            <a href="{mail_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: #ffffff !important; text-decoration: none !important; border-radius: 8px; font-weight: 600; font-size: 0.82rem; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25); transition: transform 0.15s ease;">
+                                <span style="font-size: 0.95rem;">✉️</span> Email
+                            </a>
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
+                
                 st.markdown("---")
                 with st.expander("👁️ View Raw Extracted Text", expanded=False):
                     st.text_area("Extracted OCR Text", raw_text, height=350, disabled=True, label_visibility="collapsed")
