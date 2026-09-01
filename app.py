@@ -2296,122 +2296,6 @@ def copy_to_clipboard(text, label="Copy"):
     """
     components.html(html_code, height=44)
 
-def render_file_share_button(docx_data, doc_fname, button_label="📤 Share Word File (.docx)", key_suffix=""):
-    """Renders a native Web Share button that passes the actual .docx file to WhatsApp/Mail/OS."""
-    if not docx_data:
-        return
-    docx_b64 = base64.b64encode(docx_data).decode('utf-8')
-    button_id = f"file-share-btn-{abs(hash(doc_fname + str(len(docx_data)) + key_suffix))}"
-    escaped_fname = json.dumps(f"{doc_fname}_Summary.docx")
-    
-    html_code = f"""
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-            html, body {{
-                margin: 0;
-                padding: 0;
-                background: transparent !important;
-                overflow: hidden;
-                width: 100% !important;
-                height: 100% !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-            }}
-            #{button_id} {{
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                gap: 8px !important;
-                width: 100% !important;
-                height: 38px !important;
-                padding: 0 12px !important;
-                border-radius: 9px !important;
-                font-weight: 600 !important;
-                font-size: 0.85rem !important;
-                background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
-                color: #ffffff !important;
-                border: none !important;
-                cursor: pointer !important;
-                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
-                box-sizing: border-box !important;
-                box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25) !important;
-            }}
-            #{button_id}:hover {{
-                background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%) !important;
-                box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35) !important;
-                transform: translateY(-1px) !important;
-            }}
-            #{button_id}:active {{
-                transform: translateY(0) !important;
-            }}
-        </style>
-        <button id="{button_id}">
-            <span style="font-size: 1rem;">📤</span> {button_label}
-        </button>
-        <script>
-            function b64ToBlob(b64Data, contentType) {{
-                const byteCharacters = atob(b64Data);
-                const byteArrays = [];
-                const sliceSize = 512;
-                for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {{
-                    const slice = byteCharacters.slice(offset, offset + sliceSize);
-                    const byteNumbers = new Array(slice.length);
-                    for (let i = 0; i < slice.length; i++) {{
-                        byteNumbers[i] = byteCharacters.charCodeAt(i);
-                    }}
-                    byteArrays.push(new Uint8Array(byteNumbers));
-                }}
-                return new Blob(byteArrays, {{ type: contentType }});
-            }}
-
-            document.getElementById('{button_id}').onclick = async function() {{
-                const btn = this;
-                const origText = btn.innerHTML;
-                try {{
-                    const mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-                    const blob = b64ToBlob("{docx_b64}", mimeType);
-                    const filename = {escaped_fname};
-                    const file = new File([blob], filename, {{ type: mimeType }});
-
-                    const shareNav = (navigator && navigator.canShare && navigator.canShare({{ files: [file] }})) ? navigator :
-                                     (window.top && window.top.navigator && window.top.navigator.canShare && window.top.navigator.canShare({{ files: [file] }})) ? window.top.navigator : null;
-
-                    if (shareNav) {{
-                        btn.innerHTML = '<span>⏳</span> Preparing Share...';
-                        await shareNav.share({{
-                            files: [file],
-                            title: 'DocuMind Pro - ' + filename,
-                            text: 'Here is the summary file for ' + filename
-                        }});
-                        btn.innerHTML = '<span>✅</span> Shared!';
-                        setTimeout(() => {{ btn.innerHTML = origText; }}, 2500);
-                    }} else {{
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                        
-                        btn.innerHTML = '<span>⬇️</span> File Ready!';
-                        alert("The Word document is ready in your downloads! You can now drag and drop it into WhatsApp or Email.");
-                        setTimeout(() => {{ btn.innerHTML = origText; }}, 2500);
-                    }}
-                }} catch (err) {{
-                    if (err.name !== 'AbortError') {{
-                        console.error('Share error:', err);
-                    }}
-                    btn.innerHTML = origText;
-                }}
-            }};
-        </script>
-    """
-    components.html(html_code, height=44)
-
 def render_export_and_share_popover(docx_data, md_data, results, summary_result, key_suffix=""):
     """Renders download buttons and instant WhatsApp/Email share links inside a popover."""
     with st.popover("📤 Export Document", use_container_width=True, key=f"export_document_popover{key_suffix}"):
@@ -2439,10 +2323,7 @@ def render_export_and_share_popover(docx_data, md_data, results, summary_result,
         st.markdown("<hr style='margin: 14px 0 10px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
         st.markdown("<div style='font-size: 0.86rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;'><span>⚡</span> Quick Share with Friends</div>", unsafe_allow_html=True)
         
-        # 1. Native File Share Button (Sends actual .docx file to WhatsApp/Mail/Apps)
-        render_file_share_button(docx_data, doc_fname, button_label="📤 Share Word File (.docx)", key_suffix=f"_pop_{key_suffix}")
-        
-        # 2. Text Quick Links
+        # Clean and safely truncate summary for URL sharing limits
         clean_summary = summary_result.strip() if summary_result else ""
         if len(clean_summary) > 1200:
             share_summary_text = clean_summary[:1180] + "...\n\n(Full summary available in DocuMind Pro)"
@@ -2456,15 +2337,29 @@ def render_export_and_share_popover(docx_data, md_data, results, summary_result,
         mail_body = f"Hi,\n\nHere is the study summary generated by DocuMind Pro for '{doc_fname}':\n\n----------------------------------------\n{share_summary_text}\n----------------------------------------\n\nBest regards,\nDocuMind Pro 🚀"
         mail_url = f"mailto:?subject={urllib.parse.quote(mail_subject)}&body={urllib.parse.quote(mail_body)}"
         
+        docx_b64 = base64.b64encode(docx_data).decode('utf-8') if docx_data else ""
+        escaped_fname = json.dumps(f"{doc_fname}_Summary.docx")
+        btn_id_wa = f"share-wa-btn-{abs(hash(doc_fname + key_suffix + 'wa'))}"
+        btn_id_mail = f"share-mail-btn-{abs(hash(doc_fname + key_suffix + 'mail'))}"
+        
         share_html = f"""
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
+                html, body {{
+                    margin: 0;
+                    padding: 0;
+                    background: transparent !important;
+                    overflow: hidden;
+                    width: 100% !important;
+                }}
                 .dm-share-btn {{
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
                     gap: 8px !important;
                     width: 100% !important;
-                    padding: 8px 12px !important;
+                    height: 38px !important;
+                    padding: 0 12px !important;
                     border-radius: 9px !important;
                     font-weight: 600 !important;
                     font-size: 0.84rem !important;
@@ -2472,9 +2367,8 @@ def render_export_and_share_popover(docx_data, md_data, results, summary_result,
                     box-sizing: border-box !important;
                     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
                     cursor: pointer !important;
-                }}
-                .dm-share-btn, .dm-share-btn *, .dm-share-btn:hover, .dm-share-btn:visited, .dm-share-btn:active {{
-                    text-decoration: none !important;
+                    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+                    margin-bottom: 8px !important;
                 }}
                 .dm-share-wa {{
                     background: #f0fdf4 !important;
@@ -2501,18 +2395,61 @@ def render_export_and_share_popover(docx_data, md_data, results, summary_result,
                     transform: translateY(-1px) !important;
                 }}
             </style>
-            <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 4px; padding-bottom: 2px;">
-                <a href="{wa_url}" target="_blank" rel="noopener noreferrer" class="dm-share-btn dm-share-wa">
-                    <span style="font-size: 0.95rem; text-decoration: none !important;">💬</span>
-                    <span style="color: #166534 !important; text-decoration: none !important;">WhatsApp (Text Summary)</span>
-                </a>
-                <a href="{mail_url}" target="_blank" rel="noopener noreferrer" class="dm-share-btn dm-share-mail">
-                    <span style="font-size: 0.95rem; text-decoration: none !important;">✉️</span>
-                    <span style="color: #4338ca !important; text-decoration: none !important;">Email (Text Summary)</span>
-                </a>
+            <div style="display: flex; flex-direction: column; width: 100%; padding-top: 2px;">
+                <button id="{btn_id_wa}" class="dm-share-btn dm-share-wa">
+                    <span style="font-size: 1rem;">💬</span>
+                    <span>Share via WhatsApp (File + Text)</span>
+                </button>
+                <button id="{btn_id_mail}" class="dm-share-btn dm-share-mail">
+                    <span style="font-size: 1rem;">✉️</span>
+                    <span>Share via Email (File + Text)</span>
+                </button>
             </div>
+            <script>
+                function downloadDocx() {{
+                    try {{
+                        const byteCharacters = atob("{docx_b64}");
+                        const byteNumbers = new Array(byteCharacters.length);
+                        for (let i = 0; i < byteCharacters.length; i++) {{
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }}
+                        const byteArray = new Uint8Array(byteNumbers);
+                        const blob = new Blob([byteArray], {{ type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }});
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = {escaped_fname};
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }} catch (e) {{
+                        console.error('Download error:', e);
+                    }}
+                }}
+
+                document.getElementById('{btn_id_wa}').onclick = function() {{
+                    const btn = this;
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = '<span>⏳</span> Preparing...';
+                    downloadDocx();
+                    window.open("{wa_url}", "_blank");
+                    btn.innerHTML = '<span>✅</span> File Ready & WhatsApp Opened!';
+                    setTimeout(() => {{ btn.innerHTML = orig; }}, 3000);
+                }};
+
+                document.getElementById('{btn_id_mail}').onclick = function() {{
+                    const btn = this;
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = '<span>⏳</span> Preparing...';
+                    downloadDocx();
+                    window.open("{mail_url}", "_blank");
+                    btn.innerHTML = '<span>✅</span> File Ready & Email Opened!';
+                    setTimeout(() => {{ btn.innerHTML = orig; }}, 3000);
+                }};
+            </script>
         """
-        st.markdown(share_html, unsafe_allow_html=True)
+        components.html(share_html, height=92)
 
 def main():
 
@@ -4629,61 +4566,129 @@ def main():
                 mail_url = f"mailto:?subject={urllib.parse.quote(mail_subject)}&body={urllib.parse.quote(mail_body)}"
 
                 st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)
-                s_bar_col1, s_bar_col2 = st.columns([1.3, 1.0], vertical_alignment="center")
-                with s_bar_col1:
-                    render_file_share_button(docx_data, doc_fname, button_label="📤 Share Word File (.docx)", key_suffix="_tab1")
-                with s_bar_col2:
-                    st.markdown(f"""
-                        <style>
-                            .dm-tab-share-btn {{
-                                display: inline-flex !important;
-                                align-items: center !important;
-                                gap: 6px !important;
-                                padding: 7px 12px !important;
-                                border-radius: 8px !important;
-                                font-weight: 600 !important;
-                                font-size: 0.8rem !important;
-                                text-decoration: none !important;
-                                transition: all 0.2s ease !important;
-                                cursor: pointer !important;
-                            }}
-                            .dm-tab-share-btn, .dm-tab-share-btn *, .dm-tab-share-btn:hover, .dm-tab-share-btn:visited, .dm-tab-share-btn:active {{
-                                text-decoration: none !important;
-                            }}
-                            .dm-tab-wa {{
-                                background: #f0fdf4 !important;
-                                color: #166534 !important;
-                                border: 1px solid #bbf7d0 !important;
-                            }}
-                            .dm-tab-wa:hover {{
-                                background: #dcfce7 !important;
-                                border-color: #86efac !important;
-                                color: #14532d !important;
-                                transform: translateY(-1px) !important;
-                            }}
-                            .dm-tab-mail {{
-                                background: #eef2ff !important;
-                                color: #4338ca !important;
-                                border: 1px solid #c7d2fe !important;
-                            }}
-                            .dm-tab-mail:hover {{
-                                background: #e0e7ff !important;
-                                border-color: #a5b4fc !important;
-                                color: #3730a3 !important;
-                                transform: translateY(-1px) !important;
-                            }}
-                        </style>
-                        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex-wrap: wrap;">
-                            <a href="{wa_url}" target="_blank" rel="noopener noreferrer" class="dm-tab-share-btn dm-tab-wa" title="Share Text via WhatsApp">
-                                <span style="font-size: 0.95rem; text-decoration: none !important;">💬</span>
-                                <span style="color: #166534 !important; text-decoration: none !important;">WhatsApp</span>
-                            </a>
-                            <a href="{mail_url}" target="_blank" rel="noopener noreferrer" class="dm-tab-share-btn dm-tab-mail" title="Share Text via Email">
-                                <span style="font-size: 0.95rem; text-decoration: none !important;">✉️</span>
-                                <span style="color: #4338ca !important; text-decoration: none !important;">Email</span>
-                            </a>
+                docx_b64_tab = base64.b64encode(docx_data).decode('utf-8') if docx_data else ""
+                escaped_fname_tab = json.dumps(f"{doc_fname}_Summary.docx")
+                btn_tab_wa = f"tab-share-wa-{abs(hash(doc_fname + 'tab_wa'))}"
+                btn_tab_mail = f"tab-share-mail-{abs(hash(doc_fname + 'tab_mail'))}"
+
+                tab_share_html = f"""
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        html, body {{
+                            margin: 0;
+                            padding: 0;
+                            background: transparent !important;
+                            overflow: hidden;
+                            width: 100% !important;
+                        }}
+                        .dm-tab-bar {{
+                            background: rgba(248, 250, 252, 0.95);
+                            border: 1px solid #e2e8f0;
+                            border-radius: 12px;
+                            padding: 8px 14px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            box-sizing: border-box;
+                            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                            width: 100%;
+                        }}
+                        .dm-btn {{
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 6px;
+                            padding: 7px 12px;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            font-size: 0.82rem;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                            box-sizing: border-box;
+                            border: 1.5px solid transparent;
+                            font-family: inherit;
+                        }}
+                        .dm-btn-wa {{
+                            background: #f0fdf4;
+                            color: #166534;
+                            border-color: #bbf7d0;
+                        }}
+                        .dm-btn-wa:hover {{
+                            background: #dcfce7;
+                            border-color: #86efac;
+                            color: #14532d;
+                            transform: translateY(-1px);
+                        }}
+                        .dm-btn-mail {{
+                            background: #eef2ff;
+                            color: #4338ca;
+                            border-color: #c7d2fe;
+                        }}
+                        .dm-btn-mail:hover {{
+                            background: #e0e7ff;
+                            border-color: #a5b4fc;
+                            color: #3730a3;
+                            transform: translateY(-1px);
+                        }}
+                    </style>
+                    <div class="dm-tab-bar">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1.05rem;">⚡</span>
+                            <span style="font-size: 0.86rem; font-weight: 700; color: #334155;">Share with Friends:</span>
                         </div>
-                    """, unsafe_allow_html=True)
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button id="{btn_tab_wa}" class="dm-btn dm-btn-wa">
+                                <span>💬</span> WhatsApp (Word File + Text)
+                            </button>
+                            <button id="{btn_tab_mail}" class="dm-btn dm-btn-mail">
+                                <span>✉️</span> Email (Word File + Text)
+                            </button>
+                        </div>
+                    </div>
+                    <script>
+                        function downloadDocx() {{
+                            try {{
+                                const byteCharacters = atob("{docx_b64_tab}");
+                                const byteNumbers = new Array(byteCharacters.length);
+                                for (let i = 0; i < byteCharacters.length; i++) {{
+                                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                                }}
+                                const byteArray = new Uint8Array(byteNumbers);
+                                const blob = new Blob([byteArray], {{ type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }});
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = {escaped_fname_tab};
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                URL.revokeObjectURL(url);
+                            }} catch (e) {{
+                                console.error('Download error:', e);
+                            }}
+                        }}
+
+                        document.getElementById('{btn_tab_wa}').onclick = function() {{
+                            const btn = this;
+                            const orig = btn.innerHTML;
+                            btn.innerHTML = '<span>⏳</span> Preparing...';
+                            downloadDocx();
+                            window.open("{wa_url}", "_blank");
+                            btn.innerHTML = '<span>✅</span> Opened!';
+                            setTimeout(() => {{ btn.innerHTML = orig; }}, 3000);
+                        }};
+
+                        document.getElementById('{btn_tab_mail}').onclick = function() {{
+                            const btn = this;
+                            const orig = btn.innerHTML;
+                            btn.innerHTML = '<span>⏳</span> Preparing...';
+                            downloadDocx();
+                            window.open("{mail_url}", "_blank");
+                            btn.innerHTML = '<span>✅</span> Opened!';
+                            setTimeout(() => {{ btn.innerHTML = orig; }}, 3000);
+                        }};
+                    </script>
+                """
+                components.html(tab_share_html, height=56)
                 
                 st.markdown("---")
                 with st.expander("👁️ View Raw Extracted Text", expanded=False):
