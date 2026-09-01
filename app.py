@@ -2299,7 +2299,7 @@ def copy_to_clipboard(text, label="Copy"):
 def render_export_and_share_popover(docx_data, md_data, results, summary_result, key_suffix=""):
     """Renders download buttons and instant WhatsApp/Email share links inside a popover."""
     with st.popover("📤 Export Document", use_container_width=True, key=f"export_document_popover{key_suffix}"):
-        st.markdown("<div style='font-size: 0.88rem; font-weight: 700; color: #1e293b; margin-bottom: 8px;'>💾 Download Files</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 0.86rem; font-weight: 700; color: #1e293b; margin-bottom: 8px;'>💾 Download Files</div>", unsafe_allow_html=True)
         doc_fname = results.get('filename', 'DocuMind')
         st.download_button(
             label="📄 Export as Word (.docx)",
@@ -2321,7 +2321,7 @@ def render_export_and_share_popover(docx_data, md_data, results, summary_result,
         
         # --- Instant Social & Email Sharing Section ---
         st.markdown("<hr style='margin: 14px 0 10px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
-        st.markdown("<div style='font-size: 0.88rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;'><span>⚡</span> Quick Share with Friends</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 0.86rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;'><span>⚡</span> Quick Share with Friends</div>", unsafe_allow_html=True)
         
         # Clean and safely truncate summary for URL sharing limits
         clean_summary = summary_result.strip() if summary_result else ""
@@ -2338,12 +2338,58 @@ def render_export_and_share_popover(docx_data, md_data, results, summary_result,
         mail_url = f"mailto:?subject={urllib.parse.quote(mail_subject)}&body={urllib.parse.quote(mail_body)}"
         
         share_html = f"""
-            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px; padding-bottom: 4px;">
-                <a href="{wa_url}" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 9px 12px; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: #ffffff !important; text-decoration: none !important; border-radius: 10px; font-weight: 600; font-size: 0.86rem; box-shadow: 0 3px 8px rgba(37, 211, 102, 0.25); transition: transform 0.15s ease; box-sizing: border-box;">
-                    <span style="font-size: 1.05rem;">💬</span> Share via WhatsApp
+            <style>
+                .dm-share-btn {{
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 8px !important;
+                    width: 100% !important;
+                    padding: 9px 12px !important;
+                    border-radius: 9px !important;
+                    font-weight: 600 !important;
+                    font-size: 0.85rem !important;
+                    text-decoration: none !important;
+                    box-sizing: border-box !important;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                    cursor: pointer !important;
+                }}
+                .dm-share-btn, .dm-share-btn *, .dm-share-btn:hover, .dm-share-btn:visited, .dm-share-btn:active {{
+                    text-decoration: none !important;
+                }}
+                .dm-share-wa {{
+                    background: #f0fdf4 !important;
+                    color: #166534 !important;
+                    border: 1.5px solid #bbf7d0 !important;
+                }}
+                .dm-share-wa:hover {{
+                    background: #dcfce7 !important;
+                    border-color: #86efac !important;
+                    color: #14532d !important;
+                    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15) !important;
+                    transform: translateY(-1px) !important;
+                }}
+                .dm-share-mail {{
+                    background: #eef2ff !important;
+                    color: #4338ca !important;
+                    border: 1.5px solid #c7d2fe !important;
+                }}
+                .dm-share-mail:hover {{
+                    background: #e0e7ff !important;
+                    border-color: #a5b4fc !important;
+                    color: #3730a3 !important;
+                    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
+                    transform: translateY(-1px) !important;
+                }}
+            </style>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px; padding-bottom: 2px;">
+                <a href="{wa_url}" target="_blank" rel="noopener noreferrer" class="dm-share-btn dm-share-wa">
+                    <span style="font-size: 1rem; text-decoration: none !important;">💬</span>
+                    <span style="color: #166534 !important; text-decoration: none !important;">Share via WhatsApp</span>
                 </a>
-                <a href="{mail_url}" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 9px 12px; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: #ffffff !important; text-decoration: none !important; border-radius: 10px; font-weight: 600; font-size: 0.86rem; box-shadow: 0 3px 8px rgba(79, 70, 229, 0.25); transition: transform 0.15s ease; box-sizing: border-box;">
-                    <span style="font-size: 1.05rem;">✉️</span> Share via Email
+                <a href="{mail_url}" target="_blank" rel="noopener noreferrer" class="dm-share-btn dm-share-mail">
+                    <span style="font-size: 1rem; text-decoration: none !important;">✉️</span>
+                    <span style="color: #4338ca !important; text-decoration: none !important;">Share via Email</span>
                 </a>
             </div>
         """
@@ -4464,17 +4510,58 @@ def main():
                 mail_url = f"mailto:?subject={urllib.parse.quote(mail_subject)}&body={urllib.parse.quote(mail_body)}"
 
                 st.markdown(f"""
-                    <div style="background: linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(241, 245, 249, 0.8) 100%); border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 16px; margin: 16px 0 8px 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <style>
+                        .dm-tab-share-btn {{
+                            display: inline-flex !important;
+                            align-items: center !important;
+                            gap: 6px !important;
+                            padding: 6px 14px !important;
+                            border-radius: 8px !important;
+                            font-weight: 600 !important;
+                            font-size: 0.82rem !important;
+                            text-decoration: none !important;
+                            transition: all 0.2s ease !important;
+                            cursor: pointer !important;
+                        }}
+                        .dm-tab-share-btn, .dm-tab-share-btn *, .dm-tab-share-btn:hover, .dm-tab-share-btn:visited, .dm-tab-share-btn:active {{
+                            text-decoration: none !important;
+                        }}
+                        .dm-tab-wa {{
+                            background: #f0fdf4 !important;
+                            color: #166534 !important;
+                            border: 1px solid #bbf7d0 !important;
+                        }}
+                        .dm-tab-wa:hover {{
+                            background: #dcfce7 !important;
+                            border-color: #86efac !important;
+                            color: #14532d !important;
+                            transform: translateY(-1px) !important;
+                        }}
+                        .dm-tab-mail {{
+                            background: #eef2ff !important;
+                            color: #4338ca !important;
+                            border: 1px solid #c7d2fe !important;
+                        }}
+                        .dm-tab-mail:hover {{
+                            background: #e0e7ff !important;
+                            border-color: #a5b4fc !important;
+                            color: #3730a3 !important;
+                            transform: translateY(-1px) !important;
+                        }}
+                    </style>
+                    <div style="background: rgba(248, 250, 252, 0.9); border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 16px; margin: 16px 0 8px 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span style="font-size: 1.05rem;">⚡</span>
                             <span style="font-size: 0.86rem; font-weight: 700; color: #334155;">Share Summary with Friends:</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                            <a href="{wa_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: #ffffff !important; text-decoration: none !important; border-radius: 8px; font-weight: 600; font-size: 0.82rem; box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25); transition: transform 0.15s ease;">
-                                <span style="font-size: 0.95rem;">💬</span> WhatsApp
+                            <a href="{wa_url}" target="_blank" rel="noopener noreferrer" class="dm-tab-share-btn dm-tab-wa">
+                                <span style="font-size: 0.95rem; text-decoration: none !important;">💬</span>
+                                <span style="color: #166534 !important; text-decoration: none !important;">WhatsApp</span>
                             </a>
-                            <a href="{mail_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: #ffffff !important; text-decoration: none !important; border-radius: 8px; font-weight: 600; font-size: 0.82rem; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25); transition: transform 0.15s ease;">
-                                <span style="font-size: 0.95rem;">✉️</span> Email
+                            <a href="{mail_url}" target="_blank" rel="noopener noreferrer" class="dm-tab-share-btn dm-tab-mail">
+                                <span style="font-size: 0.95rem; text-decoration: none !important;">✉️</span>
+                                <span style="color: #4338ca !important; text-decoration: none !important;">Email</span>
                             </a>
                         </div>
                     </div>
