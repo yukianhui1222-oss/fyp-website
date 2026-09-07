@@ -3804,6 +3804,38 @@ def main():
         [data-testid="stSelectboxVirtualDropdown"] li[aria-selected="true"] * {
             color: #6366f1 !important;
         }
+
+        /* Toast Notifications: Force high-contrast white card styling across all devices and OS themes */
+        div[data-testid="stToast"] {
+            background-color: #FFFFFF !important;
+            background: #FFFFFF !important;
+            color: #0F172A !important;
+            border: 1px solid #CBD5E1 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.18), 0 8px 10px -6px rgba(15, 23, 42, 0.12) !important;
+            padding: 12px 16px !important;
+        }
+        div[data-testid="stToast"] * {
+            color: #0F172A !important;
+        }
+        div[data-testid="stToast"] p,
+        div[data-testid="stToast"] span,
+        div[data-testid="stToast"] div,
+        div[data-testid="stToast"] [data-testid="stMarkdownContainer"] p {
+            color: #0F172A !important;
+            font-weight: 600 !important;
+            font-size: 0.92rem !important;
+        }
+        div[data-testid="stToast"] svg {
+            fill: #475569 !important;
+            color: #475569 !important;
+        }
+        div[data-testid="stToast"] button {
+            color: #475569 !important;
+        }
+        div[data-testid="stToast"] button:hover {
+            color: #0F172A !important;
+        }
         </style>
     """, unsafe_allow_html=True)
     
