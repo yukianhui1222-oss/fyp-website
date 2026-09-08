@@ -3685,12 +3685,18 @@ def main():
         div[data-testid="stPopoverBody"] {
             background-color: #FFFFFF !important;
             border: 1px solid #E5E7EB !important;
-            border-radius: 12px !important;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
-            padding: 16px 16px 28px 16px !important;
+            border-radius: 14px !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.08) !important;
+            padding: 12px 14px 14px 14px !important;
             max-height: 420px !important;
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch !important;
+        }
+        div[data-testid="stPopoverBody"] [data-testid="stVerticalBlock"] {
+            gap: 8px !important;
+        }
+        div[data-testid="stPopoverBody"] div[data-testid="element-container"] {
+            margin-bottom: 0px !important;
         }
         div[data-testid="stPopoverBody"] > div,
         div[data-testid="stPopoverBody"] [data-testid="stVerticalBlock"],
@@ -4152,7 +4158,7 @@ def main():
                 
             with st.popover("👤 Profile", use_container_width=True):
                 st.markdown(f"""
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #E5E7EB;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2px; padding-bottom: 8px; border-bottom: 1px solid #E5E7EB;">
                         {avatar_html}
                         <div style="display: flex; flex-direction: column; overflow: hidden;">
                             <span style="font-weight: 700; color: #1f2937; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{profile_name}</span>
@@ -4167,16 +4173,12 @@ def main():
                     st.session_state.leaderboard_active = False
                     st.rerun()
                     
-                st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
-                
                 if st.button("🏆 Global Leaderboard", key="nav_leaderboard_btn", use_container_width=True):
                     st.session_state.leaderboard_active = True
                     st.session_state.edit_profile_active = False
                     st.session_state.quiz_mode_active = False
                     st.rerun()
                     
-                st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
-                
                 if st.button("Logout", key="nav_logout_button", use_container_width=True, type="primary"):
                     st.session_state.user = None
                     st.session_state.logout_request = True
