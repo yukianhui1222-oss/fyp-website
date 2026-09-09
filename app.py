@@ -1698,15 +1698,22 @@ def render_left_panel(raw_text, summary_result, api_key, results):
         with chat_container:
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
-                    # Extract quiz context if active
+                    # Extract quiz context if active or recently completed
                     quiz_ctx = ""
-                    if st.session_state.get('quiz_data'):
-                        quiz_ctx += "\n--- Current/Last Quiz Questions and User Answers ---\n"
-                        for i, q_item in enumerate(st.session_state.quiz_data):
+                    active_quiz = st.session_state.get('quiz_data') or st.session_state.get('last_completed_quiz')
+                    if active_quiz:
+                        quiz_ctx += "\n--- Current/Recent Quiz Questions, Options, and Student Answers ---\n"
+                        for i, q_item in enumerate(active_quiz):
                             u_ans = st.session_state.get(f"user_ans_{i}", "Unanswered")
                             c_ans = q_item.get("correct_answer") or q_item.get("answer") or "Unknown"
+                            opts = " | ".join(str(o) for o in q_item.get("options", []))
+                            expl = q_item.get("explanation", "")
                             quiz_ctx += f"Question {i+1}: {q_item.get('question')}\n"
-                            quiz_ctx += f"User Answer: {u_ans} | Correct Answer: {c_ans}\n"
+                            if opts:
+                                quiz_ctx += f"  Options: {opts}\n"
+                            quiz_ctx += f"  Student Answer: {u_ans} | Designated Correct Answer: {c_ans}\n"
+                            if expl:
+                                quiz_ctx += f"  Reference Explanation: {expl}\n"
                     
                     # Call Gemini API
                     from summarizer import generate_chat_response
@@ -2042,6 +2049,7 @@ def render_quiz_view():
                     if st.button("⬅️ Return to Document", use_container_width=True, key="ret_doc_final_btn"):
                         st.session_state.quiz_mode_active = False
                         st.session_state.quiz_finished = False
+                        st.session_state.last_completed_quiz = st.session_state.quiz_data
                         st.session_state.quiz_data = None
                         st.rerun()
                 with col_b:
@@ -2165,6 +2173,71 @@ def render_quiz_view():
                 
                 st.info(f"{detail_label}{explanation_str}")
 
+                # Interactive AI Tutor for this specific question
+                st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+                with st.expander("🤖 Ask AI Tutor About This Question / 向 AI 助教深入追问", expanded=False):
+                    st.markdown("<p style='font-size: 0.86rem; color: #475569; margin-bottom: 10px;'>Need further clarification, misconception diagnosis, or option breakdown? Ask the AI Tutor below:</p>", unsafe_allow_html=True)
+                    
+                    qa_col1, qa_col2, qa_col3 = st.columns(3)
+                    tutor_action_prompt = None
+                    
+                    with qa_col1:
+                        if st.button("❓ Why is my answer wrong?", key=f"tutor_why_wrong_{idx}", use_container_width=True):
+                            tutor_action_prompt = f"Please explain specifically why my choice '{user_ans_disp}' is incorrect, diagnose the underlying conceptual misconception, and explain why '{correct_ans_disp}' is the correct choice."
+                    with qa_col2:
+                        if st.button("💡 Deep Conceptual Mechanism", key=f"tutor_deep_dive_{idx}", use_container_width=True):
+                            tutor_action_prompt = f"Please provide a deep, rigorous academic explanation of the underlying concept and mechanism tested by this question: '{question_text}'."
+                    with qa_col3:
+                        if st.button("🔍 Distractor Breakdown", key=f"tutor_distractors_{idx}", use_container_width=True):
+                            opts_list = [f"{display_dict.get(o, o)}" for o in options_en]
+                            tutor_action_prompt = f"Please break down each of these options ({', '.join(opts_list)}), explaining why each incorrect option is a distractor and why '{correct_ans_disp}' is academically defensible."
+                    
+                    inquiry_input = st.text_input("Or enter your question about this quiz item:", placeholder="e.g. 为什么不能选 C？/ Could you give a practical example?", key=f"tutor_custom_input_{idx}")
+                    if st.button("🚀 Ask AI Tutor", key=f"tutor_submit_{idx}", type="primary", use_container_width=False):
+                        if inquiry_input.strip():
+                            tutor_action_prompt = inquiry_input.strip()
+                    
+                    tutor_resp_key = f"tutor_response_q_{idx}"
+                    if tutor_action_prompt:
+                        with st.spinner("AI Tutor is analyzing the question and lecture notes..."):
+                            from summarizer import generate_chat_response
+                            q_spec_context = f"""--- CURRENT QUIZ QUESTION CONTEXT ---
+Question: {q.get('question')}
+Options: {', '.join(q.get('options', []))}
+Designated Correct Answer: {correct_ans}
+Student's Selected Answer: {user_ans}
+Evaluation: {'CORRECT' if user_ans == correct_ans else 'INCORRECT'}
+Topic Tag: {q_topic}
+Official Explanation: {q.get('explanation', '')}"""
+                            
+                            doc_raw = st.session_state.ocr_results.get('raw_text', '') if 'ocr_results' in st.session_state else ""
+                            doc_sum = st.session_state.ocr_results.get('summary', '') if 'ocr_results' in st.session_state else ""
+                            import os
+                            tutor_api_key = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY", ""))
+                            
+                            ai_reply = generate_chat_response(
+                                ocr_text=doc_raw,
+                                summary_text=doc_sum,
+                                chat_history=[],
+                                user_question=tutor_action_prompt,
+                                api_key=tutor_api_key,
+                                quiz_context=q_spec_context
+                            )
+                            st.session_state[tutor_resp_key] = ai_reply
+                    
+                    if st.session_state.get(tutor_resp_key):
+                        st.markdown("<hr style='margin: 12px 0; border: 0; border-top: 1px dashed #cbd5e1;'>", unsafe_allow_html=True)
+                        st.markdown(f"""
+                        <div style='background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #6366f1; border-radius: 8px; padding: 14px 16px; margin-top: 8px;'>
+                            <div style='font-size: 0.85rem; font-weight: 700; color: #4338ca; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;'>
+                                🎓 AI Tutor Response:
+                            </div>
+                            <div style='font-size: 0.92rem; color: #1e293b; line-height: 1.6;'>
+                                {st.session_state[tutor_resp_key]}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
         st.markdown("<br>", unsafe_allow_html=True)
         nav_cols = st.columns(4)
         
@@ -2173,6 +2246,7 @@ def render_quiz_view():
             if st.button(exit_label, use_container_width=True, key="exit_quiz_action_btn"):
                 st.session_state.quiz_mode_active = False
                 st.session_state.review_mode = False
+                st.session_state.last_completed_quiz = st.session_state.quiz_data
                 st.session_state.quiz_data = None
                 st.session_state.is_retry = False
                 st.session_state.parent_attempt_id = ""
@@ -2205,6 +2279,7 @@ def render_quiz_view():
                         if review_mode:
                             st.session_state.quiz_mode_active = False
                             st.session_state.review_mode = False
+                            st.session_state.last_completed_quiz = st.session_state.quiz_data
                             st.session_state.quiz_data = None
                             st.rerun()
                         else:
