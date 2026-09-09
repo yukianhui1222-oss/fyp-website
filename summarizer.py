@@ -196,6 +196,14 @@ Your mission is to generate 10 academically rigorous, meaningful multiple-choice
 - MEDIUM: Test conceptual understanding, causal relationships, comparative differences, and standard academic applications.
 - HARD: Test in-depth analytical reasoning, conceptual distinctions, multi-step problem solving, and nuanced edge cases. Distractors must be plausible and challenging.
 
+=== EXPLANATION & PEDAGOGICAL RIGOR REQUIREMENTS (CRITICAL) ===
+For every question, the `explanation` (and `explanation_trans`) must function as an expert academic verification and learning engine:
+1. EXPLAIN THE "WHY", NOT JUST "WHAT": Do NOT merely paraphrase the correct option or say "as stated in the text". Explain the underlying conceptual mechanism, why the correct answer is accurate, and why the principal distractors represent common misconceptions.
+2. ADDRESS NUANCE & OVERSIMPLIFICATION: If the source material simplifies a concept, provide the defensible academic qualification (e.g., "While notes state X, fundamentally Y is required because...").
+3. MISCONCEPTION ANALYSIS: Explicitly address what false assumption or confusion makes the wrong options tempting, so a student who selected a distractor immediately recognizes their error.
+4. CALIBRATED LENGTH: Keep explanations concise, dense, and impactful: exactly 2 to 4 sentences in English, matched naturally in {target_language}.
+5. ZERO HALLUCINATION: Rely strictly on verifiable principles grounded in the provided document content.
+
 === REQUIRED JSON OUTPUT FORMAT ===
 Output MUST be a strict, valid JSON array containing exactly 10 question objects.
 Do NOT include markdown markers (such as ```json or ```), do NOT write any introductory or concluding commentary. Output ONLY the raw JSON string directly.
@@ -218,8 +226,8 @@ Each question object in the array MUST strictly follow this exact schema:
       "Translation of option 4 in {target_language}"
     ],
     "correct_answer": "Exact string of the correct option matching one item in options array word-for-word in English",
-    "explanation": "Clear academic explanation of why this answer is correct and why other distractors are incorrect",
-    "explanation_trans": "High-quality translation of the academic explanation in {target_language}",
+    "explanation": "2-4 sentence academic explanation: why this answer is correct, the underlying concept, and why common distractors are misconceptions",
+    "explanation_trans": "High-quality natural translation of the academic explanation in {target_language}",
     "topic_tag": "A brief sub-concept tag (e.g. 'Superposition vs Interference', 'Quantum Noise', 'Surface Code')"
   }}
 ]
@@ -345,7 +353,16 @@ Your primary goal is to provide reliable, context-aware, and educational answers
 - Explain key concepts in simple, intuitive terms, introducing technical terminology with clear definitions.
 - Use step-by-step points, bullet lists, code blocks, or LaTeX math notation where appropriate.
 - Match the user's inquiry language (Chinese inquiry -> Chinese answer, English inquiry -> English answer).
-- Output ONLY the final helpful, clean response without internal planning steps."""
+- Output ONLY the final helpful, clean response without internal planning steps.
+
+7. QUIZ ANSWER EXPLANATION & VERIFICATION ENGINE (ACTIVE WHEN DISCUSSING QUIZZES)
+- When the user asks about quiz questions, specific options, or quiz performance:
+  * INDEPENDENT VERIFICATION FIRST: Do NOT blindly trust stored correct answers. Internally check whether the designated correct answer is academically sound, whether another option could also be correct, and whether the question is ambiguous. If the stored answer is questionable, explicitly clarify this.
+  * EXPLAIN WHY: Explain the conceptual mechanism, why the correct answer is valid, and why the student's selected answer is correct or incorrect.
+  * MISCONCEPTION DIAGNOSIS: For incorrect answers, gently diagnose what misconception or confusion the student's choice represents, and why the correct answer is more appropriate. Do not criticize the student.
+  * REINFORCE CORRECT ANSWERS: For correct answers, do not just say "Correct"; reinforce understanding by explaining the underlying principle.
+  * ADDRESS NUANCE & OVERSIMPLIFICATION: If the source material simplifies a concept, clarify: "The provided material simplifies this concept. More precisely, ..."
+  * CONCISE & IMPACTFUL: Keep the core explanation around 2–5 sentences unless deeper breakdown is requested."""
 
     # Build properly formatted alternating history for Gemini ChatSession
     gemini_history = []
@@ -405,6 +422,78 @@ Current User Message:
             return res.text.strip()
         except Exception as err:
             return f"⚠️ Chat Error: {str(err)}"
+
+def verify_and_explain_quiz_answer(question, correct_answer, selected_answer, ocr_text, api_key, language="Chinese", options=None):
+    """
+    Dedicated Quiz Explanation and Verification Engine:
+    Evaluates a student's selected answer, performs independent verification,
+    diagnoses misconceptions, and produces an educational explanation.
+    """
+    if not api_key:
+        return "⚠️ Error: API Key missing."
+        
+    try:
+        model_name = _get_model_name(api_key)
+        model = genai.GenerativeModel(model_name)
+        
+        opts_block = f"Options: {', '.join(options)}\n" if options else ""
+        
+        prompt = f"""You are the Quiz Explanation and Verification Engine of DocuMind Pro.
+Your task is to evaluate the student's selected answer and provide an accurate, educational, and trustworthy explanation.
+
+=== SOURCE MATERIAL ===
+{ocr_text}
+
+=== QUIZ ITEM DETAILS ===
+Question: {question}
+{opts_block}Designated Correct Answer: {correct_answer}
+Student's Selected Answer: {selected_answer}
+Target Interface Language: {language}
+
+=== STRICT RULES ===
+1. VERIFY THE ANSWER FIRST:
+   Do not blindly trust the stored correct answer.
+   Independently check:
+   - Whether the designated correct answer is academically correct.
+   - Whether another option could also reasonably be correct.
+   - Whether the question is ambiguous.
+   - Whether the explanation is supported by the study material.
+   If the stored answer appears questionable or ambiguous, explicitly flag it rather than presenting incorrect information.
+
+2. EXPLAIN WHY:
+   Do not merely repeat the correct option. Explain:
+   - Why the correct answer is correct.
+   - The underlying concept.
+   - Why the student's answer is correct or incorrect.
+
+3. ADDRESS IMPORTANT NUANCE:
+   If the correct answer is a simplified description, mention the important technical qualification.
+   (e.g., if material simplifies a concept, state: "The provided material simplifies this concept. More precisely, ...").
+
+4. DO NOT HALLUCINATE:
+   Never invent information merely to make an explanation sound convincing. If available material is insufficient, state:
+   "The provided study material does not contain enough information to verify this explanation confidently."
+
+5. FOR INCORRECT ANSWERS:
+   Explain why the selected answer is incorrect, what misconception it represents, and why the correct answer is more appropriate. Do not criticize the student.
+
+6. FOR CORRECT ANSWERS:
+   Do not simply say "Correct." Reinforce the student's understanding by explaining the underlying concept.
+
+7. SOURCE CONSISTENCY:
+   Use the provided study material as the primary reference. If external knowledge is used, ensure it does not contradict the source.
+
+8. EXPLANATION LENGTH & LANGUAGE:
+   Keep explanations concise but meaningful: approximately 2–5 sentences in {language}. Technical terms may include standard English terminology in parentheses.
+
+9. PRE-RESPONSE QUALITY CHECK:
+   Internally verify: Did I explain WHY? Did I exaggerate? Did I paraphrase? Did I prevent creating misconceptions?
+   Output ONLY the final polished explanation in {language}."""
+
+        response = _generate_with_retry(model, prompt)
+        return response.text.strip()
+    except Exception as e:
+        return f"⚠️ Verification Error: {str(e)}"
 
 if __name__ == "__main__":
     pass
