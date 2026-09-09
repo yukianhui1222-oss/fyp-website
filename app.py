@@ -1748,6 +1748,8 @@ def clear_quiz_runtime_state():
         'radio_q_', 
         'q_submitted_', 
         'tutor_response_q_', 
+        'tutor_trans_q_',
+        'tutor_show_trans_q_',
         'tutor_custom_input_', 
         'custom_inquiry_input_', 
         'ai_tutor_response_'
@@ -2243,16 +2245,54 @@ Official Explanation: {q.get('explanation', '')}"""
                                 quiz_context=q_spec_context
                             )
                             st.session_state[tutor_resp_key] = ai_reply
+                            # Clear previous translation cache when a new response is generated
+                            tutor_trans_k = f"tutor_trans_q_{idx}"
+                            tutor_show_k = f"tutor_show_trans_q_{idx}"
+                            if tutor_trans_k in st.session_state:
+                                del st.session_state[tutor_trans_k]
+                            if tutor_show_k in st.session_state:
+                                del st.session_state[tutor_show_k]
+                    
+                    tutor_trans_key = f"tutor_trans_q_{idx}"
+                    tutor_show_trans_key = f"tutor_show_trans_q_{idx}"
                     
                     if st.session_state.get(tutor_resp_key):
                         st.markdown("<hr style='margin: 12px 0; border: 0; border-top: 1px dashed #cbd5e1;'>", unsafe_allow_html=True)
+                        
+                        target_lang = st.session_state.get("quiz_target_lang", "Chinese")
+                        is_showing_trans = st.session_state.get(tutor_show_trans_key, False)
+                        
+                        th_col1, th_col2 = st.columns([6, 4], vertical_alignment="center")
+                        with th_col1:
+                            st.markdown("<div style='font-size: 0.9rem; font-weight: 700; color: #4338ca;'>🎓 AI Tutor Response:</div>", unsafe_allow_html=True)
+                        with th_col2:
+                            trans_btn_label = "🔤 Show Original" if is_showing_trans else f"🌐 Translate ({target_lang})"
+                            if st.button(trans_btn_label, key=f"btn_toggle_tutor_trans_{idx}", use_container_width=True):
+                                if is_showing_trans:
+                                    st.session_state[tutor_show_trans_key] = False
+                                    st.rerun()
+                                else:
+                                    if not st.session_state.get(tutor_trans_key):
+                                        with st.spinner(f"Translating response into {target_lang}..."):
+                                            from summarizer import translate_text
+                                            tutor_api_key = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY", ""))
+                                            translated_reply = translate_text(st.session_state[tutor_resp_key], tutor_api_key, target_lang)
+                                            st.session_state[tutor_trans_key] = translated_reply
+                                    st.session_state[tutor_show_trans_key] = True
+                                    st.rerun()
+                        
+                        display_text = st.session_state.get(tutor_trans_key) if is_showing_trans else st.session_state[tutor_resp_key]
+                        badge_label = f"🌐 {target_lang} Translation" if is_showing_trans else "🇬🇧 Original Response"
+                        badge_color = "#059669" if is_showing_trans else "#6366f1"
+                        badge_bg = "#ecfdf5" if is_showing_trans else "#eef2ff"
+                        
                         st.markdown(f"""
-                        <div style='background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #6366f1; border-radius: 8px; padding: 14px 16px; margin-top: 8px;'>
-                            <div style='font-size: 0.85rem; font-weight: 700; color: #4338ca; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;'>
-                                🎓 AI Tutor Response:
+                        <div style='background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid {badge_color}; border-radius: 8px; padding: 14px 16px; margin-top: 8px;'>
+                            <div style='display: inline-block; background-color: {badge_bg}; color: {badge_color}; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;'>
+                                {badge_label}
                             </div>
                             <div style='font-size: 0.92rem; color: #1e293b; line-height: 1.6;'>
-                                {st.session_state[tutor_resp_key]}
+                                {display_text}
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
