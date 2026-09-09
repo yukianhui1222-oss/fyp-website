@@ -2196,29 +2196,49 @@ def render_quiz_view():
 
                 # Interactive AI Tutor for this specific question
                 st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
-                with st.expander("🤖 Ask AI Tutor About This Question / 向 AI 助教深入追问", expanded=False):
+                
+                tutor_resp_key = f"tutor_response_q_{idx}"
+                tutor_trans_key = f"tutor_trans_q_{idx}"
+                tutor_show_trans_key = f"tutor_show_trans_q_{idx}"
+                has_tutor_resp = bool(st.session_state.get(tutor_resp_key))
+                
+                with st.expander("🤖 Ask AI Tutor About This Question / 向 AI 助教深入追问", expanded=has_tutor_resp):
                     st.markdown("<p style='font-size: 0.86rem; color: #475569; margin-bottom: 10px;'>Need further clarification, misconception diagnosis, or option breakdown? Ask the AI Tutor below:</p>", unsafe_allow_html=True)
                     
                     qa_col1, qa_col2, qa_col3 = st.columns(3)
                     tutor_action_prompt = None
+                    target_lang = st.session_state.get("quiz_target_lang", "Chinese")
+                    
+                    btn_why_label = "❓ 为什么我选错？" if show_trans else "❓ Why is my choice wrong?"
+                    btn_concept_label = "💡 深入底层原理" if show_trans else "💡 Deep Conceptual Mechanism"
+                    btn_opts_label = "🔍 逐项分析拆解" if show_trans else "🔍 Distractor Breakdown"
                     
                     with qa_col1:
-                        if st.button("❓ Why is my answer wrong?", key=f"tutor_why_wrong_{idx}", use_container_width=True):
-                            tutor_action_prompt = f"Please explain specifically why my choice '{user_ans_disp}' is incorrect, diagnose the underlying conceptual misconception, and explain why '{correct_ans_disp}' is the correct choice."
+                        if st.button(btn_why_label, key=f"tutor_why_wrong_{idx}", use_container_width=True):
+                            if show_trans:
+                                tutor_action_prompt = f"请用{target_lang}详细诊断：为什么我的选项 '{user_ans_disp}' 是不正确的？这反映了什么概念误区？为什么正确选项 '{correct_ans_disp}' 才是准确的？"
+                            else:
+                                tutor_action_prompt = f"Please explain specifically why my choice '{user_ans_disp}' is incorrect, diagnose the underlying conceptual misconception, and explain why '{correct_ans_disp}' is the correct choice."
                     with qa_col2:
-                        if st.button("💡 Deep Conceptual Mechanism", key=f"tutor_deep_dive_{idx}", use_container_width=True):
-                            tutor_action_prompt = f"Please provide a deep, rigorous academic explanation of the underlying concept and mechanism tested by this question: '{question_text}'."
+                        if st.button(btn_concept_label, key=f"tutor_deep_dive_{idx}", use_container_width=True):
+                            if show_trans:
+                                tutor_action_prompt = f"请用{target_lang}深入剖析本题背后真正的科学学术机理与核心原理：'{question_text}'。"
+                            else:
+                                tutor_action_prompt = f"Please provide a deep, rigorous academic explanation of the underlying concept and mechanism tested by this question: '{question_text}'."
                     with qa_col3:
-                        if st.button("🔍 Distractor Breakdown", key=f"tutor_distractors_{idx}", use_container_width=True):
+                        if st.button(btn_opts_label, key=f"tutor_distractors_{idx}", use_container_width=True):
                             opts_list = [f"{display_dict.get(o, o)}" for o in options_en]
-                            tutor_action_prompt = f"Please break down each of these options ({', '.join(opts_list)}), explaining why each incorrect option is a distractor and why '{correct_ans_disp}' is academically defensible."
+                            if show_trans:
+                                tutor_action_prompt = f"请用{target_lang}逐一深度分析这4个选项（{', '.join(opts_list)}），指出各个干扰项错在哪里、为什么正确答案最严谨。"
+                            else:
+                                tutor_action_prompt = f"Please break down each of these options ({', '.join(opts_list)}), explaining why each incorrect option is a distractor and why '{correct_ans_disp}' is academically defensible."
                     
-                    inquiry_input = st.text_input("Or enter your question about this quiz item:", placeholder="e.g. 为什么不能选 C？/ Could you give a practical example?", key=f"tutor_custom_input_{idx}")
+                    input_ph = "例如：为什么不能选 C？/ 实际应用场景是什么？" if show_trans else "e.g. Why is option C wrong? / Could you give a practical example?"
+                    inquiry_input = st.text_input("Or enter your question about this quiz item:", placeholder=input_ph, key=f"tutor_custom_input_{idx}")
                     if st.button("🚀 Ask AI Tutor", key=f"tutor_submit_{idx}", type="primary", use_container_width=False):
                         if inquiry_input.strip():
                             tutor_action_prompt = inquiry_input.strip()
                     
-                    tutor_resp_key = f"tutor_response_q_{idx}"
                     if tutor_action_prompt:
                         with st.spinner("AI Tutor is analyzing the question and lecture notes..."):
                             from summarizer import generate_chat_response
@@ -2246,20 +2266,15 @@ Official Explanation: {q.get('explanation', '')}"""
                             )
                             st.session_state[tutor_resp_key] = ai_reply
                             # Clear previous translation cache when a new response is generated
-                            tutor_trans_k = f"tutor_trans_q_{idx}"
-                            tutor_show_k = f"tutor_show_trans_q_{idx}"
-                            if tutor_trans_k in st.session_state:
-                                del st.session_state[tutor_trans_k]
-                            if tutor_show_k in st.session_state:
-                                del st.session_state[tutor_show_k]
-                    
-                    tutor_trans_key = f"tutor_trans_q_{idx}"
-                    tutor_show_trans_key = f"tutor_show_trans_q_{idx}"
+                            if tutor_trans_key in st.session_state:
+                                del st.session_state[tutor_trans_key]
+                            if tutor_show_trans_key in st.session_state:
+                                del st.session_state[tutor_show_trans_key]
+                            st.rerun()
                     
                     if st.session_state.get(tutor_resp_key):
                         st.markdown("<hr style='margin: 12px 0; border: 0; border-top: 1px dashed #cbd5e1;'>", unsafe_allow_html=True)
                         
-                        target_lang = st.session_state.get("quiz_target_lang", "Chinese")
                         is_showing_trans = st.session_state.get(tutor_show_trans_key, False)
                         
                         th_col1, th_col2 = st.columns([6, 4], vertical_alignment="center")
@@ -2270,7 +2285,6 @@ Official Explanation: {q.get('explanation', '')}"""
                             if st.button(trans_btn_label, key=f"btn_toggle_tutor_trans_{idx}", use_container_width=True):
                                 if is_showing_trans:
                                     st.session_state[tutor_show_trans_key] = False
-                                    st.rerun()
                                 else:
                                     if not st.session_state.get(tutor_trans_key):
                                         with st.spinner(f"Translating response into {target_lang}..."):
@@ -2279,7 +2293,7 @@ Official Explanation: {q.get('explanation', '')}"""
                                             translated_reply = translate_text(st.session_state[tutor_resp_key], tutor_api_key, target_lang)
                                             st.session_state[tutor_trans_key] = translated_reply
                                     st.session_state[tutor_show_trans_key] = True
-                                    st.rerun()
+                                st.rerun()
                         
                         display_text = st.session_state.get(tutor_trans_key) if is_showing_trans else st.session_state[tutor_resp_key]
                         badge_label = f"🌐 {target_lang} Translation" if is_showing_trans else "🇬🇧 Original Response"
