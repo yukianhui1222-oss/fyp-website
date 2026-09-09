@@ -270,8 +270,8 @@ Summary Content:
 
 def generate_chat_response(ocr_text, summary_text, chat_history, user_question, api_key, quiz_context=""):
     """
-    Generates a response from the DocuMind AI Learning Assistant based on
-    OCR text, summary, chat history, the current question, and optional quiz context.
+    Generates a response from the DocuMind AI Learning Assistant using Gemini's
+    native multi-turn chat session grounded in the document context.
     """
     if not api_key:
         return "⚠️ Error: API Key missing."
@@ -281,91 +281,99 @@ def generate_chat_response(ocr_text, summary_text, chat_history, user_question, 
     except Exception as e:
         return f"⚠️ Configuration Error: {str(e)}"
         
-    formatted_history = ""
-    for msg in chat_history:
-        role_label = "User" if msg["role"] == "user" else "Assistant"
-        formatted_history += f"{role_label}: {msg['content']}\n"
-        
-    system_prompt = """You are DocuMind AI Learning Assistant. Your role is to help students understand learning materials, lecture notes, quiz questions, and educational content.
+    system_instruction = f"""You are DocuMind AI Learning Assistant, an expert, supportive, and pedagogically grounded educational tutor.
+Your mission is to help students understand their courseware, clarify difficult concepts, provide real-world examples, translate content, and reinforce knowledge.
 
-=== CRITICAL RULES ===
-
-1. SOURCE SELECTION PRIORITY:
-   Before generating any answer, determine the correct content source in this exact order:
-   - Priority 1: Current User Message (if the user provides text directly in their query).
-   - Priority 2: Most Recent Assistant Response (from the context).
-   - Priority 3: Most Recent User Message.
-   - Priority 4: Full Conversation History (for follow-up questions/clarifications).
-   - Priority 5: OCR Extracted Text (uploaded notes).
-   - Priority 6: Generated Summary of notes.
-   Always choose the highest-priority valid source. Never automatically use OCR notes or summaries unless they are relevant to the user's request.
-
-2. TRANSLATION RULES:
-   If the user asks to translate (e.g., "translate", "翻译", "translate this", "translate the above content", "翻译以上内容"):
-   - Identify the target using the Source Selection Priority (defaulting to the most recent assistant response if no text is in the current message).
-   - Translate ONLY the target content. Do NOT explain, summarize, or search OCR notes.
-   - If no target language is specified: translate English text to Chinese, and translate Chinese text to English.
-
-3. SUMMARIZATION & REWRITE RULES:
-   If the user asks to summarize, rewrite, paraphrase, or simplify:
-   - Process ONLY the target content determined by the Source Selection Priority. Do NOT answer unrelated concepts or search OCR notes.
-
-4. FOLLOW-UP & REFERENCE RULES:
-   - Resolve pronouns ("it", "this", "above", "这个", "上面", "上述", "以上", "刚刚") automatically using the Source Selection Priority.
-   - Apply follow-up requests (e.g., "explain more", "give example", "why is it important") to the most recent relevant content from the conversation history.
-
-5. OCR & QUIZ RULES:
-   - Use OCR notes or generated summaries ONLY when the user explicitly asks about the lecture notes (e.g., "Explain chapter 3", "Summarize notes").
-   - Use quiz questions/answers context only when the user asks about the quiz (e.g., "Why is this answer wrong?").
-
-6. LANGUAGE RULES:
-   - Respond in the same language as the user (English -> English, Chinese -> Chinese, Malay -> Malay).
-
-=== OUTPUT CONSTRAINT (CRITICAL) ===
-- You MUST ONLY output the final response/result. 
-- Do NOT output any decision steps, reasoning, planning logs, classification details, or intermediate thinking.
-- Never output headers/bullets like "Step 1", "User Intent", "Content Source", "Selected Content", or "Final Decision Process".
-- Failure to comply with this constraint is unacceptable. Output ONLY the clean final answer."""
-
-    # Find most recent assistant response and user message for explicit prompt referencing
-    most_recent_assistant = ""
-    most_recent_user = ""
-    for msg in reversed(chat_history):
-        if msg["role"] == "assistant" and not most_recent_assistant:
-            most_recent_assistant = msg["content"]
-        if msg["role"] == "user" and not most_recent_user:
-            most_recent_user = msg["content"]
-
-    prompt = f"""=== CONTEXT SOURCES ===
-
-1. OCR Extracted Text (uploaded lecture notes):
+=== ACADEMIC DOCUMENT CONTEXT ===
+--- OCR Extracted Text (Courseware Notes) ---
 {ocr_text}
 
-2. Generated Summary of the notes:
+--- Structured Summary of Document ---
 {summary_text}
-
-3. Most Recent Assistant Response:
-{most_recent_assistant}
-
-4. Most Recent User Message:
-{most_recent_user}
-
-5. Full Conversation History:
-{formatted_history}
-
 {quiz_context}
 
-=== CURRENT USER QUESTION ===
-{user_question}
-"""
+=== CORE OPERATIONAL RULES ===
+1. MULTI-TURN DIALOGUE TRACKING (CRITICAL):
+   - You are engaged in a continuous multi-turn study dialogue. ALWAYS maintain context from previous turns.
+   - When the user refers to previous discussion (e.g., "翻译", "翻译上面解释的内容", "translate the above", "解释一下", "举个例子", "讲简单点", "总结一下", "为什么"):
+     * Accurately identify the substantive concept, explanation, or text from the recent conversation history.
+     * Apply the requested operation directly to that content. NEVER echo the user's prompt or ask redundant clarifying questions when context is already clear in the chat history.
 
+2. TRANSLATION:
+   - When asked to translate:
+     * If the user says "翻译", "翻译上面", "翻译上面解释的内容", "translate this", "translate the above", etc., translate the relevant previous assistant explanation or content directly.
+     * If the source content from the chat is English and the user asks in Chinese, translate it into natural, clear Simplified Chinese (简体中文).
+     * If the source content is Chinese and the user asks in English, translate into English.
+     * Provide the translation cleanly without unnecessary conversational meta-commentary.
+
+3. DOCUMENT GROUNDING & TUTORING:
+   - When answering questions about the courseware, ground your facts in the Document Context.
+   - When the student asks for clarification, analogies, or examples (e.g. "Simpler", "Example"), provide pedagogically intuitive explanations.
+   - If the student asks about quiz questions or why an answer is correct/incorrect, reference the quiz context and document facts.
+
+4. LANGUAGE & FORMAT:
+   - Match the user's inquiry language (Chinese -> Chinese, English -> English, etc.).
+   - Use clean, well-formatted Markdown (bullet points, bold highlights, code blocks) for readability.
+   - Output ONLY the final helpful response."""
+
+    # Build properly formatted alternating history for Gemini ChatSession
+    gemini_history = []
+    for msg in chat_history:
+        role = "user" if msg.get("role") == "user" else "model"
+        content = str(msg.get("content", "")).strip()
+        if content:
+            gemini_history.append({"role": role, "parts": [content]})
+            
+    # Ensure history starts with user role
+    while gemini_history and gemini_history[0]["role"] != "user":
+        gemini_history.pop(0)
+        
+    # Merge consecutive messages from same role to maintain strict alternating turns
+    merged_history = []
+    for turn in gemini_history:
+        if merged_history and merged_history[-1]["role"] == turn["role"]:
+            merged_history[-1]["parts"][0] += "\n\n" + turn["parts"][0]
+        else:
+            merged_history.append(turn)
+            
+    # History must end with model turn so that user_question is the next user turn
+    while merged_history and merged_history[-1]["role"] != "model":
+        merged_history.pop()
+
+    model_name = _get_model_name(api_key)
+    
     try:
-        model_name = _get_model_name(api_key)
-        model = genai.GenerativeModel(model_name, system_instruction=system_prompt)
-        response = _generate_with_retry(model, prompt)
-        return response.text
+        model = genai.GenerativeModel(model_name, system_instruction=system_instruction)
+        chat = model.start_chat(history=merged_history)
+        
+        # Send with retry wrapper
+        base_delay = 15
+        for attempt in range(3):
+            try:
+                response = chat.send_message(user_question)
+                return response.text.strip()
+            except Exception as e:
+                error_msg = str(e)
+                if ("429" in error_msg or "Quota exceeded" in error_msg) and attempt < 2:
+                    time.sleep(base_delay * (2 ** attempt))
+                    continue
+                raise
     except Exception as e:
-        return f"⚠️ Chat Error: {str(e)}"
+        # Fallback to single-turn prompt if start_chat encounters an unexpected error
+        try:
+            formatted_history = "\n".join([f"{'User' if m.get('role')=='user' else 'Assistant'}: {m.get('content', '')}" for m in chat_history[-6:]])
+            fallback_prompt = f"""{system_instruction}
+
+Conversation History:
+{formatted_history}
+
+Current User Message:
+{user_question}"""
+            model = genai.GenerativeModel(model_name)
+            res = _generate_with_retry(model, fallback_prompt)
+            return res.text.strip()
+        except Exception as err:
+            return f"⚠️ Chat Error: {str(err)}"
 
 if __name__ == "__main__":
     pass
