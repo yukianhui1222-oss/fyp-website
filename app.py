@@ -4435,6 +4435,12 @@ def main():
                 key="main_summary_target_lang",
                 disabled=st.session_state.get('is_processing', False)
             )
+            st.toggle(
+                "✍️ Handwritten Mode (手写笔记模式)", 
+                key="handwritten_note_mode",
+                help="Enable AI Multimodal Vision to accurately transcribe handwritten notes, cursive script, and notebook paper.",
+                disabled=st.session_state.get('is_processing', False)
+            )
             
         with ctrl_col2:
             st.markdown("<label style='font-size: 0.98rem; font-weight: 700; color: #1e293b; display: inline-block; margin-bottom: 8px;'>⚡ Actions</label>", unsafe_allow_html=True)
@@ -4479,9 +4485,11 @@ def main():
                 st.spinner("Synthesizing your document details...")
                 st.markdown("</div>", unsafe_allow_html=True)
 
-            # Step 1: OCR
-            status_placeholder.markdown("🔍 <span style='color: #f59e0b; font-weight: 600;'>Step 1/2:</span> Extracting text...", unsafe_allow_html=True)
-            my_bar.progress(10, text="🔍 OCR Engine: Extracting text components...")
+            # Step 1: OCR / Multimodal Vision Extraction
+            is_hw = st.session_state.get('handwritten_note_mode', False)
+            step1_text = "Transcribing handwritten notes with AI Vision..." if is_hw else "Extracting text components..."
+            status_placeholder.markdown(f"🔍 <span style='color: #f59e0b; font-weight: 600;'>Step 1/2:</span> {step1_text}", unsafe_allow_html=True)
+            my_bar.progress(10, text=f"🔍 {'Multimodal AI Vision' if is_hw else 'OCR Engine'}: {step1_text}")
             
             from ocr_engine import extract_text_from_image
             start_time = time.time()
@@ -4489,10 +4497,15 @@ def main():
             
             def update_progress(current, total):
                 percent = min(10 + int((current / total) * 40), 50)
-                my_bar.progress(percent, text=f"🔍 OCR Engine: Processing page {current}/{total}...")
+                my_bar.progress(percent, text=f"🔍 {'AI Vision' if is_hw else 'OCR Engine'}: Processing page {current}/{total}...")
                 status_placeholder.markdown(f"🔍 <span style='color: #f59e0b; font-weight: 600;'>Step 1/2:</span> Extracting text ({current}/{total})...", unsafe_allow_html=True)
 
-            raw_text = extract_text_from_image(uploaded_file, progress_callback=update_progress)
+            raw_text = extract_text_from_image(
+                uploaded_file, 
+                progress_callback=update_progress,
+                api_key=api_key,
+                handwritten_mode=is_hw
+            )
             ocr_time = time.time() - start_time
             
             if not raw_text or "⚠️" in raw_text:

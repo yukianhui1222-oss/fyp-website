@@ -167,9 +167,47 @@ def _pages_to_text(pages: list) -> str:
     return "\n".join(lines).strip()
 
 
-def extract_text_from_image(file_obj, progress_callback: Optional[Callable] = None) -> str:
+def extract_text_via_gemini_vision(image, api_key: str) -> str:
     """
-    Extracts text from uploaded file.
+    Transcribes handwritten notes and complex document images using Google Gemini Multimodal Vision.
+    Specifically solves ruled notebook paper, cursive, equations, and informal handwriting.
+    """
+    if not api_key:
+        return ""
+    try:
+        from summarizer import _get_model_name, _generate_with_retry
+        import google.generativeai as genai
+        
+        genai.configure(api_key=api_key)
+        model_name = _get_model_name(api_key)
+        model = genai.GenerativeModel(model_name)
+        
+        prompt = """You are an expert Academic Document & Handwriting Transcription Engine.
+Your task is to accurately transcribe all handwritten or printed text, formulas, symbols, and notes visible in this image.
+
+RULES:
+1. Accurately transcribe all handwritten and printed text line by line.
+2. Faithfully preserve list hierarchies (e.g., i, ii, iii, bullets, numbers, dashes, sub-items).
+3. Faithfully transcribe equations, formulas, code, and academic terms.
+4. If words are crossed out or erased, ignore the strikethrough error and transcribe the intended clean text.
+5. Output ONLY the raw transcribed text. Do NOT add preamble, conversational remarks, or markdown code fence blocks."""
+
+        response = _generate_with_retry(model, [prompt, image])
+        return response.text.strip() if response and response.text else ""
+    except Exception as e:
+        logger.warning("Gemini Vision transcription error: %s", e)
+        return ""
+
+
+def extract_text_from_image(
+    file_obj, 
+    progress_callback: Optional[Callable] = None,
+    api_key: Optional[str] = None,
+    handwritten_mode: bool = False
+) -> str:
+    """
+    Extracts text from uploaded file supporting both classical OCR (PaddleOCR)
+    and Multimodal LLM Vision (Gemini Vision) for handwritten lecture notes.
 
     Parameters
     ----------
@@ -177,6 +215,10 @@ def extract_text_from_image(file_obj, progress_callback: Optional[Callable] = No
         File object containing .name attribute and byte content.
     progress_callback : callable | None
         Progress callback function, receives (current, total) parameters.
+    api_key : str | None
+        Gemini API key for multimodal vision transcription.
+    handwritten_mode : bool
+        Whether to prioritize multimodal vision for handwritten notes.
     """
     if not file_obj:
         return ""
@@ -192,7 +234,38 @@ def extract_text_from_image(file_obj, progress_callback: Optional[Callable] = No
     if ext not in _IMAGE_EXTS and ext not in _DOC_EXTS:
         return f"⚠️ Unsupported file format: '{ext}'"
 
-    # ── 写入临时文件 ──────────────────────────────────────────
+    # ── 优先处理手写模式（Handwritten Notes Mode）────────────────
+    if handwritten_mode and api_key:
+        try:
+            from PIL import Image
+            if ext in _IMAGE_EXTS:
+                if progress_callback:
+                    progress_callback(1, 1)
+                img = Image.open(io.BytesIO(file_bytes)).convert("RGB")
+                vision_text = extract_text_via_gemini_vision(img, api_key)
+                if vision_text:
+                    return f"-- Page 1 (Handwritten Notes - Gemini Vision) --\n{vision_text}"
+            elif ext == ".pdf":
+                # Multi-page handwritten PDF support
+                import fitz
+                doc = fitz.open(stream=file_bytes, filetype="pdf")
+                total_pages = len(doc)
+                page_texts = []
+                for p_idx in range(total_pages):
+                    if progress_callback:
+                        progress_callback(p_idx + 1, total_pages)
+                    page = doc[p_idx]
+                    pix = page.get_pixmap(dpi=150)
+                    p_img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                    p_text = extract_text_via_gemini_vision(p_img, api_key)
+                    if p_text:
+                        page_texts.append(f"-- Page {p_idx + 1} (Handwritten Notes - Gemini Vision) --\n{p_text}")
+                if page_texts:
+                    return "\n\n".join(page_texts)
+        except Exception as e_hw:
+            logger.warning("Handwritten mode direct vision failed: %s, falling back to standard pipeline", e_hw)
+
+    # ── 写入临时文件执行标准解析管线 ────────────────────────────
     tmp_path: Optional[str] = None
     try:
         suffix = ext if ext else ".tmp"
@@ -206,39 +279,71 @@ def extract_text_from_image(file_obj, progress_callback: Optional[Callable] = No
             result = parser.process_file(tmp_path, progress_callback=progress_callback)
             pages = result.get("pages", [])
             text = _pages_to_text(pages)
+            
+            # 如果文档解析出来字数极少且为扫描 PDF，尝试 Gemini Vision 兜底
+            if (not text or len(text.strip()) < 20 or "No text detected" in text) and ext == ".pdf" and api_key:
+                try:
+                    import fitz
+                    from PIL import Image
+                    doc = fitz.open(tmp_path)
+                    total_pages = min(len(doc), 5)
+                    recovered = []
+                    for p_idx in range(total_pages):
+                        page = doc[p_idx]
+                        pix = page.get_pixmap(dpi=150)
+                        p_img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                        p_txt = extract_text_via_gemini_vision(p_img, api_key)
+                        if p_txt:
+                            recovered.append(f"-- Page {p_idx + 1} (Recovered via Gemini Vision) --\n{p_txt}")
+                    if recovered:
+                        return "\n\n".join(recovered)
+                except Exception:
+                    pass
             return text if text else "No text detected."
 
         # 路径 B：图片格式
         else:
             from PIL import Image
-            processor = _get_ocr_processor()
-
             img = Image.open(io.BytesIO(file_bytes)).convert("RGB")
 
-            # 尺寸限制 - 预处理并按比例缩小超大图像（提速与精度的平衡点）
+            # 尺寸限制 - 预处理并按比例缩小超大图像
             max_dim = 1500
             if max(img.size) > max_dim:
                 img.thumbnail((max_dim, max_dim), Image.LANCZOS)
 
+            processor = _get_ocr_processor()
             ocr_results = processor.process_images([img], progress_callback=progress_callback)
-            if not ocr_results:
-                return "No text detected."
-
-            blocks = ocr_results[0].get("blocks", [])
-            if not blocks:
-                return "No text detected."
-
+            
+            blocks = ocr_results[0].get("blocks", []) if ocr_results else []
             texts = [b.get("text", "").strip() for b in blocks if b.get("text", "").strip()]
+            
+            paddle_text = ""
             if texts:
                 avg_len = sum(len(t) for t in texts) / len(texts)
-                joined = "".join(texts) if (avg_len < 2.0 and len(texts) > 5) else "\n".join(texts)
-            else:
-                joined = ""
+                paddle_text = "".join(texts) if (avg_len < 2.0 and len(texts) > 5) else "\n".join(texts)
+            
+            # 智能兜底检测（Auto Fallback for Handwriting / Low Confidence）:
+            clean_paddle = paddle_text.strip()
+            if (not clean_paddle or len(clean_paddle) < 20 or len(texts) <= 2) and api_key:
+                logger.info("PaddleOCR yielded minimal/no text (%d chars). Triggering Gemini Vision recovery...", len(clean_paddle))
+                vision_text = extract_text_via_gemini_vision(img, api_key)
+                if vision_text and len(vision_text) > len(clean_paddle):
+                    return f"-- Page 1 (Auto-Recovered via Gemini Vision) --\n{vision_text}"
 
-            return f"-- Page 1 (image) --\n{joined}" if joined else "No text detected."
+            return f"-- Page 1 (image) --\n{paddle_text}" if paddle_text else "No text detected."
 
     except Exception as e:
         logger.error("OCR Engine Error: %s", e, exc_info=True)
+        # 如果传统 OCR 崩溃（如系统缺失图形库），且有 API Key，无缝启用 Gemini Vision 兜底！
+        if api_key and ext in _IMAGE_EXTS:
+            try:
+                from PIL import Image
+                img = Image.open(io.BytesIO(file_bytes)).convert("RGB")
+                vision_text = extract_text_via_gemini_vision(img, api_key)
+                if vision_text:
+                    return f"-- Page 1 (Image - Gemini Vision Fallback) --\n{vision_text}"
+            except Exception:
+                pass
         return f"⚠️ OCR Engine Error: {e}"
     finally:
         if tmp_path and os.path.exists(tmp_path):
