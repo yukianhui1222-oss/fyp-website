@@ -4491,7 +4491,13 @@ def main():
             status_placeholder.markdown(f"🔍 <span style='color: #f59e0b; font-weight: 600;'>Step 1/2:</span> {step1_text}", unsafe_allow_html=True)
             my_bar.progress(10, text=f"🔍 {'Multimodal AI Vision' if is_hw else 'OCR Engine'}: {step1_text}")
             
+            import importlib
+            import ocr_engine
+            # Ensure fresh module is loaded if running under hot-reloaded environment
+            if not hasattr(ocr_engine, 'extract_text_via_gemini_vision'):
+                importlib.reload(ocr_engine)
             from ocr_engine import extract_text_from_image
+
             start_time = time.time()
             uploaded_file.seek(0)
             
@@ -4500,12 +4506,24 @@ def main():
                 my_bar.progress(percent, text=f"🔍 {'AI Vision' if is_hw else 'OCR Engine'}: Processing page {current}/{total}...")
                 status_placeholder.markdown(f"🔍 <span style='color: #f59e0b; font-weight: 600;'>Step 1/2:</span> Extracting text ({current}/{total})...", unsafe_allow_html=True)
 
-            raw_text = extract_text_from_image(
-                uploaded_file, 
-                progress_callback=update_progress,
-                api_key=api_key,
-                handwritten_mode=is_hw
-            )
+            try:
+                raw_text = extract_text_from_image(
+                    uploaded_file, 
+                    progress_callback=update_progress,
+                    api_key=api_key,
+                    handwritten_mode=is_hw
+                )
+            except TypeError as te:
+                if "api_key" in str(te):
+                    importlib.reload(ocr_engine)
+                    raw_text = ocr_engine.extract_text_from_image(
+                        uploaded_file, 
+                        progress_callback=update_progress,
+                        api_key=api_key,
+                        handwritten_mode=is_hw
+                    )
+                else:
+                    raise te
             ocr_time = time.time() - start_time
             
             if not raw_text or "⚠️" in raw_text:

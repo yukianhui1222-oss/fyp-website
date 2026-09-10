@@ -203,7 +203,8 @@ def extract_text_from_image(
     file_obj, 
     progress_callback: Optional[Callable] = None,
     api_key: Optional[str] = None,
-    handwritten_mode: bool = False
+    handwritten_mode: bool = False,
+    **kwargs
 ) -> str:
     """
     Extracts text from uploaded file supporting both classical OCR (PaddleOCR)
