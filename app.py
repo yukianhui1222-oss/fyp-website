@@ -2517,12 +2517,137 @@ def render_export_and_share_popover(docx_data, md_data, results, summary_result,
                 use_container_width=True,
                 key=f"export_raw_btn{key_suffix}"
             )
-        copy_to_clipboard(summary_result, "Copy Summary Markdown")
-        if raw_text_content:
-            copy_to_clipboard(raw_text_content, "Copy Extracted Text")
+        # --- Section 2: Quick Copy to Clipboard ---
+        st.markdown("<hr style='margin: 12px 0 10px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 0.86rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;'><span>📋</span> Copy to Clipboard</div>", unsafe_allow_html=True)
         
-        # --- Instant Social & Email Sharing Section ---
-        st.markdown("<hr style='margin: 14px 0 10px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
+        escaped_summary_text = json.dumps(summary_result or "")
+        escaped_raw_text = json.dumps(raw_text_content or "")
+        btn_id_copy_sum = f"copy-sum-btn-{abs(hash(doc_fname + key_suffix + 'sum'))}"
+        btn_id_copy_raw = f"copy-raw-btn-{abs(hash(doc_fname + key_suffix + 'raw'))}"
+        
+        raw_copy_btn_html = f"""
+            <button id="{btn_id_copy_raw}" class="dm-copy-btn">
+                <span style="font-size: 0.95rem;">📄</span>
+                <span>Copy Extracted Text</span>
+            </button>
+        """ if raw_text_content else ""
+
+        copy_html = f"""
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                html, body {{
+                    margin: 0;
+                    padding: 0;
+                    background: transparent !important;
+                    overflow: hidden;
+                    width: 100% !important;
+                }}
+                .dm-copy-btn {{
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 8px !important;
+                    width: 100% !important;
+                    height: 38px !important;
+                    padding: 0 12px !important;
+                    border-radius: 9px !important;
+                    font-weight: 600 !important;
+                    font-size: 0.84rem !important;
+                    text-decoration: none !important;
+                    box-sizing: border-box !important;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                    cursor: pointer !important;
+                    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+                    margin-bottom: 8px !important;
+                    background: #f8fafc !important;
+                    color: #4338ca !important;
+                    border: 1.5px solid #e0e7ff !important;
+                }}
+                .dm-copy-btn:hover {{
+                    background: #eef2ff !important;
+                    border-color: #a5b4fc !important;
+                    color: #3730a3 !important;
+                    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
+                    transform: translateY(-1px) !important;
+                }}
+                .dm-copy-btn:active {{
+                    transform: translateY(0) !important;
+                }}
+            </style>
+            <div style="display: flex; flex-direction: column; width: 100%; padding-top: 2px;">
+                <button id="{btn_id_copy_sum}" class="dm-copy-btn">
+                    <span style="font-size: 0.95rem;">📋</span>
+                    <span>Copy Summary Markdown</span>
+                </button>
+                {raw_copy_btn_html}
+            </div>
+            <script>
+                function safeCopy(text) {{
+                    if (navigator.clipboard && window.isSecureContext) {{
+                        return navigator.clipboard.writeText(text).catch(function() {{
+                            return execFallback(text);
+                        }});
+                    }}
+                    return execFallback(text);
+                }}
+                function execFallback(str) {{
+                    var el = document.createElement('textarea');
+                    el.value = str;
+                    el.style.position = 'fixed';
+                    el.style.top = '-9999px';
+                    el.style.left = '-9999px';
+                    document.body.appendChild(el);
+                    el.focus();
+                    el.select();
+                    try {{ document.execCommand('copy'); }} catch (e) {{}}
+                    document.body.removeChild(el);
+                    return Promise.resolve();
+                }}
+                document.getElementById('{btn_id_copy_sum}').onclick = function() {{
+                    const btn = this;
+                    const orig = btn.innerHTML;
+                    safeCopy({escaped_summary_text}).then(() => {{
+                        btn.innerHTML = '<span style="font-size: 0.95rem;">✅</span> Copied!';
+                        btn.style.background = '#f0fdf4';
+                        btn.style.borderColor = '#86efac';
+                        btn.style.color = '#166534';
+                        setTimeout(() => {{
+                            btn.innerHTML = orig;
+                            btn.style.background = '#f8fafc';
+                            btn.style.borderColor = '#e0e7ff';
+                            btn.style.color = '#4338ca';
+                        }}, 2000);
+                    }});
+                }};
+                {f'''
+                const rawBtn = document.getElementById('{btn_id_copy_raw}');
+                if (rawBtn) {{
+                    rawBtn.onclick = function() {{
+                        const btn = this;
+                        const orig = btn.innerHTML;
+                        safeCopy({escaped_raw_text}).then(() => {{
+                            btn.innerHTML = '<span style="font-size: 0.95rem;">✅</span> Copied!';
+                            btn.style.background = '#f0fdf4';
+                            btn.style.borderColor = '#86efac';
+                            btn.style.color = '#166534';
+                            setTimeout(() => {{
+                                btn.innerHTML = orig;
+                                btn.style.background = '#f8fafc';
+                                btn.style.borderColor = '#e0e7ff';
+                                btn.style.color = '#4338ca';
+                            }}, 2000);
+                        }});
+                    }};
+                }}
+                ''' if raw_text_content else ''}
+            </script>
+        """
+        copy_height = 92 if raw_text_content else 46
+        components.html(copy_html, height=copy_height)
+        
+        # --- Section 3: Instant Social & Email Sharing Section ---
+        st.markdown("<hr style='margin: 12px 0 10px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
         st.markdown("<div style='font-size: 0.86rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;'><span>⚡</span> Quick Share Full Summary & Translation</div>", unsafe_allow_html=True)
         
         # Format 100% full, untruncated summary & translation
@@ -2628,10 +2753,31 @@ def render_export_and_share_popover(docx_data, md_data, results, summary_result,
                 </button>
             </div>
             <script>
+                function safeShareCopy(text) {{
+                    if (navigator.clipboard && window.isSecureContext) {{
+                        return navigator.clipboard.writeText(text).catch(function() {{
+                            return execShareFallback(text);
+                        }});
+                    }}
+                    return execShareFallback(text);
+                }}
+                function execShareFallback(str) {{
+                    var el = document.createElement('textarea');
+                    el.value = str;
+                    el.style.position = 'fixed';
+                    el.style.top = '-9999px';
+                    el.style.left = '-9999px';
+                    document.body.appendChild(el);
+                    el.focus();
+                    el.select();
+                    try {{ document.execCommand('copy'); }} catch (e) {{}}
+                    document.body.removeChild(el);
+                    return Promise.resolve();
+                }}
                 document.getElementById('{btn_id_wa}').onclick = function() {{
                     const btn = this;
                     const orig = btn.innerHTML;
-                    navigator.clipboard.writeText({escaped_full_text}).catch(() => {{}});
+                    safeShareCopy({escaped_full_text});
                     window.open("{wa_url}", "_blank");
                     btn.innerHTML = '<span>✅</span> Copied & WhatsApp Opened!';
                     setTimeout(() => {{ btn.innerHTML = orig; }}, 3000);
@@ -2640,7 +2786,7 @@ def render_export_and_share_popover(docx_data, md_data, results, summary_result,
                 document.getElementById('{btn_id_mail}').onclick = function() {{
                     const btn = this;
                     const orig = btn.innerHTML;
-                    navigator.clipboard.writeText({escaped_mail_body}).catch(() => {{}});
+                    safeShareCopy({escaped_mail_body});
                     
                     // 1. Open Gmail Web Compose (100% reliable on modern web)
                     const gWin = window.open("{gmail_url}", "_blank");
