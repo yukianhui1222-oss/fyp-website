@@ -2399,9 +2399,32 @@ def copy_to_clipboard(text, label="Copy"):
             {emoji_html}{label}
         </button>
         <script>
+            function copyTextToClipboard(val) {{
+                if (navigator.clipboard && window.isSecureContext) {{
+                    return navigator.clipboard.writeText(val).catch(function() {{
+                        return execCopyFallback(val);
+                    }});
+                }}
+                return execCopyFallback(val);
+            }}
+            function execCopyFallback(val) {{
+                var t = document.createElement("textarea");
+                t.value = val;
+                t.style.position = "fixed";
+                t.style.top = "-9999px";
+                t.style.left = "-9999px";
+                document.body.appendChild(t);
+                t.focus();
+                t.select();
+                try {{
+                    document.execCommand('copy');
+                }} catch (e) {{}}
+                document.body.removeChild(t);
+                return Promise.resolve();
+            }}
             document.getElementById('{button_id}').onclick = function() {{
                 const text = {escaped_text};
-                navigator.clipboard.writeText(text).then(() => {{
+                copyTextToClipboard(text).then(() => {{
                     const originalContent = this.innerHTML;
                     this.innerHTML = '<span style="font-size: 0.95rem;">✅</span> Copied!';
                     this.style.backgroundColor = '#6366f1';
@@ -2484,7 +2507,19 @@ def render_export_and_share_popover(docx_data, md_data, results, summary_result,
             use_container_width=True,
             key=f"export_md_btn{key_suffix}"
         )
+        raw_text_content = results.get('raw_text', '')
+        if raw_text_content:
+            st.download_button(
+                label="📑 Export Extracted Text (.txt)",
+                data=raw_text_content,
+                file_name=f"{doc_fname}_Extracted_Text.txt",
+                mime="text/plain",
+                use_container_width=True,
+                key=f"export_raw_btn{key_suffix}"
+            )
         copy_to_clipboard(summary_result, "Copy Summary Markdown")
+        if raw_text_content:
+            copy_to_clipboard(raw_text_content, "Copy Extracted Text")
         
         # --- Instant Social & Email Sharing Section ---
         st.markdown("<hr style='margin: 14px 0 10px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
@@ -4899,10 +4934,31 @@ def main():
                         </div>
                     </div>
                     <script>
+                        function safeCopy(text) {{
+                            if (navigator.clipboard && window.isSecureContext) {{
+                                return navigator.clipboard.writeText(text).catch(function() {{
+                                    return execFallback(text);
+                                }});
+                            }}
+                            return execFallback(text);
+                        }}
+                        function execFallback(str) {{
+                            var el = document.createElement('textarea');
+                            el.value = str;
+                            el.style.position = 'fixed';
+                            el.style.top = '-9999px';
+                            el.style.left = '-9999px';
+                            document.body.appendChild(el);
+                            el.focus();
+                            el.select();
+                            try {{ document.execCommand('copy'); }} catch (e) {{}}
+                            document.body.removeChild(el);
+                            return Promise.resolve();
+                        }}
                         document.getElementById('{btn_tab_wa}').onclick = function() {{
                             const btn = this;
                             const orig = btn.innerHTML;
-                            navigator.clipboard.writeText({escaped_full_wa_tab}).catch(() => {{}});
+                            safeCopy({escaped_full_wa_tab});
                             window.open("{wa_url_tab}", "_blank");
                             btn.innerHTML = '<span>✅</span> Copied & WhatsApp Opened!';
                             setTimeout(() => {{ btn.innerHTML = orig; }}, 3000);
@@ -4911,7 +4967,7 @@ def main():
                         document.getElementById('{btn_tab_mail}').onclick = function() {{
                             const btn = this;
                             const orig = btn.innerHTML;
-                            navigator.clipboard.writeText({escaped_full_mail_tab}).catch(() => {{}});
+                            safeCopy({escaped_full_mail_tab});
                             
                             // Open Gmail Web Compose (100% reliable on web)
                             const gWin = window.open("{gmail_url_tab}", "_blank");
@@ -4927,7 +4983,12 @@ def main():
                 
                 st.markdown("---")
                 with st.expander("👁️ View Raw Extracted Text", expanded=False):
-                    st.text_area("Extracted OCR Text", raw_text, height=350, disabled=True, label_visibility="collapsed")
+                    raw_head_col1, raw_head_col2 = st.columns([6, 4], vertical_alignment="center")
+                    with raw_head_col1:
+                        st.markdown("<span style='font-size: 0.92rem; font-weight: 700; color: #1e293b;'>📄 Full Extracted Document Text</span>", unsafe_allow_html=True)
+                    with raw_head_col2:
+                        copy_to_clipboard(raw_text, "Copy Extracted Text")
+                    st.text_area("Extracted OCR Text", raw_text, height=350, label_visibility="collapsed")
                 
             with tab2:
                 # Dynamic translation update
