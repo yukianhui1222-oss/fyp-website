@@ -1015,169 +1015,19 @@ def process_avatar_image(uploaded_file):
         return None
 
 def render_edit_profile_view():
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Title Banner for Profile
-    st.markdown("""
-        <div style="background: linear-gradient(135deg, #e0e7ff 0%, #e9d5ff 50%, #fae8ff 100%); padding: 35px 20px; border-radius: 24px; text-align: center; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 15px 35px -5px rgba(99, 102, 241, 0.08);">
-            <h1 class="hero-title" style="margin: 0 !important; font-size: 3.2rem !important; background: linear-gradient(45deg, #f97316, #e11d48, #9f1239); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1;">Account Profile</h1>
-            <p style="color: #4338ca; font-size: 1.05rem; margin-top: 0.6rem; font-weight: 600; letter-spacing: 0.3px;">Manage your profile information and account details</p>
-        </div>
-    """, unsafe_allow_html=True)
+    from html import escape
 
-    # Title Banner for Profile
-    st.markdown("""
-        <div style="background: linear-gradient(135deg, rgba(224, 231, 255, 0.7) 0%, rgba(233, 213, 255, 0.7) 50%, rgba(250, 232, 255, 0.7) 100%); backdrop-filter: blur(16px); padding: 32px 24px; border-radius: 24px; text-align: center; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.12);">
-            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(99, 102, 241, 0.12); color: #4f46e5; padding: 4px 14px; border-radius: 99px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; border: 1px solid rgba(99, 102, 241, 0.2);">
-                <span>✨</span> User Profile Settings
-            </div>
-            <h1 class="hero-title" style="margin: 0 !important; font-size: 2.8rem !important; background: linear-gradient(45deg, #f97316, #e11d48, #9f1239); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.15; font-weight: 800;">Account Profile</h1>
-            <p style="color: #4338ca; font-size: 0.98rem; margin-top: 0.5rem; font-weight: 600; letter-spacing: 0.2px;">Manage your personal identity, avatar branding, and preferences</p>
-        </div>
-    """, unsafe_allow_html=True)
-
-    # Main edit container style
-    st.markdown("""
-        <style>
-        /* Overall profile container card styling */
-        div[class*="st-key-profile_container"] {
-            background: rgba(255, 255, 255, 0.95) !important;
-            border: 1px solid rgba(226, 232, 240, 0.9) !important;
-            border-radius: 24px !important;
-            padding: 32px 36px !important;
-            backdrop-filter: blur(20px) !important;
-            box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.08) !important;
-            margin-bottom: 2rem !important;
-        }
-
-        /* Style text inputs, textareas and selectbox buttons inside profile */
-        div[class*="st-key-profile_container"] div[data-testid="stTextInput"] input,
-        div[class*="st-key-profile_container"] div[data-testid="stTextArea"] textarea,
-        div[class*="st-key-profile_container"] div[data-testid="stSelectbox"] div[role="button"] {
-            border-radius: 14px !important;
-            border: 1.5px solid #e2e8f0 !important;
-            background-color: #ffffff !important;
-            padding: 12px 18px !important;
-            font-size: 0.98rem !important;
-            color: #1e293b !important;
-            font-weight: 500 !important;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) !important;
-        }
-        div[class*="st-key-profile_container"] div[data-testid="stTextInput"] input:hover,
-        div[class*="st-key-profile_container"] div[data-testid="stTextArea"] textarea:hover,
-        div[class*="st-key-profile_container"] div[data-testid="stSelectbox"] div[role="button"]:hover {
-            border-color: #a5b4fc !important;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.06) !important;
-        }
-        div[class*="st-key-profile_container"] div[data-testid="stTextInput"] input:focus,
-        div[class*="st-key-profile_container"] div[data-testid="stTextArea"] textarea:focus,
-        div[class*="st-key-profile_container"] div[data-testid="stSelectbox"] div[role="button"]:focus {
-            border-color: #6366f1 !important;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
-            outline: none !important;
-        }
-        
-        /* Style input field labels */
-        div[class*="st-key-profile_container"] label[data-testid="stWidgetLabel"] p {
-            font-size: 0.95rem !important;
-            font-weight: 700 !important;
-            color: #1e293b !important;
-            margin-bottom: 6px !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 6px !important;
-        }
-        
-        /* Make read-only/disabled text inputs look distinct and clean */
-        div[class*="st-key-profile_container"] div[data-testid="stTextInput"] input:disabled {
-            background-color: #f8fafc !important;
-            color: #64748b !important;
-            border-color: #e2e8f0 !important;
-            cursor: not-allowed !important;
-            font-weight: 500 !important;
-        }
-
-        /* Style custom file uploader */
-        div[class*="st-key-profile_container"] div[data-testid="stFileUploader"] {
-            border: 2px dashed rgba(99, 102, 241, 0.3) !important;
-            background: linear-gradient(135deg, rgba(238, 242, 255, 0.4) 0%, rgba(245, 243, 255, 0.4) 100%) !important;
-            border-radius: 16px !important;
-            padding: 14px !important;
-            transition: all 0.25s ease !important;
-        }
-        div[class*="st-key-profile_container"] div[data-testid="stFileUploader"]:hover {
-            border-color: #6366f1 !important;
-            background: linear-gradient(135deg, rgba(238, 242, 255, 0.8) 0%, rgba(245, 243, 255, 0.8) 100%) !important;
-            box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.1) !important;
-        }
-
-        /* Action buttons style overrides */
-        div[class*="st-key-profile_cancel_btn"] button {
-            background: #ffffff !important;
-            color: #475569 !important;
-            border: 1.5px solid #cbd5e1 !important;
-            border-radius: 14px !important;
-            padding: 10px 24px !important;
-            font-size: 1.02rem !important;
-            font-weight: 600 !important;
-            transition: all 0.2s ease !important;
-            height: 48px !important;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
-        }
-        div[class*="st-key-profile_cancel_btn"] button:hover {
-            background-color: #f8fafc !important;
-            color: #0f172a !important;
-            border-color: #94a3b8 !important;
-            transform: translateY(-1px);
-        }
-
-        div[class*="st-key-profile_save_btn"] button {
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
-            color: #ffffff !important;
-            border: none !important;
-            border-radius: 14px !important;
-            padding: 10px 24px !important;
-            font-size: 1.05rem !important;
-            font-weight: 700 !important;
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25) !important;
-            transition: all 0.25s ease !important;
-            height: 48px !important;
-            letter-spacing: 0.2px !important;
-        }
-        div[class*="st-key-profile_save_btn"] button:hover {
-            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
-            box-shadow: 0 12px 28px rgba(99, 102, 241, 0.35) !important;
-            transform: translateY(-2px);
-        }
-
-        /* Style the Remove Avatar button */
-        div[class*="st-key-remove_avatar_btn"] button {
-            background-color: rgba(239, 68, 68, 0.06) !important;
-            color: #ef4444 !important;
-            border: 1.5px solid rgba(239, 68, 68, 0.2) !important;
-            border-radius: 12px !important;
-            font-size: 0.85rem !important;
-            font-weight: 600 !important;
-            padding: 6px 14px !important;
-            transition: all 0.2s ease !important;
-            margin-top: 8px !important;
-        }
-        div[class*="st-key-remove_avatar_btn"] button:hover {
-            background-color: #ef4444 !important;
-            color: #ffffff !important;
-            border-color: #ef4444 !important;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25) !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-    
+    st.markdown("""<div class="profile-page-heading">
+        <div class="profile-eyebrow">YOUR PERSONAL SPACE</div>
+        <h1>My profile</h1>
+        <p>A little about you. Everything in one place.</p>
+    </div>""", unsafe_allow_html=True)
     # Fetch details from session state
     user_info = st.session_state.get('user', {})
     uid = user_info.get("uid")
     id_token = user_info.get("idToken")
     curr_email = user_info.get('email', '')
-    
+
     user_profile = st.session_state.get('user_profile', {})
     curr_name = user_profile.get('name') or user_info.get('name', '')
     curr_phone = user_profile.get('phone', '')
@@ -1186,241 +1036,176 @@ def render_edit_profile_view():
     curr_gender = user_profile.get('gender', 'Prefer not to say')
     curr_birth_date = user_profile.get('birth_date', '')
     curr_joined_at = user_profile.get('joined_at', '') or datetime.now().strftime("%B %d, %Y")
-    
+
     # Initialize temp avatar for editing
     if 'temp_avatar' not in st.session_state:
         st.session_state.temp_avatar = user_profile.get('avatar', '')
-    
-    # Form layout inside streamlit container
-    with st.container(key="profile_container", border=True):
-        # Avatar Profile Summary Header
-        profile_avatar = st.session_state.temp_avatar
-        initials = curr_name[0].upper() if curr_name else "U"
-        
-        avatar_header_html = ""
-        if profile_avatar:
-            avatar_header_html = f'<img src="{profile_avatar}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #6366F1; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);">'
-        else:
-            avatar_header_html = f'<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 2.2rem; font-family: \'Poppins\', sans-serif; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);">{initials}</div>'
-            
-        st.markdown(f"""
-            <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%); border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px 28px; display: flex; align-items: center; gap: 24px; margin-bottom: 24px; box-shadow: 0 12px 30px -8px rgba(99, 102, 241, 0.06); flex-wrap: wrap;">
-                {avatar_header_html}
-                <div style="flex-grow: 1;">
-                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <h2 style="margin: 0; font-size: 1.8rem; font-weight: 800; color: #0f172a; font-family: 'Poppins', sans-serif; line-height: 1.2;">{curr_name}</h2>
-                        <span style="background: linear-gradient(45deg, #f97316, #e11d48, #9f1239); color: white; font-size: 0.74rem; font-weight: 700; padding: 3px 12px; border-radius: 99px; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.2); display: inline-flex; align-items: center;">PRO MEMBER</span>
-                    </div>
-                    <p style="margin: 6px 0 0 0; color: #64748b; font-size: 0.92rem; font-weight: 500;">Role: <span style="color:#6366f1; font-weight:700; background: rgba(99, 102, 241, 0.08); padding: 2px 8px; border-radius: 6px;">{curr_role}</span> • Joined on {curr_joined_at}</p>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # User Stats Dashboard Widgets in Profile
-        s_col1, s_col2, s_col3 = st.columns(3)
-        with s_col1:
-            st.markdown("""
-                <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1.5px solid #bbf7d0; border-radius: 18px; padding: 18px 22px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.06); min-height: 80px;">
-                    <div style="font-size: 0.76rem; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 6px;">
-                        <span>🌐</span> API Status
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
-                        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 10px #10b981;"></span>
-                        <span style="font-size: 1.1rem; font-weight: 800; color: #14532d;">Connected</span>
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
-        with s_col2:
-            st.markdown("""
-                <div style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); border: 1.5px solid #e9d5ff; border-radius: 18px; padding: 18px 22px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.06); min-height: 80px;">
-                    <div style="font-size: 0.76rem; font-weight: 700; color: #581c87; text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 6px;">
-                        <span>⚡</span> Engine Tier
-                    </div>
-                    <div style="font-size: 1.1rem; font-weight: 800; color: #6b21a8; margin-top: 6px;">Gemini Pro 1.5</div>
-                </div>
-            """, unsafe_allow_html=True)
-        with s_col3:
-            st.markdown("""
-                <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1.5px solid #bae6fd; border-radius: 18px; padding: 18px 22px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 6px 20px rgba(59, 130, 246, 0.06); min-height: 80px;">
-                    <div style="font-size: 0.76rem; font-weight: 700; color: #075985; text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 6px;">
-                        <span>🛡️</span> Account Status
-                    </div>
-                    <div style="font-size: 1.1rem; font-weight: 800; color: #0c4a6e; margin-top: 6px;">Active Verified</div>
-                </div>
-            """, unsafe_allow_html=True)
 
-        st.markdown("<div style='height: 25px;'></div>", unsafe_allow_html=True)
-        
-        # Row 0: Customize Profile Avatar Section
-        st.markdown("""
-            <div style="display: flex; align-items: center; gap: 10px; background: linear-gradient(90deg, rgba(99, 102, 241, 0.08) 0%, transparent 100%); padding: 8px 14px; border-radius: 10px; border-left: 4px solid #6366f1; margin-bottom: 18px;">
-                <span style="font-size: 1.2rem;">🖼️</span>
-                <h4 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Poppins', sans-serif;">Customize Profile Avatar</h4>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        avatar_col1, avatar_col2 = st.columns([1.6, 3.4])
-        with avatar_col1:
-            if st.session_state.temp_avatar:
-                st.markdown(f"""
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1.5px solid #e2e8f0; border-radius: 20px; padding: 22px 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03); min-height: 190px;">
-                        <img src="{st.session_state.temp_avatar}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #6366F1; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2); margin-bottom: 10px;">
-                        <span style="font-size: 0.78rem; font-weight: 700; color: #6366f1; background: rgba(99, 102, 241, 0.08); padding: 2px 10px; border-radius: 99px;">Custom Avatar</span>
-                    </div>
-                """, unsafe_allow_html=True)
-                if st.button("❌ Remove Avatar", use_container_width=True, key="remove_avatar_btn"):
-                    st.session_state.temp_avatar = ""
-                    if 'last_processed_avatar' in st.session_state:
-                        del st.session_state.last_processed_avatar
-                    st.rerun()
-            else:
-                st.markdown(f"""
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1.5px solid #e2e8f0; border-radius: 20px; padding: 22px 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03); min-height: 190px;">
-                        <div style="width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 2.8rem; font-family: 'Poppins', sans-serif; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2); margin-bottom: 10px;">{initials}</div>
-                        <span style="font-size: 0.78rem; font-weight: 700; color: #64748b; background: #f1f5f9; padding: 2px 10px; border-radius: 99px;">Default Initials</span>
-                    </div>
-                """, unsafe_allow_html=True)
-                    
-        with avatar_col2:
-            AVATAR_PRESETS = {
-                "Use Initials (Default)": "",
-                "✨ Cosmic Rocket": "data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='gRocket' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23EC4899'/><stop offset='100%25' stop-color='%23F43F5E'/></linearGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23gRocket)'/><path d='M50 25c-3 8-5 15-5 25 0 15 5 25 5 25s5-10 5-25c0-10-2-17-5-25z' fill='white'/><path d='M40 55c-2 6-2 12 0 15 3 0 6-3 8-8zM60 55c2 6 2 12 0 15-3 0-6-3-8-8z' fill='white' opacity='0.7'/></svg>",
-                "🧠 AI Intelligence": "data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='gBrain' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%238B5CF6'/><stop offset='100%25' stop-color='%236366F1'/></linearGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23gBrain)'/><path d='M38 42c-4 0-7 3-7 7 0 2 1 4 2 5-1 1-2 2-2 4 0 3 2 6 5 6h1c0 3 3 5 6 5s6-2 6-5h1c3 0 5-3 5-6 0-2-1-3-2-4 1-1 2-3 2-5 0-4-3-7-7-7zm24 0c-4 0-7 3-7 7 0 2 1 3 2 4-1 1-2 2-2 5 0 3 2 6 5 6h1c0 3 3 5 6 5s6-2 6-5h1c3 0 5-3 5-6 0-2-1-3-2-4 1-1 2-2 2-4 0-4-3-7-7-7z' fill='white' opacity='0.9'/></svg>",
-                "💻 Tech Developer": "data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='gDev' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2306B6D4'/><stop offset='100%25' stop-color='%233B82F6'/></linearGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23gDev)'/><path d='M35 40l-15 10 15 10M65 40l15 10-15 10M45 65l10-30' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>",
-                "⚡ Cyber Speed": "data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='gLightning' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23FBBF24'/><stop offset='100%25' stop-color='%23F59E0B'/></linearGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23gLightning)'/><path d='M55 25L35 50h15L45 75l20-25H50z' fill='white'/></svg>",
-                "🎓 Academic Scholar": "data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='gGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2310B981'/><stop offset='100%25' stop-color='%23059669'/></linearGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23gGrad)'/><path d='M50 28L25 40l25 12 25-12zM32 46v12c0 5 8 8 18 8s18-3 18-8V46M71 42v15' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>"
-            }
-            preset_names = list(AVATAR_PRESETS.keys())
-            current_preset_idx = 0
-            for name, val in AVATAR_PRESETS.items():
-                if val and st.session_state.temp_avatar == val:
-                    current_preset_idx = preset_names.index(name)
-                    break
-            
-            selected_preset = st.selectbox("🎭 Select Premium Preset", options=preset_names, index=current_preset_idx, help="Choose one of our premium stylized vector avatars.")
-            if AVATAR_PRESETS[selected_preset] != st.session_state.temp_avatar:
-                if AVATAR_PRESETS[selected_preset] or st.session_state.temp_avatar in AVATAR_PRESETS.values():
-                    st.session_state.temp_avatar = AVATAR_PRESETS[selected_preset]
-                    if 'last_processed_avatar' in st.session_state:
-                        del st.session_state.last_processed_avatar
-                    st.rerun()
-            
-            uploaded_avatar = st.file_uploader("📤 Or Upload Custom Image", type=["png", "jpg", "jpeg"], help="Upload an image (PNG/JPG). It will be auto-resized and compressed.")
-            if uploaded_avatar is not None:
-                file_key = f"avatar_{uploaded_avatar.name}_{uploaded_avatar.size}"
-                if st.session_state.get("last_processed_avatar") != file_key:
-                    with st.spinner("Processing avatar..."):
-                        base64_avatar = process_avatar_image(uploaded_avatar)
-                        if base64_avatar:
-                            st.session_state.temp_avatar = base64_avatar
-                            st.session_state.last_processed_avatar = file_key
-                            st.rerun()
-                        else:
-                            st.error("Failed to process image. Please try another one.")
 
-        # Personal Details Section Header
-        st.markdown("""
-            <div style="display: flex; align-items: center; gap: 10px; background: linear-gradient(90deg, rgba(139, 92, 246, 0.08) 0%, transparent 100%); padding: 8px 14px; border-radius: 10px; border-left: 4px solid #8b5cf6; margin-top: 25px; margin-bottom: 18px;">
-                <span style="font-size: 1.2rem;">📝</span>
-                <h4 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0; font-family: 'Poppins', sans-serif;">Personal Information</h4>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Row 1: Display Name & Email Address
-        r1_col1, r1_col2 = st.columns(2)
-        with r1_col1:
-            new_name = st.text_input("👤 Display Name", value=curr_name, placeholder="Enter your full name", help="Your custom display name shown in the sidebar.")
-        with r1_col2:
-            st.text_input("🔒 Email Address (Read-Only)", value=curr_email, disabled=True, help="Your account login email (cannot be modified).")
-        
-        # Row 2: Contact Number & Gender
-        r2_col1, r2_col2 = st.columns(2)
-        with r2_col1:
-            new_phone = st.text_input("📞 Contact Number", value=curr_phone, placeholder="+6012-3456789", help="Optional phone number.")
-        with r2_col2:
-            gender_options = ["Prefer not to say", "Male", "Female", "Other"]
-            default_gender_idx = 0
-            if curr_gender in gender_options:
-                default_gender_idx = gender_options.index(curr_gender)
-            new_gender = st.selectbox("🚻 Gender", options=gender_options, index=default_gender_idx, help="Your gender identification.")
-            
-        # Row 3: Role / Designation & Date of Birth
-        r3_col1, r3_col2 = st.columns(2)
-        with r3_col1:
-            roles_list = ["Standard Account", "Student", "Lecturer", "Researcher", "Developer", "Guest"]
-            default_role_idx = 0
-            if curr_role in roles_list:
-                default_role_idx = roles_list.index(curr_role)
-            else:
-                roles_list.append(curr_role)
-                default_role_idx = len(roles_list) - 1
-            new_role = st.selectbox("🎓 Role / Designation", options=roles_list, index=default_role_idx, help="Your role in your institution.")
-        with r3_col2:
-            new_birth_date = st.text_input("📅 Date of Birth", value=curr_birth_date, placeholder="YYYY-MM-DD", help="Format: YYYY-MM-DD")
-            
-        # Row 4: Registration Date & Biography
-        r4_col1, r4_col2 = st.columns(2)
-        with r4_col1:
-            st.text_input("🔒 Registration Date (Read-Only)", value=curr_joined_at, disabled=True, help="The date your account profile was created.")
-        with r4_col2:
-            st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-            
-        # Biography
-        new_bio = st.text_area("📝 Biography / Notes", value=curr_bio, placeholder="Tell us about yourself...", help="Short bio or notes.")
-        
-        st.markdown("<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0;'>", unsafe_allow_html=True)
-        
-        # Action buttons
-        btn_col1, btn_col2 = st.columns([1, 3.5])
-        with btn_col1:
-            if st.button("Cancel", use_container_width=True, key="profile_cancel_btn"):
-                if 'temp_avatar' in st.session_state:
-                    del st.session_state.temp_avatar
-                if 'last_processed_avatar' in st.session_state:
-                    del st.session_state.last_processed_avatar
-                st.session_state.edit_profile_active = False
-                st.rerun()
-        with btn_col2:
-            if st.button("Save Changes ✓", type="primary", use_container_width=True, key="profile_save_btn"):
-                if not new_name.strip():
-                    st.error("Display Name cannot be empty.")
-                else:
-                    with st.spinner("Saving changes to Firestore..."):
-                        success, msg = save_user_details(
-                            uid=uid,
-                            id_token=id_token,
-                            name=new_name.strip(),
-                            phone=new_phone.strip(),
-                            role=new_role,
-                            bio=new_bio.strip(),
-                            gender=new_gender,
-                            birth_date=new_birth_date.strip(),
-                            joined_at=curr_joined_at,
-                            avatar=st.session_state.temp_avatar
-                        )
-                        if success:
-                            # Update local session profile
-                            st.session_state.user_profile = {
-                                "name": new_name.strip(),
-                                "phone": new_phone.strip(),
-                                "role": new_role,
-                                "bio": new_bio.strip(),
-                                "gender": new_gender,
-                                "birth_date": new_birth_date.strip(),
-                                "joined_at": curr_joined_at,
-                                "avatar": st.session_state.temp_avatar,
-                                "exists": True
-                            }
-                            if 'temp_avatar' in st.session_state:
-                                del st.session_state.temp_avatar
-                            if 'last_processed_avatar' in st.session_state:
-                                del st.session_state.last_processed_avatar
-                            st.session_state.edit_profile_active = False
-                            st.toast("Profile updated successfully!", icon="✅")
-                            time.sleep(1)
-                            st.rerun()
+    with st.container(key="profile_dashboard"):
+        profile_left, profile_right = st.columns([1.12, 1], gap="large")
+        with profile_left:
+            with st.container(key="profile_container", border=True):
+                avatar = st.session_state.temp_avatar
+                initials = escape(curr_name[:1].upper() or "U")
+                portrait = (f'<img src="{escape(avatar, quote=True)}" alt="Your profile photo">'
+                            if avatar else f'<div class="profile-monogram">{initials}</div>')
+                st.markdown(f"""<div class="profile-portrait">{portrait}</div>
+                    <div class="profile-card-heading"><h2>My profile</h2><span>Personal details</span></div>
+                    """, unsafe_allow_html=True)
+                # Row 1: Display Name & Email Address
+                r1_col1, r1_col2 = st.columns(2)
+                with r1_col1:
+                    new_name = st.text_input("👤 Display Name", value=curr_name, placeholder="Enter your full name", help="Your custom display name shown in the sidebar.")
+                with r1_col2:
+                    st.text_input("🔒 Email Address (Read-Only)", value=curr_email, disabled=True, help="Your account login email (cannot be modified).")
+
+                # Row 2: Contact Number & Gender
+                r2_col1, r2_col2 = st.columns(2)
+                with r2_col1:
+                    new_phone = st.text_input("📞 Contact Number", value=curr_phone, placeholder="+6012-3456789", help="Optional phone number.")
+                with r2_col2:
+                    gender_options = ["Prefer not to say", "Male", "Female", "Other"]
+                    default_gender_idx = 0
+                    if curr_gender in gender_options:
+                        default_gender_idx = gender_options.index(curr_gender)
+                    new_gender = st.selectbox("🚻 Gender", options=gender_options, index=default_gender_idx, help="Your gender identification.")
+
+                # Row 3: Role / Designation & Date of Birth
+                r3_col1, r3_col2 = st.columns(2)
+                with r3_col1:
+                    roles_list = ["Standard Account", "Student", "Lecturer", "Researcher", "Developer", "Guest"]
+                    default_role_idx = 0
+                    if curr_role in roles_list:
+                        default_role_idx = roles_list.index(curr_role)
+                    else:
+                        roles_list.append(curr_role)
+                        default_role_idx = len(roles_list) - 1
+                    new_role = st.selectbox("🎓 Role / Designation", options=roles_list, index=default_role_idx, help="Your role in your institution.")
+                with r3_col2:
+                    new_birth_date = st.text_input("📅 Date of Birth", value=curr_birth_date, placeholder="YYYY-MM-DD", help="Format: YYYY-MM-DD")
+
+                # Row 4: Registration Date & Biography
+                r4_col1, r4_col2 = st.columns(2)
+                with r4_col1:
+                    st.text_input("🔒 Registration Date (Read-Only)", value=curr_joined_at, disabled=True, help="The date your account profile was created.")
+                with r4_col2:
+                    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+
+                # Biography
+                new_bio = st.text_area("📝 Biography / Notes", value=curr_bio, placeholder="Tell us about yourself...", help="Short bio or notes.")
+
+                st.markdown("<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0;'>", unsafe_allow_html=True)
+
+                # Action buttons
+                btn_col1, btn_col2 = st.columns([1, 3.5])
+                with btn_col1:
+                    if st.button("Cancel", use_container_width=True, key="profile_cancel_btn"):
+                        if 'temp_avatar' in st.session_state:
+                            del st.session_state.temp_avatar
+                        if 'last_processed_avatar' in st.session_state:
+                            del st.session_state.last_processed_avatar
+                        st.session_state.edit_profile_active = False
+                        st.rerun()
+                with btn_col2:
+                    if st.button("Save Changes ✓", type="primary", use_container_width=True, key="profile_save_btn"):
+                        if not new_name.strip():
+                            st.error("Display Name cannot be empty.")
                         else:
-                            st.error(msg)
+                            with st.spinner("Saving changes to Firestore..."):
+                                success, msg = save_user_details(
+                                    uid=uid,
+                                    id_token=id_token,
+                                    name=new_name.strip(),
+                                    phone=new_phone.strip(),
+                                    role=new_role,
+                                    bio=new_bio.strip(),
+                                    gender=new_gender,
+                                    birth_date=new_birth_date.strip(),
+                                    joined_at=curr_joined_at,
+                                    avatar=st.session_state.temp_avatar
+                                )
+                                if success:
+                                    # Update local session profile
+                                    st.session_state.user_profile = {
+                                        "name": new_name.strip(),
+                                        "phone": new_phone.strip(),
+                                        "role": new_role,
+                                        "bio": new_bio.strip(),
+                                        "gender": new_gender,
+                                        "birth_date": new_birth_date.strip(),
+                                        "joined_at": curr_joined_at,
+                                        "avatar": st.session_state.temp_avatar,
+                                        "exists": True
+                                    }
+                                    if 'temp_avatar' in st.session_state:
+                                        del st.session_state.temp_avatar
+                                    if 'last_processed_avatar' in st.session_state:
+                                        del st.session_state.last_processed_avatar
+                                    st.session_state.edit_profile_active = False
+                                    st.toast("Profile updated successfully!", icon="✅")
+                                    time.sleep(1)
+                                    st.rerun()
+                                else:
+                                    st.error(msg)
+
+        with profile_right:
+            with st.container(key="profile_account_card", border=True):
+                st.markdown('<div class="profile-card-heading"><h2>My account</h2><span class="profile-chip">Signed in</span></div>', unsafe_allow_html=True)
+                for label, value in [("Account email", curr_email), ("Role / designation", curr_role), ("Member since", curr_joined_at)]:
+                    st.markdown(f'<div class="profile-account-row"><span>{label}</span><strong>{escape(str(value))}</strong></div>', unsafe_allow_html=True)
+            with st.container(key="profile_details_card", border=True):
+                st.markdown('<div class="profile-card-heading"><h2>Profile overview</h2><span>Your details</span></div>', unsafe_allow_html=True)
+                for label, value in [("Display name", curr_name), ("Contact number", curr_phone), ("Biography", curr_bio), ("Profile photo", st.session_state.temp_avatar)]:
+                    status = "Added" if value else "Optional"
+                    tone = "complete" if value else "optional"
+                    st.markdown(f'<div class="profile-status-row"><span><i class="profile-dot {tone}"></i>{label}</span><span class="profile-status {tone}">{status}</span></div>', unsafe_allow_html=True)
+            with st.container(key="profile_avatar_card", border=True):
+                st.markdown('<div class="profile-card-heading"><h2>Make it yours</h2><span>Profile photo</span></div>', unsafe_allow_html=True)
+                st.caption("Choose a preset or upload a photo, then save your changes.")
+                AVATAR_PRESETS = {
+                    "Use Initials (Default)": "",
+                    "✨ Cosmic Rocket": "data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='gRocket' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23EC4899'/><stop offset='100%25' stop-color='%23F43F5E'/></linearGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23gRocket)'/><path d='M50 25c-3 8-5 15-5 25 0 15 5 25 5 25s5-10 5-25c0-10-2-17-5-25z' fill='white'/><path d='M40 55c-2 6-2 12 0 15 3 0 6-3 8-8zM60 55c2 6 2 12 0 15-3 0-6-3-8-8z' fill='white' opacity='0.7'/></svg>",
+                    "🧠 AI Intelligence": "data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='gBrain' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%238B5CF6'/><stop offset='100%25' stop-color='%236366F1'/></linearGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23gBrain)'/><path d='M38 42c-4 0-7 3-7 7 0 2 1 4 2 5-1 1-2 2-2 4 0 3 2 6 5 6h1c0 3 3 5 6 5s6-2 6-5h1c3 0 5-3 5-6 0-2-1-3-2-4 1-1 2-3 2-5 0-4-3-7-7-7zm24 0c-4 0-7 3-7 7 0 2 1 3 2 4-1 1-2 2-2 5 0 3 2 6 5 6h1c0 3 3 5 6 5s6-2 6-5h1c3 0 5-3 5-6 0-2-1-3-2-4 1-1 2-2 2-4 0-4-3-7-7-7z' fill='white' opacity='0.9'/></svg>",
+                    "💻 Tech Developer": "data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='gDev' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2306B6D4'/><stop offset='100%25' stop-color='%233B82F6'/></linearGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23gDev)'/><path d='M35 40l-15 10 15 10M65 40l15 10-15 10M45 65l10-30' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>",
+                    "⚡ Cyber Speed": "data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='gLightning' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23FBBF24'/><stop offset='100%25' stop-color='%23F59E0B'/></linearGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23gLightning)'/><path d='M55 25L35 50h15L45 75l20-25H50z' fill='white'/></svg>",
+                    "🎓 Academic Scholar": "data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='gGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2310B981'/><stop offset='100%25' stop-color='%23059669'/></linearGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23gGrad)'/><path d='M50 28L25 40l25 12 25-12zM32 46v12c0 5 8 8 18 8s18-3 18-8V46M71 42v15' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>"
+                }
+                preset_names = list(AVATAR_PRESETS.keys())
+                current_preset_idx = 0
+                for name, val in AVATAR_PRESETS.items():
+                    if val and st.session_state.temp_avatar == val:
+                        current_preset_idx = preset_names.index(name)
+                        break
+
+                selected_preset = st.selectbox("Choose an avatar", options=preset_names, index=current_preset_idx, help="Choose an illustrated avatar.")
+                if AVATAR_PRESETS[selected_preset] != st.session_state.temp_avatar:
+                    if AVATAR_PRESETS[selected_preset] or st.session_state.temp_avatar in AVATAR_PRESETS.values():
+                        st.session_state.temp_avatar = AVATAR_PRESETS[selected_preset]
+                        if 'last_processed_avatar' in st.session_state:
+                            del st.session_state.last_processed_avatar
+                        st.rerun()
+
+                uploaded_avatar = st.file_uploader("Upload a photo", type=["png", "jpg", "jpeg"], help="Upload an image (PNG/JPG). It will be auto-resized and compressed.")
+                if uploaded_avatar is not None:
+                    file_key = f"avatar_{uploaded_avatar.name}_{uploaded_avatar.size}"
+                    if st.session_state.get("last_processed_avatar") != file_key:
+                        with st.spinner("Processing avatar..."):
+                            base64_avatar = process_avatar_image(uploaded_avatar)
+                            if base64_avatar:
+                                st.session_state.temp_avatar = base64_avatar
+                                st.session_state.last_processed_avatar = file_key
+                                st.rerun()
+                            else:
+                                st.error("Failed to process image. Please try another one.")
+
+
+                if st.session_state.temp_avatar:
+                    if st.button("Remove photo", key="remove_avatar_btn", use_container_width=True):
+                        st.session_state.temp_avatar = ""
+                        st.session_state.pop('last_processed_avatar', None)
+                        st.rerun()
+
 
 def render_leaderboard_view():
     import streamlit as st
