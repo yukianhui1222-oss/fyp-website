@@ -4358,7 +4358,7 @@ def main():
         
         with p_col1:
             with st.popover("📂 Documents", use_container_width=True):
-                st.markdown("<h4 style='font-size: 0.95rem; font-weight: 700; color: #1f2937; margin-bottom: 12px;'>📚 Saved Summaries</h4>", unsafe_allow_html=True)
+                st.markdown("<div class='drawer-heading'>Your documents</div>", unsafe_allow_html=True)
                 if not uid:
                     st.caption("Log in to view saved summaries.")
                 else:
@@ -4375,9 +4375,9 @@ def main():
                             display_title = doc_title if len(doc_title) <= 22 else doc_title[:20] + "..."
                             
                             is_active = (active_doc_id == doc_id)
-                            prefix = "🟢 " if is_active else "📄 "
+                            prefix = "● " if is_active else ""
                             
-                            h_col1, h_col2 = st.columns([5, 1.2])
+                            h_col1, h_col2 = st.columns([7, 1], gap="small")
                             with h_col1:
                                 if st.button(f"{prefix}{display_title}", key=f"load_doc_{doc_id}", use_container_width=True, help=doc_title):
                                     st.session_state.ocr_results = {
@@ -4407,7 +4407,7 @@ def main():
                                     st.toast(f"Loaded summary: {doc_title}!", icon="📥")
                                     st.rerun()
                             with h_col2:
-                                if st.button("🗑️", key=f"del_doc_{doc_id}", use_container_width=True, help=f"Delete '{doc_title}'"):
+                                if st.button("✕", key=f"del_doc_{doc_id}", use_container_width=True, help=f"Delete '{doc_title}'"):
                                     success, msg = delete_summary_from_firestore(uid, doc_id, id_token)
                                     if success:
                                         st.toast(f"Deleted '{doc_title}'!", icon="🗑️")
@@ -4421,9 +4421,9 @@ def main():
                                         
         with p_col2:
             with st.popover("⚙️ Settings", use_container_width=True):
-                st.markdown("<h4 style='font-size: 0.95rem; font-weight: 700; color: #1f2937; margin-bottom: 12px;'>Settings & Core</h4>", unsafe_allow_html=True)
+                st.markdown("<div class='drawer-heading'>Workspace settings</div>", unsafe_allow_html=True)
                 st.markdown("""
-                    <div style="background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+                    <div class="drawer-settings-card" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px;">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);"></span>
                             <span style="font-size: 0.8rem; font-weight: 700; color: #1f2937;">API Status: Online</span>
@@ -4474,7 +4474,7 @@ def main():
                 
             with st.popover("👤 Profile", use_container_width=True):
                 st.markdown(f"""
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2px; padding-bottom: 8px; border-bottom: 1px solid #E5E7EB;">
+                    <div class="drawer-profile-card" style="display: flex; align-items: center; gap: 12px;">
                         {avatar_html}
                         <div style="display: flex; flex-direction: column; overflow: hidden;">
                             <span style="font-weight: 700; color: #1f2937; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{profile_name}</span>

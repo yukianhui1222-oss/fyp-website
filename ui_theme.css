@@ -229,3 +229,54 @@ div[data-testid="stPopoverBody"] button[data-testid="stBaseButton-secondary"]:ho
 div[data-testid="stPopoverBody"] button[data-testid="baseButton-secondary"]:hover {
   background: #f8ede5 !important; border-color: #d8b59f !important;
 }
+
+/* Drawer contents: quiet list rows rather than a grid of outlined buttons. */
+div[data-testid="stPopoverBody"] .drawer-heading {
+  font-size: 1.05rem !important; font-weight: 600; letter-spacing: -.3px;
+  color: #342a24 !important; padding: 2px 2px 15px;
+  margin-bottom: 4px; border-bottom: 1px solid #eee5de;
+}
+div[data-testid="stPopoverBody"] [data-testid="stHorizontalBlock"]:has([class*="st-key-load_doc_"]) {
+  gap: 6px !important; align-items: center !important;
+  border-bottom: 1px solid #f1ebe6; padding: 3px 0;
+}
+div[data-testid="stPopoverBody"] [class*="st-key-load_doc_"] button {
+  background: transparent !important; border: none !important;
+  border-radius: 9px !important; box-shadow: none !important;
+  justify-content: flex-start !important; text-align: left !important;
+  padding: 10px 12px !important; min-height: 42px !important;
+}
+div[data-testid="stPopoverBody"] [class*="st-key-load_doc_"] button p {
+  color: #59483d !important; font-size: .88rem !important;
+  font-weight: 400 !important; text-align: left !important;
+}
+div[data-testid="stPopoverBody"] [class*="st-key-load_doc_"] button:hover {
+  background: #f7eee7 !important;
+}
+div[data-testid="stPopoverBody"] div[class*="st-key-del_doc_"] button {
+  background: transparent !important; border: none !important;
+  box-shadow: none !important; border-radius: 8px !important;
+  padding: 4px !important; min-height: 32px !important; height: 32px !important;
+  width: 32px !important; min-width: 32px !important;
+}
+div[data-testid="stPopoverBody"] div[class*="st-key-del_doc_"] button p {
+  font-size: .8rem !important; color: #a28b7b !important;
+}
+div[data-testid="stPopoverBody"] div[class*="st-key-del_doc_"] button:hover {
+  background: #fce9e3 !important;
+}
+div[data-testid="stPopoverBody"] div[class*="st-key-del_doc_"] button:hover p { color: #b84632 !important; }
+div[data-testid="stPopoverBody"] .drawer-settings-card,
+div[data-testid="stPopoverBody"] .drawer-profile-card {
+  background: #faf5f0 !important; border: 1px solid #eee2d8;
+  border-radius: 14px; padding: 16px; margin-bottom: 12px;
+}
+div[data-testid="stPopoverBody"] [class*="st-key-nav_"] button {
+  justify-content: flex-start !important; padding: 10px 14px !important;
+  border: none !important; background: transparent !important;
+  border-radius: 10px !important; box-shadow: none !important;
+}
+div[data-testid="stPopoverBody"] [class*="st-key-nav_"] button p { color: #59483d !important; font-weight: 500 !important; }
+div[data-testid="stPopoverBody"] [class*="st-key-nav_"] button:hover { background: #f7eee7 !important; }
+div[data-testid="stPopoverBody"] .st-key-nav_logout_button button { border-top: 1px solid #eee5de !important; }
+div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b84632 !important; }
