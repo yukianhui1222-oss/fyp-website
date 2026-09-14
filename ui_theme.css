@@ -97,12 +97,13 @@ div[data-baseweb="tab-list"] button { min-height: 42px !important; white-space: 
 .workspace-title {
   font-family: Inter, 'Segoe UI', sans-serif !important;
   font-size: clamp(2.3rem, 5vw, 3.4rem) !important;
-  font-weight: 700 !important;
-  letter-spacing: -1.8px !important;
-  color: #18283b !important;
+  font-weight: 650 !important;
+  letter-spacing: -2.4px !important;
+  color: #27221f !important;
   text-align: center;
-  padding: 18px 0 12px !important;
-  margin: 0 0 12px !important;
+  line-height: 1.12 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 .block-container:has(.workspace-title):not(:has([data-baseweb="tab-list"])) {
   max-width: 1100px !important;
@@ -130,9 +131,19 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
 .documind-nav-brand > span:last-child {
   background: #ffffff0d !important; color: #ffb293 !important;
 }
-.workspace-title {
-  color: #27221f !important; font-weight: 500 !important;
-  padding-top: 26px !important; margin-bottom: 18px !important;
+.workspace-heading { text-align: center; padding: 24px 0 26px; }
+.workspace-title span {
+  background: linear-gradient(120deg, #b94827, #a93f65);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+[data-testid="stMarkdownContainer"] p.workspace-tagline {
+  margin: 12px 0 0 !important;
+  color: #716159 !important;
+  font-size: clamp(0.88rem, 2vw, 1rem) !important;
+  font-weight: 400;
+  letter-spacing: 0.025em;
+  line-height: 1.5;
 }
 .block-container:has(.workspace-title) div.st-key-setup_container,
 .block-container:has(.workspace-title) div.st-key-setup_expander {

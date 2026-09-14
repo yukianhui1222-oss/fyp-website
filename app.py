@@ -4519,7 +4519,12 @@ def main():
     has_results = 'ocr_results' in st.session_state and not st.session_state.is_processing
     uploaded_file = None
 
-    st.markdown('<h1 class="workspace-title">DocuMind</h1>', unsafe_allow_html=True)
+    st.markdown("""
+        <div class="workspace-heading">
+            <h1 class="workspace-title">Docu<span>Mind</span></h1>
+            <p class="workspace-tagline">Less reading. More understanding.</p>
+        </div>
+    """, unsafe_allow_html=True)
 
     # Render Setup & Upload container
     if has_results:
