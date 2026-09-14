@@ -96,7 +96,7 @@ div[data-baseweb="tab-list"] button { min-height: 42px !important; white-space: 
 /* A direct, quiet entry into the document workspace. */
 .workspace-title {
   font-family: Inter, 'Segoe UI', sans-serif !important;
-  font-size: clamp(2.3rem, 5vw, 3.4rem) !important;
+  font-size: clamp(3.2rem, 7vw, 5.2rem) !important;
   font-weight: 650 !important;
   letter-spacing: -2.4px !important;
   color: #27221f !important;
@@ -188,4 +188,44 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
 }
 @media (max-width: 600px) {
   .block-container:has(.workspace-title) div.st-key-setup_container { padding: 16px !important; border-radius: 22px !important; }
+}
+
+/* Lightweight dashboard navigation and matching menu panels. */
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
+  background: #fffdfb !important;
+  border-bottom: 1px solid #e7dcd3 !important;
+  box-shadow: 0 4px 20px #3a281608 !important;
+}
+.documind-nav-brand > span:first-child { -webkit-text-fill-color: #27221f !important; }
+.documind-nav-brand > span:last-child { background: #f7ebe2 !important; color: #a65a37 !important; }
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button {
+  background: #f8f3ee !important; border: 1px solid #eee3da !important;
+  border-radius: 24px !important; color: #51443b !important; padding: 9px 16px !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button *,
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button p,
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button span {
+  color: #51443b !important; font-size: 0.88rem !important; font-weight: 500 !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button:hover,
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button[aria-expanded="true"] {
+  background: #f3e4d9 !important; border-color: #dfbca6 !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button:hover * {
+  color: #8d4b2d !important;
+}
+div[data-testid="stPopoverBody"] {
+  border: 1px solid #e7dcd3 !important; border-radius: 20px !important;
+  padding: 20px !important; box-shadow: 0 18px 48px #3424161a !important;
+  max-height: min(560px, 75vh) !important; max-width: calc(100vw - 24px) !important;
+  scrollbar-width: thin; scrollbar-color: #d9c9bd transparent;
+}
+div[data-testid="stPopoverBody"] button[data-testid="stBaseButton-secondary"],
+div[data-testid="stPopoverBody"] button[data-testid="baseButton-secondary"] {
+  border-radius: 10px !important; border-color: #eee5de !important;
+  background: #fdfbf9 !important; min-height: 40px;
+}
+div[data-testid="stPopoverBody"] button[data-testid="stBaseButton-secondary"]:hover,
+div[data-testid="stPopoverBody"] button[data-testid="baseButton-secondary"]:hover {
+  background: #f8ede5 !important; border-color: #d8b59f !important;
 }
