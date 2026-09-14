@@ -1208,18 +1208,11 @@ def render_edit_profile_view():
 
 
 def render_leaderboard_view():
-    import streamlit as st
-    from datetime import datetime
-    import time
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Title Banner for Leaderboard
-    st.markdown("""<div style="background: linear-gradient(135deg, #e0e7ff 0%, #e9d5ff 50%, #fae8ff 100%); padding: 35px 20px; border-radius: 24px; text-align: center; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 15px 35px -5px rgba(99, 102, 241, 0.08);">
-    <h1 class="hero-title" style="margin: 0 !important; font-size: 3.2rem !important; background: linear-gradient(45deg, #f97316, #e11d48, #9f1239); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1;">🏆 Global Leaderboard</h1>
-    <p style="color: #4338ca; font-size: 1.15rem; margin-top: 0.6rem; font-weight: 600; letter-spacing: 0.3px;">Real-time ranking of top scholars. Complete quizzes to climb the board!</p>
-</div>""", unsafe_allow_html=True)
-    
+    from html import escape
+
+    st.markdown("""<div class="lb-heading"><span class="lb-eyebrow">DOCUMIND COMMUNITY</span>
+        <h1>Leaderboard <span>· Rise to the top</span></h1>
+        <p>Keep learning. Earn XP. Make your mark.</p></div>""", unsafe_allow_html=True)
     user_info = st.session_state.get("user")
     uid = user_info.get("uid") if user_info else None
     id_token = user_info.get("idToken") if user_info else None
@@ -1241,167 +1234,54 @@ def render_leaderboard_view():
             st.rerun()
         return
 
-    # Find current user's stats
-    user_rank = None
-    user_points = 0
-    user_quizzes = 0
-    points_gap = None
-    
-    # Look up in the sorted rankings
-    for index, u in enumerate(leaderboard_data):
-        if u["user_id"] == uid:
-            user_rank = index + 1
-            user_points = u["total_points"]
-            user_quizzes = u["completed_quizzes"]
-            
-            # Find gap with the user above them
-            if index > 0:
-                above_user = leaderboard_data[index - 1]
-                points_gap = above_user["total_points"] - user_points
-            break
 
-    # If user has no record in the leaderboard yet, they are 0 points and unranked (or at the bottom)
-    if user_rank is None:
-        user_points = 0
-        user_quizzes = 0
+    leaderboard_data = leaderboard_data or []
+    current_index = next((i for i, u in enumerate(leaderboard_data) if u["user_id"] == uid), None)
+    current = leaderboard_data[current_index] if current_index is not None else {}
+    rank_label = f"#{current_index + 1}" if current_index is not None else "Unranked"
+    if current_index is None:
+        standing = "Complete a quiz to join the leaderboard."
+    elif current_index == 0:
+        standing = "You are leading the way. Keep it up!"
+    else:
+        gap = leaderboard_data[current_index - 1]["total_points"] - current["total_points"]
+        standing = f"{gap:,} XP to the next rank" if gap > 0 else "Level on XP with the rank above"
+
+    def avatar(user, extra=""):
+        name = str(user.get("username") or "Learner")
+        return f'<span class="lb-avatar {extra}" aria-hidden="true">{escape(name[:1].upper())}</span>'
+
+    with st.container(key="leaderboard_shell"):
+        st.markdown('<div class="lb-section-bar"><span class="lb-pill">◉ All-time rankings</span><span>Ranked by total quiz XP</span></div>', unsafe_allow_html=True)
         if leaderboard_data:
-            # Put them at the end
-            user_rank = len(leaderboard_data) + 1
-            points_gap = leaderboard_data[-1]["total_points"] - user_points
+            podium = []
+            for i in [1, 0, 2]:
+                if i >= len(leaderboard_data):
+                    continue
+                u = leaderboard_data[i]
+                name = escape(str(u.get("username") or "Learner"))
+                podium.append(f'<div class="lb-contender lb-place-{i+1}">{avatar(u)}<div class="lb-contender-name">{name}</div><div class="lb-plinth"><span class="lb-medal">{["🥇", "🥈", "🥉"][i]}</span><span class="lb-place-label">#{i+1} · { ["Champion", "Runner-up", "Third place"][i]}</span><strong>{u["total_points"]:,}<small>XP</small></strong><span class="lb-quiz-count">{u["completed_quizzes"]} quizzes completed</span></div></div>')
+            st.markdown('<div class="lb-podium">'+''.join(podium)+'</div>', unsafe_allow_html=True)
         else:
-            user_rank = 1
-            points_gap = 0
+            st.markdown('<div class="lb-empty"><span>✦</span><h2>The podium is waiting</h2><p>Complete a quiz and become the first learner on the board.</p></div>', unsafe_allow_html=True)
 
-    # Top Section: User's Standing Card (Dashboard style)
-    gap_text = f"🔥 {points_gap} XP gap to next rank" if points_gap and points_gap > 0 else "👑 You are at the top!"
-    st.markdown(f"""<div style="background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 20px; padding: 28px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-around; gap: 20px; align-items: center;">
-    <div style="text-align: center; min-width: 130px;">
-        <div style="font-size: 1.05rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Your Rank</div>
-        <div style="font-size: 2.8rem; font-weight: 800; color: #6366f1;">#{user_rank}</div>
-    </div>
-    <div style="width: 1px; height: 60px; background-color: #E2E8F0; display: inline-block;"></div>
-    <div style="text-align: center; min-width: 130px;">
-        <div style="font-size: 1.05rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Total Points</div>
-        <div style="font-size: 2.8rem; font-weight: 800; color: #0f172a;">{user_points} <span style="font-size: 1.3rem; color: #8b5cf6; font-weight: 700;">XP</span></div>
-    </div>
-    <div style="width: 1px; height: 60px; background-color: #E2E8F0; display: inline-block;"></div>
-    <div style="text-align: center; min-width: 130px;">
-        <div style="font-size: 1.05rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Quizzes Completed</div>
-        <div style="font-size: 2.8rem; font-weight: 800; color: #10b981;">{user_quizzes}</div>
-    </div>
-    <div style="width: 1px; height: 60px; background-color: #E2E8F0; display: inline-block;"></div>
-    <div style="text-align: center; min-width: 200px;">
-        <div style="font-size: 1.05rem; font-weight: 600; color: #64748B; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Standing Status</div>
-        <div style="font-size: 1.3rem; font-weight: 700; color: #f97316; margin-top: 10px;">{gap_text}</div>
-    </div>
-</div>""", unsafe_allow_html=True)
-    
-    # Leaderboard Table Card
-    st.markdown("""<style>
-.leaderboard-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 10px 0;
-    font-size: 1.15rem;
-    text-align: left;
-}
-.leaderboard-table th {
-    background-color: #f8fafc;
-    color: #475569;
-    font-weight: 700;
-    padding: 16px 24px;
-    border-bottom: 2px solid #e2e8f0;
-    text-transform: uppercase;
-    font-size: 1.05rem;
-    letter-spacing: 0.5px;
-}
-.leaderboard-table td {
-    padding: 18px 24px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #0f172a;
-    font-size: 1.15rem;
-}
-.leaderboard-table tr {
-    transition: background-color 0.2s ease;
-}
-.leaderboard-table tr:hover {
-    background-color: rgba(99, 102, 241, 0.03);
-}
-.leaderboard-row-active {
-    background-color: rgba(99, 102, 241, 0.08) !important;
-    border-left: 5px solid #6366f1 !important;
-}
-.leaderboard-row-active td {
-    font-weight: 700 !important;
-    color: #4f46e5 !important;
-}
-.rank-medal {
-    font-size: 1.6rem;
-    margin-right: 6px;
-}
-</style>""", unsafe_allow_html=True)
-
-    # Construct Leaderboard Table HTML
-    table_rows_html = ""
-    for index, u in enumerate(leaderboard_data):
-        rank = index + 1
-        username = u["username"]
-        points = u["total_points"]
-        quizzes = u["completed_quizzes"]
-        
-        # Format last updated timestamp to human readable
-        last_updated_str = u["last_updated"]
-        try:
-            dt = datetime.fromisoformat(last_updated_str.replace("Z", "+00:00"))
-            formatted_date = dt.strftime("%b %d, %I:%M %p")
-        except Exception:
-            formatted_date = last_updated_str[:16].replace("T", " ")
-            
-        is_current_user = (u["user_id"] == uid)
-        row_class = ' class="leaderboard-row-active"' if is_current_user else ""
-        
-        # Rank Medal / Icons
-        if rank == 1:
-            rank_display = '<span class="rank-medal">🥇</span> 1'
-        elif rank == 2:
-            rank_display = '<span class="rank-medal">🥈</span> 2'
-        elif rank == 3:
-            rank_display = '<span class="rank-medal">🥉</span> 3'
-        else:
-            rank_display = f"{rank}"
-            
-        table_rows_html += f"""<tr{row_class}>
-    <td>{rank_display}</td>
-    <td>{username} {' (You)' if is_current_user else ''}</td>
-    <td><strong>{points}</strong> XP</td>
-    <td>{quizzes}</td>
-    <td style="color: #64748b; font-size: 1.0rem;">{formatted_date}</td>
-</tr>"""
-        
-    leaderboard_card_html = f"""<div style="background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 24px; padding: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03); overflow-x: auto; margin-bottom: 24px;">
-    <table class="leaderboard-table">
-        <thead>
-            <tr>
-                <th style="width: 12%;">Rank</th>
-                <th style="width: 33%;">User</th>
-                <th style="width: 20%;">Total Points</th>
-                <th style="width: 15%;">Quizzes</th>
-                <th style="width: 20%;">Last Updated</th>
-            </tr>
-        </thead>
-        <tbody>
-{table_rows_html}
-        </tbody>
-    </table>
-</div>"""
-    st.markdown(leaderboard_card_html, unsafe_allow_html=True)
-    
-    # Back to home navigation button
-    col_back, col_spacer = st.columns([1, 3])
-    with col_back:
-        if st.button("↩️ Back to Home", use_container_width=True, type="primary", key="lbl_back_home_btn"):
-            st.session_state.leaderboard_active = False
-            st.rerun()
+        st.markdown(f'<div class="lb-standing"><div><span>Your rank</span><strong>{rank_label}</strong></div><div><span>Your total XP</span><strong>{current.get("total_points", 0):,}</strong></div><div><span>Quizzes completed</span><strong>{current.get("completed_quizzes", 0)}</strong></div><div class="lb-standing-message">{standing}</div></div>', unsafe_allow_html=True)
+        rows = []
+        for i, u in enumerate(leaderboard_data):
+            stamp = str(u.get("last_updated") or "")
+            try:
+                date = datetime.fromisoformat(stamp.replace("Z", "+00:00")).strftime("%b %d, %Y")
+            except (ValueError, TypeError):
+                date = stamp[:16].replace("T", " ") or "—"
+            is_current = u["user_id"] == uid
+            row_class = ' class="lb-current-row"' if is_current else ''
+            you = '<span class="lb-you">You</span>' if is_current else ''
+            rows.append(f'<tr{row_class}><td>#{i+1:02d}</td><td><div class="lb-user">{avatar(u)}<span>{escape(str(u.get("username") or "Learner"))}</span>{you}</div></td><td class="lb-points">{u["total_points"]:,} <small>XP</small></td><td>{u["completed_quizzes"]}</td><td>{escape(date)}</td></tr>')
+        table = '<div class="lb-table-scroll" role="region" aria-label="Leaderboard rankings" tabindex="0"><table class="lb-table"><thead><tr><th scope="col">Rank</th><th scope="col">Learner</th><th scope="col">Total XP</th><th scope="col">Quizzes</th><th scope="col">Last updated</th></tr></thead><tbody>'+''.join(rows)+'</tbody></table></div>' if rows else '<div class="lb-no-rankings">No rankings yet.</div>'
+        st.markdown(f'<div class="lb-list"><div class="lb-list-heading"><h2>Top learners</h2><span>{len(leaderboard_data)} ranked learners</span></div>{table}</div>', unsafe_allow_html=True)
+    if st.button("← Back to Home", key="lbl_back_home_btn"):
+        st.session_state.leaderboard_active = False
+        st.rerun()
 
 @st.fragment
 def render_left_panel(raw_text, summary_result, api_key, results):
