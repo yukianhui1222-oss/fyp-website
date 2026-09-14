@@ -571,6 +571,9 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
   </script>
+
+  <link rel="stylesheet" href="login.css">
+
 </head>
 
 <body>
@@ -586,24 +589,30 @@
     <div class="split-container" id="auth-main-container">
     <!-- Left Illustration Panel -->
     <div class="left-panel">
-      <!-- Ensure the src path matches what Streamlit serves from the static component dir -->
-      <img src="illustration.png" alt="Welcome Illustration">
+      <p class="showcase-kicker">Less reading. More understanding.</p>
+      <div class="showcase-heading"><span class="orbit orbit-one"></span><span class="orbit orbit-two"></span><h1>Your documents.<br>Your next<br><em>bright idea.</em></h1></div>
+      <div class="document-scene" aria-hidden="true">
+        <div class="paper paper-back"></div>
+        <div class="paper paper-front"><div class="paper-top"><span class="paper-icon">D</span><span>DOCUMIND / INSIGHTS</span><span>↗</span></div><h3>Big ideas,<br>made simple.</h3><div class="paper-line wide"></div><div class="paper-line"></div><div class="paper-line short"></div><div class="insight-box"><span>✦ &nbsp; THE KEY TAKEAWAY</span><p>A little clarity goes a long way.</p></div><div class="paper-bottom">01 — YOUR NEXT CHAPTER <span>↗</span></div></div>
+        <div class="floating-note"><span>✦</span><div>From pages to possibilities.<small>Summarize · Explore · Learn</small></div></div>
+      </div>
+      <p class="showcase-footer">A clearer mind starts here. <span>✳</span></p>
     </div>
 
     <!-- Right Form Panel -->
     <div class="right-panel">
-      <!-- Decorative Header Wave -->
-      <div class="wave-top"></div>
+      <div class="login-brand"><span class="brand-ring"></span>DocuMind</div>
+      <div class="login-footer"><span>DocuMind · Your learning companion</span><span>Read. Think. Grow.</span></div>
 
       <div class="form-wrapper">
         <div class="auth-header">
-          <h2>Welcome!</h2>
-          <p>Sign in or create a new account.</p>
+          <h2 id="auth-title">Sign In</h2>
+          <p id="auth-subtitle">Welcome back. Make room for your next idea.</p>
         </div>
 
         <div class="tabs">
-          <div class="tab active" onclick="switchTab('login')" id="tab-login">Sign in</div>
-          <div class="tab" onclick="switchTab('signup')" id="tab-signup">Create account</div>
+          <button type="button" class="tab active" onclick="switchTab('login')" id="tab-login">Sign in</button>
+          <button type="button" class="tab" onclick="switchTab('signup')" id="tab-signup">Sign Up ↗</button>
         </div>
 
         <div id="error-message" class="error-msg"></div>
@@ -615,10 +624,10 @@
             <!-- LOGIN FORM -->
             <div id="form-login" class="form-section active">
               <div class="form-group">
-                <input type="text" id="login-identifier" placeholder="👤 Email or Phone Number">
+                <input type="text" id="login-identifier" placeholder="Email or phone number" aria-label="Email or phone number" autocomplete="username">
               </div>
               <div class="form-group">
-                <input type="password" id="login-password" class="password-input" placeholder="🔒 Your password">
+                <input type="password" id="login-password" class="password-input" placeholder="Password" aria-label="Password" autocomplete="current-password">
                 <span class="toggle-password" onclick="togglePasswordVisibility('login-password', this)">👁️</span>
               </div>
               <a href="#" onclick="handleForgotPassword(); return false;" class="forgot-password">Forgot password?</a>
@@ -738,6 +747,17 @@
     function initStreamlit() {
       sendMessageToStreamlitClient("streamlit:componentReady", { apiVersion: 1 });
     }
+
+    let frameResizePending = false;
+    const frameObserver = new ResizeObserver(() => {
+      if (frameResizePending) return;
+      frameResizePending = true;
+      requestAnimationFrame(() => {
+        frameResizePending = false;
+        setFrameHeight();
+      });
+    });
+    frameObserver.observe(document.getElementById('auth-wrapper'));
 
     function setFrameHeight(height) {
       sendMessageToStreamlitClient("streamlit:setFrameHeight", { height: height || document.body.scrollHeight });
@@ -880,6 +900,8 @@
     }
 
     function switchTab(tabStr) {
+      document.getElementById('auth-title').textContent = tabStr === 'login' ? 'Sign In' : 'Create account';
+      document.getElementById('auth-subtitle').textContent = tabStr === 'login' ? 'Welcome back. Make room for your next idea.' : 'Your next chapter starts with a free account.';
       document.getElementById('tab-login').classList.remove('active');
       document.getElementById('tab-signup').classList.remove('active');
       document.getElementById('form-login').classList.remove('active');

@@ -22,6 +22,7 @@ if sys.version_info < (3, 10):
         pass
 
 import streamlit as st
+from ui_theme import load_theme
 import streamlit.components.v1 as components
 import time
 import os
@@ -2488,7 +2489,7 @@ def format_summary_for_sharing(summary_text, doc_fname, translation_text=None, r
 
 def render_export_and_share_popover(docx_data, md_data, results, summary_result, translation_result="", result_lang="", key_suffix=""):
     """Renders download buttons and instant WhatsApp/Email share links inside a popover."""
-    with st.popover("📤 Export Document", use_container_width=True, key=f"export_document_popover{key_suffix}"):
+    with st.container(key=f"export_document_popover{key_suffix}"), st.popover("📤 Export Document", use_container_width=True):
         st.markdown("<div style='font-size: 0.86rem; font-weight: 700; color: #1e293b; margin-bottom: 8px;'>💾 Download Files</div>", unsafe_allow_html=True)
         doc_fname = results.get('filename', 'DocuMind')
         st.download_button(
@@ -4147,6 +4148,8 @@ def main():
         </style>
     """, unsafe_allow_html=True)
     
+    st.markdown(load_theme(), unsafe_allow_html=True)
+
     # API key and settings are handled in the logged-in main flow
 
     if st.session_state.user is None:
@@ -4522,7 +4525,7 @@ def main():
                     <span>✨</span> AI-Powered Document Intelligence
                 </div>
             </div>
-            <p class="hero-subtitle">Unlock instant insights, interactive mindmaps, and smart quizzes from any document or image. Powered by state-of-the-art OCR & Gemini LLM.</p>
+            <p class="hero-subtitle">Turn your documents into clear summaries, visual mind maps, and quizzes. Upload a file below to start learning.</p>
             <div class="hero-pills">
                 <div class="hero-pill"><span>👁️</span> OCR Extraction</div>
                 <div class="hero-pill"><span>🧠</span> AI Summary</div>
@@ -4560,7 +4563,8 @@ def main():
 
     # Render Setup & Upload container
     if has_results:
-        setup_container = st.expander("📤 Analyze New Document", expanded=False, key="setup_expander")
+        with st.container(key="setup_expander"):
+            setup_container = st.expander("📤 Analyze New Document", expanded=False)
     else:
         setup_container = st.container(border=True, key="setup_container")
         
