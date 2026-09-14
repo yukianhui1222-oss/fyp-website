@@ -1305,7 +1305,7 @@ def render_left_panel(raw_text, summary_result, api_key, results):
     with title_col:
         st.markdown("<h3 style='font-size: 1.6rem; font-weight: 800; color: #0f172a; margin: 0; font-family: \"Poppins\", sans-serif; display: flex; align-items: center; gap: 8px;'>💬 AI Study Assistant</h3>", unsafe_allow_html=True)
     with clear_col:
-        if st.button("🧹 Clear", key=f"clear_chat_{doc_id}", use_container_width=True):
+        if st.button("Clear chat", key=f"clear_chat_{doc_id}", use_container_width=True):
             st.session_state[chat_history_key] = []
             if st.session_state.get("user") and results.get('is_loaded_from_db'):
                 uid = st.session_state.user.get("uid")
@@ -1320,10 +1320,10 @@ def render_left_panel(raw_text, summary_result, api_key, results):
     st.markdown("<div style='margin-bottom: 5px; font-size: 0.8rem; font-weight: 600; color: #4b5563;'>⚡ Quick Prompts:</div>", unsafe_allow_html=True)
     q_col1, q_col2 = st.columns(2)
     with q_col1:
-        if st.button("💡 Simpler", key=f"quick_simpler_{doc_id}", use_container_width=True, help="Explain the last concept in simpler terms"):
+        if st.button("Explain simply", key=f"quick_simpler_{doc_id}", use_container_width=True, help="Explain the last concept in simpler terms"):
             st.session_state[f"quick_question_{doc_id}"] = "Can you explain the last concept/topic in simpler terms?"
     with q_col2:
-        if st.button("🧪 Example", key=f"quick_example_{doc_id}", use_container_width=True, help="Provide a practical example of the current topic"):
+        if st.button("Give an example", key=f"quick_example_{doc_id}", use_container_width=True, help="Provide a practical example of the current topic"):
             st.session_state[f"quick_question_{doc_id}"] = "Can you give me a clear, practical example of this concept?"
     
     st.markdown("<hr style='margin: 0.5rem 0; opacity: 0.1;'>", unsafe_allow_html=True)
@@ -4400,8 +4400,7 @@ def main():
         word_count = len(raw_text.split())
         is_saved = results.get('is_loaded_from_db', False)
 
-        # ── Row 1: Title (full width) ──────────────────────────────────
-        st.markdown("<h2 style='font-size: 2.0rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0; font-family: \"Poppins\", sans-serif; display: flex; align-items: center; gap: 10px;'>✨ Analysis Results</h2>", unsafe_allow_html=True)
+        st.markdown('<div class="results-heading"><h2>Analysis results</h2><p>Read, explore and review your document.</p></div>', unsafe_allow_html=True)
 
         # Prepare data for Export popover (needed regardless of rename mode)
         from doc_generator import generate_docx
@@ -4478,15 +4477,12 @@ def main():
         else:
             # ── Row 2: [badge][pencil] then spacer then [Export] far right ──
             badge_col, pencil_col, spacer_col, export_col = st.columns(
-                [1.8, 0.14, 2.7, 1.2], gap="small", vertical_alignment="center"
+                [5, 0.4, 0.2, 1.6], gap="small", vertical_alignment="center"
             )
             with badge_col:
-                # Truncate very long filenames for display
-                display_filename = filename if len(filename) <= 35 else filename[:33] + '...'
+                from html import escape
                 st.markdown(
-                    f"<div style='background-color: rgba(99, 102, 241, 0.08); color: #6366f1; font-size: 0.85rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(99, 102, 241, 0.15); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;' title='{filename}'>"
-                    f"📂 Active Document: <strong>{display_filename}</strong>"
-                    f"</div>",
+                    f'<div class="results-document" title="{escape(filename, quote=True)}">{escape(filename)}</div>',
                     unsafe_allow_html=True
                 )
             with pencil_col:
@@ -4507,7 +4503,7 @@ def main():
         ) if is_saved else ""
         st.markdown(
             f"<div style='font-size: 0.98rem; color: #475569; font-weight: 500; margin-top: 8px; margin-bottom: 24px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;'>"
-            f"⏱️ {ocr_time:.2f}s  •  📊 {word_count} words  •  📄 {page_count} pages{db_badge_html}"
+            f"{word_count:,} words · {page_count} pages · Processed in {ocr_time:.1f}s{db_badge_html}"
             f"</div>",
             unsafe_allow_html=True
         )
@@ -4515,8 +4511,8 @@ def main():
 
         # Cloud Database Saving UI (Flat layout Notion-style)
         if not is_saved:
-            with st.container():
-                st.markdown("<h5 style='font-size: 0.95rem; font-weight: 700; color: #374151; margin-bottom: 8px;'>☁️ Save Summary to Cloud Database</h5>", unsafe_allow_html=True)
+            with st.expander("Save to my library", expanded=False):
+                st.caption("Give this document a title so you can return to it later.")
                 s_col1, s_col2 = st.columns([3.5, 1])
                 with s_col1:
                     doc_filename = results.get('filename', '')
@@ -4570,19 +4566,17 @@ def main():
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        main_col, chat_col = st.columns([1.6, 1.0], gap="large")
-
-        with chat_col:
-            with st.container(border=True, key="chatbot_container"):
+        with st.expander("Study assistant · Ask about this document", expanded=False):
+            with st.container(key="chatbot_container"):
                 render_left_panel(raw_text, summary_result, api_key, results)
 
-        with main_col:
-            tab1, tab2, tab3, tab4 = st.tabs(["Summary", f"🌐 {result_lang} Translation", "🗺️ Mind Map", "📝 Quiz"])
+        with st.container(key="results_reading"):
+            tab1, tab2, tab3, tab4 = st.tabs(["Summary", f"{result_lang} translation", "Mind map", "Quiz"])
             
             with tab1:
                 sum_col1, sum_col2 = st.columns([6, 4], vertical_alignment="center")
                 with sum_col1:
-                    st.markdown("#### ✨ AI Summary")
+                    st.caption("Key ideas from your document")
                 with sum_col2:
                     copy_to_clipboard(summary_result, "Copy Summary")
                 
