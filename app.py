@@ -4513,64 +4513,13 @@ def main():
 
     
     
-    logo_path = "logo.png"
-    logo_html_small = ""
-    if os.path.exists(logo_path):
-        with open(logo_path, "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read()).decode()
-        logo_html_small = f'<img class="hero-logo" src="data:image/png;base64,{encoded_string}">'
-
-    # Initialize variables
+    # Keep the workspace focused on the upload task.
+    if 'is_processing' not in st.session_state:
+        st.session_state.is_processing = False
     has_results = 'ocr_results' in st.session_state and not st.session_state.is_processing
     uploaded_file = None
 
-    # Render the welcome hero banner and feature cards directly
-    st.markdown(f"""
-        <div class="hero-container">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
-                {logo_html_small}
-                <h1 class="hero-title" style="margin: 0 !important; line-height: 1 !important;">DocuMind</h1>
-            </div>
-            <div style="margin-bottom: 1.8rem; display: flex; justify-content: center;">
-                <div class="hero-badge">
-                    <span>✨</span> AI-Powered Document Intelligence
-                </div>
-            </div>
-            <p class="hero-subtitle">Turn your documents into clear summaries, visual mind maps, and quizzes. Upload a file below to start learning.</p>
-            <div class="hero-pills">
-                <div class="hero-pill"><span>👁️</span> OCR Extraction</div>
-                <div class="hero-pill"><span>🧠</span> AI Summary</div>
-                <div class="hero-pill"><span>🗺️</span> Interactive Markmap</div>
-                <div class="hero-pill"><span>📝</span> Smart Quiz</div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    st.markdown("""
-        <div class="feature-grid">
-            <div class="feature-card feature-card-ocr">
-                <div class="feature-card-icon">👁️</div>
-                <div class="feature-card-title">Advanced OCR</div>
-                <div class="feature-card-desc">Accurately parse text from scanned images, PDFs, Word documents, and PowerPoint slides.</div>
-            </div>
-            <div class="feature-card feature-card-synthesis">
-                <div class="feature-card-icon">🧠</div>
-                <div class="feature-card-title">AI Synthesis</div>
-                <div class="feature-card-desc">Synthesize core findings, translate across multiple languages, and generate document-based quiz games.</div>
-            </div>
-            <div class="feature-card feature-card-mindmap">
-                <div class="feature-card-icon">🗺️</div>
-                <div class="feature-card-title">Interactive Mindmap</div>
-                <div class="feature-card-desc">Organize concepts visually into interactive markmaps with PDF exports and direct markdown copies.</div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-
-    # Use session state to handle button disabling
-    if 'is_processing' not in st.session_state:
-        st.session_state.is_processing = False
+    st.markdown('<h1 class="workspace-title">DocuMind</h1>', unsafe_allow_html=True)
 
     # Render Setup & Upload container
     if has_results:
@@ -4580,9 +4529,6 @@ def main():
         setup_container = st.container(border=True, key="setup_container")
         
     with setup_container:
-        if not has_results:
-            st.markdown("<h4 style='margin-top: 0; color: #1e293b; font-family: \"Poppins\", sans-serif;'>📤 Upload & Configure</h4>", unsafe_allow_html=True)
-            
         uploaded_file = st.file_uploader(
             "Upload Document or Image", 
             type=["png", "pdf", "docx", "doc", "pptx", "ppt"],
@@ -4611,14 +4557,6 @@ def main():
                         <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.2);">Ready to Analyze</span>
                     </div>
                 """, unsafe_allow_html=True)
-        else:
-            st.markdown("""
-                <div style="background: rgba(255, 255, 255, 0.85); border-left: 3px solid #6366f1; border-radius: 6px; padding: 10px 16px; margin: 15px 0; text-align: left; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.03);">
-                    <span style="font-size: 1.15rem;">💡</span>
-                    <span style="color: #475569; font-size: 0.9rem; font-weight: 500;">Ready to start? Drag & drop or browse to upload your document (PDF, Docx, PPTx, or Image).</span>
-                </div>
-            """, unsafe_allow_html=True)
-        
         st.markdown("<div style='height: 1px; background: linear-gradient(90deg, rgba(226,232,240,0.1) 0%, rgba(226,232,240,0.8) 50%, rgba(226,232,240,0.1) 100%); margin: 18px 0;'></div>", unsafe_allow_html=True)
         
         # 2. Controls & Actions Row (2 balanced columns: Left = Language Select, Right = Buttons)
