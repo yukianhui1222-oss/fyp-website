@@ -1,7 +1,7 @@
 /* Reference-inspired authentication layout. All Firebase controls retain their IDs. */
 :root { --primary: #f45b35; --primary-hover: #e94929; --text-dark: #242322; }
 * { box-sizing: border-box; }
-body { min-height: 0; margin: 0; padding: 38px 24px; overflow: auto; background: radial-gradient(ellipse at 32% 8%, #c9b3a7 0, transparent 55%), radial-gradient(ellipse at 85% 90%, #b9b7b6 0, transparent 60%), #eeecea; font-family: Inter, 'Segoe UI', sans-serif; }
+body { min-height: 0; margin: 0; padding: 38px 24px; overflow: auto; background: transparent; font-family: Inter, 'Segoe UI', sans-serif; }
 #auth-wrapper { width: 100%; max-width: 1200px; min-width: 0; }
 #banner-injection-point { display: none; }
 .split-container { width: 100%; max-width: none; height: auto; min-height: 760px; border-radius: 42px; background: #27221f; box-shadow: 0 26px 65px #241c2330; overflow: hidden; }

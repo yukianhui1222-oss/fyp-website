@@ -4153,6 +4153,17 @@ def main():
     # API key and settings are handled in the logged-in main flow
 
     if st.session_state.user is None:
+        # Paint the login background on the full viewport, outside the auth iframe.
+        st.markdown("""
+            <style>
+            [data-testid="stAppViewContainer"] {
+                background: radial-gradient(ellipse at 32% 8%, #c9b3a7 0, transparent 55%),
+                    radial-gradient(ellipse at 85% 90%, #b9b7b6 0, transparent 60%), #eeecea !important;
+                background-attachment: fixed !important;
+                min-height: 100vh;
+            }
+            </style>
+        """, unsafe_allow_html=True)
         logo_html = ""
         logo_path = "logo.png"
         if os.path.exists(logo_path):
