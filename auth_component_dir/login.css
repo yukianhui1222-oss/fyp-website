@@ -49,3 +49,16 @@ button:focus-visible, a:focus-visible { outline: 3px solid #f59d7d; outline-offs
 @media (max-width: 960px) { .right-panel { padding-left: 35px; padding-right: 35px; }.login-brand { left: 28px; font-size: 19px; }.tabs { right: 20px; }.left-panel { padding-left: 25px; padding-right: 25px; }.floating-note { right: 0; } }
 @media (max-width: 768px) { body { padding: 20px 12px; }.split-container { min-height: 650px; border-radius: 30px; }.left-panel { display: none; }.right-panel { border-radius: 30px; padding: 125px 28px 100px; }.login-brand { top: 32px; }.tabs { top: 31px; }.login-footer { left: 28px; right: 28px; }.auth-header h2 { font-size: 34px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
+
+/* Larger, stronger authentication text on both desktop and mobile. */
+.auth-header h2 { font-weight: 700; }
+.auth-header p, .tab, .forgot-password, .error-msg { font-size: 15px; font-weight: 600; }
+.form-group input, .form-group select, .btn-primary { font-size: 16px; font-weight: 600; min-height: 50px; }
+.divider, .login-footer, .showcase-kicker, .showcase-footer { font-size: 13px; font-weight: 500; }
+.auth-header p, .login-footer { color: #6e655f; }
+.tabs { max-width: calc(100% - 40px); }
+@media (max-width: 480px) {
+  .tabs { position: static; margin: 0 0 24px; max-width: 100%; }
+  .right-panel { padding-top: 100px; }
+  .login-footer { flex-wrap: wrap; }
+}
