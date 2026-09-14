@@ -93,13 +93,17 @@ div[data-baseweb="tab-list"] button { min-height: 42px !important; white-space: 
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition: none !important; scroll-behavior: auto !important; }
 }
 
-/* A direct, quiet entry into the document workspace. */
+/* Prominent spectrum wordmark with responsive sizing. */
 .workspace-title {
   font-family: Inter, 'Segoe UI', sans-serif !important;
-  font-size: clamp(3.2rem, 7vw, 5.2rem) !important;
-  font-weight: 650 !important;
-  letter-spacing: -2.4px !important;
-  color: #27221f !important;
+  font-size: clamp(3.8rem, 11vw, 8rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.055em !important;
+  color: #7541c8 !important;
+  background: linear-gradient(105deg, #d84b36 3%, #c56b10 18%, #27804f 34%, #168497 49%, #4263d6 64%, #8741cc 80%, #ca3986 97%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block; max-width: 100%;
   text-align: center;
   line-height: 1.12 !important;
   padding: 0 !important;
@@ -112,10 +116,11 @@ div[data-baseweb="tab-list"] button { min-height: 42px !important; white-space: 
   min-height: 155px;
 }
 
-/* Carry the login palette into the workspace without changing widget behavior. */
+/* Soft lavender, sky and mint surfaces echo the spectrum wordmark. */
 [data-testid="stAppViewContainer"]:has(.workspace-title) {
-  background: radial-gradient(ellipse at 32% 8%, #c9b3a7 0, transparent 55%),
-    radial-gradient(ellipse at 85% 90%, #b9b7b6 0, transparent 60%), #eeecea !important;
+  background: radial-gradient(ellipse at 15% 8%, #e5dcfb 0, transparent 52%),
+    radial-gradient(ellipse at 90% 25%, #dcedfc 0, transparent 50%),
+    radial-gradient(ellipse at 65% 95%, #dff4ed 0, transparent 55%), #f7f8fd !important;
   background-attachment: fixed !important;
 }
 div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
@@ -125,21 +130,16 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
 }
 .documind-nav-brand::before {
   content: ''; width: 20px; height: 20px; flex: 0 0 20px;
-  border-radius: 50%; border: 3px solid #ff7856;
-  border-bottom-color: #ce5a89;
+  border-radius: 50%; border: 3px solid #8b65d8;
+  border-bottom-color: #37a49a;
 }
 .documind-nav-brand > span:last-child {
   background: #ffffff0d !important; color: #ffb293 !important;
 }
-.workspace-heading { text-align: center; padding: 24px 0 26px; }
-.workspace-title span {
-  background: linear-gradient(120deg, #b94827, #a93f65);
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+.workspace-heading { text-align: center; padding: 30px 0 32px; }
 [data-testid="stMarkdownContainer"] p.workspace-tagline {
   margin: 12px 0 0 !important;
-  color: #716159 !important;
+  color: #68718a !important;
   font-size: clamp(0.88rem, 2vw, 1rem) !important;
   font-weight: 400;
   letter-spacing: 0.025em;
@@ -147,25 +147,25 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
 }
 .block-container:has(.workspace-title) div.st-key-setup_container,
 .block-container:has(.workspace-title) div.st-key-setup_expander {
-  background: #fff !important; border: 1px solid #e8e0da !important;
-  border-radius: 28px !important; box-shadow: 0 18px 50px #30231b0d !important;
+  background: #fff !important; border: 1px solid #e2def2 !important;
+  border-radius: 28px !important; box-shadow: 0 18px 50px #51428b0d !important;
 }
 .block-container:has(.workspace-title) div.st-key-setup_container:hover {
-  border-color: #e8e0da !important; box-shadow: 0 18px 50px #30231b0d !important;
+  border-color: #e2def2 !important; box-shadow: 0 18px 50px #51428b0d !important;
 }
 .block-container:has(.workspace-title) div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] {
-  background: #faf7f3 !important; border: 1.5px dashed #d5c3b7 !important;
+  background: #f6f7ff !important; border: 1.5px dashed #bcbce5 !important;
   border-radius: 18px !important; padding: 26px !important;
 }
 .block-container:has(.workspace-title) div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"]:hover {
-  background: #fff5ee !important; border-color: #ee9775 !important;
+  background: #eff2ff !important; border-color: #8b7ada !important;
 }
 .block-container:has(.workspace-title) div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] svg {
-  fill: #b27b61 !important;
+  fill: #7a70bb !important;
 }
 .block-container:has(.workspace-title) button[data-testid="stBaseButton-primary"],
 .block-container:has(.workspace-title) button[data-testid="baseButton-primary"] {
-  background: linear-gradient(175deg, #ff630a, #ff493b 55%, #ca598b) !important;
+  background: linear-gradient(115deg, #6650c8, #8051c9 52%, #ab397f) !important;
   border-radius: 24px !important; box-shadow: none !important;
 }
 .block-container:has(.workspace-title) button[data-testid="stBaseButton-primary"]:hover:not(:disabled),
@@ -174,17 +174,17 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
 }
 .block-container:has(.workspace-title) button[data-testid="stBaseButton-secondary"],
 .block-container:has(.workspace-title) button[data-testid="baseButton-secondary"] {
-  border-radius: 24px !important; border-color: #e4dcd5 !important; color: #51443b !important;
+  border-radius: 24px !important; border-color: #dcdff0 !important; color: #4c5474 !important;
 }
 .block-container:has(.workspace-title) button[data-testid="stBaseButton-secondary"]:hover,
 .block-container:has(.workspace-title) button[data-testid="baseButton-secondary"]:hover {
-  background: #faf4ef !important; border-color: #d9ad95 !important; color: #9e5434 !important;
+  background: #f0edfb !important; border-color: #b3a4df !important; color: #6750a3 !important;
 }
 .block-container:has(.workspace-title) [data-baseweb="select"] > div {
-  background: #fcfaf8 !important; border-color: #e6ddd6 !important; border-radius: 14px !important;
+  background: #fafaff !important; border-color: #dddff0 !important; border-radius: 14px !important;
 }
 .block-container:has(.workspace-title) :focus-visible {
-  outline-color: #ef9b77 !important;
+  outline-color: #9180d8 !important;
 }
 @media (max-width: 600px) {
   .block-container:has(.workspace-title) div.st-key-setup_container { padding: 16px !important; border-radius: 22px !important; }
@@ -192,53 +192,53 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
 
 /* Lightweight dashboard navigation and matching menu panels. */
 div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
-  background: #fffdfb !important;
-  border-bottom: 1px solid #e7dcd3 !important;
-  box-shadow: 0 4px 20px #3a281608 !important;
+  background: #fcfcff !important;
+  border-bottom: 1px solid #e0dff0 !important;
+  box-shadow: 0 4px 20px #51428b08 !important;
 }
 .documind-nav-brand > span:first-child { -webkit-text-fill-color: #27221f !important; }
-.documind-nav-brand > span:last-child { background: #f7ebe2 !important; color: #a65a37 !important; }
+.documind-nav-brand > span:last-child { background: #ede8fb !important; color: #7157a7 !important; }
 div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button {
-  background: #f8f3ee !important; border: 1px solid #eee3da !important;
-  border-radius: 24px !important; color: #51443b !important; padding: 9px 16px !important;
+  background: #f1f0fb !important; border: 1px solid #e4e1f2 !important;
+  border-radius: 24px !important; color: #4c5474 !important; padding: 9px 16px !important;
 }
 div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button *,
 div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button p,
 div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button span {
-  color: #51443b !important; font-size: 0.88rem !important; font-weight: 500 !important;
+  color: #4c5474 !important; font-size: 0.88rem !important; font-weight: 500 !important;
 }
 div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button:hover,
 div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button[aria-expanded="true"] {
-  background: #f3e4d9 !important; border-color: #dfbca6 !important;
+  background: #e7e4fa !important; border-color: #bab0df !important;
 }
 div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button:hover * {
-  color: #8d4b2d !important;
+  color: #65519c !important;
 }
 div[data-testid="stPopoverBody"] {
-  border: 1px solid #e7dcd3 !important; border-radius: 20px !important;
-  padding: 20px !important; box-shadow: 0 18px 48px #3424161a !important;
+  border: 1px solid #e0dff0 !important; border-radius: 20px !important;
+  padding: 20px !important; box-shadow: 0 18px 48px #51428b1a !important;
   max-height: min(560px, 75vh) !important; max-width: calc(100vw - 24px) !important;
-  scrollbar-width: thin; scrollbar-color: #d9c9bd transparent;
+  scrollbar-width: thin; scrollbar-color: #c5bfdf transparent;
 }
 div[data-testid="stPopoverBody"] button[data-testid="stBaseButton-secondary"],
 div[data-testid="stPopoverBody"] button[data-testid="baseButton-secondary"] {
-  border-radius: 10px !important; border-color: #eee5de !important;
-  background: #fdfbf9 !important; min-height: 40px;
+  border-radius: 10px !important; border-color: #e8e5f2 !important;
+  background: #fcfbff !important; min-height: 40px;
 }
 div[data-testid="stPopoverBody"] button[data-testid="stBaseButton-secondary"]:hover,
 div[data-testid="stPopoverBody"] button[data-testid="baseButton-secondary"]:hover {
-  background: #f8ede5 !important; border-color: #d8b59f !important;
+  background: #efebfa !important; border-color: #bcb0dc !important;
 }
 
 /* Drawer contents: quiet list rows rather than a grid of outlined buttons. */
 div[data-testid="stPopoverBody"] .drawer-heading {
   font-size: 1.05rem !important; font-weight: 600; letter-spacing: -.3px;
-  color: #342a24 !important; padding: 2px 2px 15px;
-  margin-bottom: 4px; border-bottom: 1px solid #eee5de;
+  color: #393c5a !important; padding: 2px 2px 15px;
+  margin-bottom: 4px; border-bottom: 1px solid #e8e5f2;
 }
 div[data-testid="stPopoverBody"] [data-testid="stHorizontalBlock"]:has([class*="st-key-load_doc_"]) {
   gap: 6px !important; align-items: center !important;
-  border-bottom: 1px solid #f1ebe6; padding: 3px 0;
+  border-bottom: 1px solid #eeecf6; padding: 3px 0;
 }
 div[data-testid="stPopoverBody"] [class*="st-key-load_doc_"] button {
   background: transparent !important; border: none !important;
@@ -247,11 +247,11 @@ div[data-testid="stPopoverBody"] [class*="st-key-load_doc_"] button {
   padding: 10px 12px !important; min-height: 42px !important;
 }
 div[data-testid="stPopoverBody"] [class*="st-key-load_doc_"] button p {
-  color: #59483d !important; font-size: .88rem !important;
+  color: #535b78 !important; font-size: .88rem !important;
   font-weight: 400 !important; text-align: left !important;
 }
 div[data-testid="stPopoverBody"] [class*="st-key-load_doc_"] button:hover {
-  background: #f7eee7 !important;
+  background: #eeebf9 !important;
 }
 div[data-testid="stPopoverBody"] div[class*="st-key-del_doc_"] button {
   background: transparent !important; border: none !important;
@@ -268,7 +268,7 @@ div[data-testid="stPopoverBody"] div[class*="st-key-del_doc_"] button:hover {
 div[data-testid="stPopoverBody"] div[class*="st-key-del_doc_"] button:hover p { color: #b84632 !important; }
 div[data-testid="stPopoverBody"] .drawer-settings-card,
 div[data-testid="stPopoverBody"] .drawer-profile-card {
-  background: #faf5f0 !important; border: 1px solid #eee2d8;
+  background: #f4f2fc !important; border: 1px solid #e5e0f1;
   border-radius: 14px; padding: 16px; margin-bottom: 12px;
 }
 div[data-testid="stPopoverBody"] [class*="st-key-nav_"] button {
@@ -276,7 +276,7 @@ div[data-testid="stPopoverBody"] [class*="st-key-nav_"] button {
   border: none !important; background: transparent !important;
   border-radius: 10px !important; box-shadow: none !important;
 }
-div[data-testid="stPopoverBody"] [class*="st-key-nav_"] button p { color: #59483d !important; font-weight: 500 !important; }
-div[data-testid="stPopoverBody"] [class*="st-key-nav_"] button:hover { background: #f7eee7 !important; }
-div[data-testid="stPopoverBody"] .st-key-nav_logout_button button { border-top: 1px solid #eee5de !important; }
+div[data-testid="stPopoverBody"] [class*="st-key-nav_"] button p { color: #535b78 !important; font-weight: 500 !important; }
+div[data-testid="stPopoverBody"] [class*="st-key-nav_"] button:hover { background: #eeebf9 !important; }
+div[data-testid="stPopoverBody"] .st-key-nav_logout_button button { border-top: 1px solid #e8e5f2 !important; }
 div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b84632 !important; }

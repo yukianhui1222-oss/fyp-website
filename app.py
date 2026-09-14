@@ -4521,7 +4521,7 @@ def main():
 
     st.markdown("""
         <div class="workspace-heading">
-            <h1 class="workspace-title">Docu<span>Mind</span></h1>
+            <h1 class="workspace-title">DocuMind</h1>
             <p class="workspace-tagline">Less reading. More understanding.</p>
         </div>
     """, unsafe_allow_html=True)
