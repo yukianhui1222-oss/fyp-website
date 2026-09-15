@@ -4261,6 +4261,24 @@ def main():
                 else:
                     st.button("🗑️ Clear Results", type="secondary", use_container_width=True, disabled=True, key="main_clear_disabled_btn")
 
+    if not has_results and not st.session_state.is_processing:
+        with st.container(key="home_learning_guide"):
+            st.html("""
+                <div class="learning-guide-heading"><span>MAKE IT YOURS</span><h2>A little plan for your next study session</h2></div>
+                <div class="learning-route">
+                    <article><span class="route-number" aria-hidden="true">01</span><h3>Find the essentials</h3><p>Upload your notes, then use Summary to review the key ideas.</p><span class="route-tag">Start with the big picture</span></article>
+                    <article><span class="route-number" aria-hidden="true">02</span><h3>Connect the ideas</h3><p>Explore the Mind map or read a translation to clarify unfamiliar concepts.</p><span class="route-tag">Make it click</span></article>
+                    <article><span class="route-number" aria-hidden="true">03</span><h3>Check what sticks</h3><p>Try a Quiz, review your answers, and ask the AI Tutor about tricky questions.</p><span class="route-tag">Turn reading into recall</span></article>
+                </div>
+            """)
+            with st.expander("Tips for a clearer analysis", expanded=False):
+                st.markdown("""
+- **Start with one topic.** Upload a single lecture or chapter for a focused study session.
+- **Use a clear source.** For images, keep the page upright, well lit, and fully visible.
+- **Working with handwriting?** Enable Handwritten Mode before starting analysis.
+- **Keep useful results.** After analysis, open **Save to my library** to save them to your account.
+                """)
+
     if st.session_state.is_processing:
         if not api_key:
             st.error("Please enter your Gemini API Key in the sidebar first!")
