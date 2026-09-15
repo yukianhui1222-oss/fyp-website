@@ -829,3 +829,6 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 .footer-signoff strong { color: #66517e; font-size: 1rem; }
 .footer-signoff strong span { color: #af87b4; margin-left: 8px; }
 @media (max-width: 640px) { .documind-footer { grid-template-columns: 1fr; gap: 24px; margin-top: 40px; padding-top: 28px; } .footer-purpose { padding-top: 0; } }
+
+.st-key-flashcard_face { background: linear-gradient(135deg, #f4effc, #edf6fc) !important; border: 1px solid #d9cdea !important; border-radius: 20px !important; padding: 28px !important; min-height: 200px; }
+.st-key-flashcard_face [data-testid="stMarkdownContainer"] p { font-size: 1.1rem !important; line-height: 1.8 !important; }

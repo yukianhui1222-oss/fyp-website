@@ -1424,6 +1424,71 @@ def clear_quiz_runtime_state():
                 pass
 
 @st.fragment(run_every=1.0)
+def render_flashcards(summary, api_key, language):
+    import hashlib
+    import random
+    deck_key = 'flashcards_' + hashlib.sha256((summary + language).encode()).hexdigest()
+    with st.expander("Flashcards · Recall before you reveal", expanded=False):
+        st.caption("Generate question cards from this summary. Cards stay available during this session.")
+        if st.button("Generate flashcards", key="generate_flashcards", disabled=not bool(summary and api_key)):
+            from summarizer import generate_quiz
+            with st.spinner("Preparing your flashcards…"):
+                raw, error = generate_quiz(summary, api_key, language, "Medium")
+                if error:
+                    st.error(error)
+                else:
+                    try:
+                        cleaned = raw.strip()
+                        if cleaned.startswith('```'):
+                            cleaned = cleaned.split('\n', 1)[1].rsplit('```', 1)[0]
+                        questions = json.loads(cleaned)
+                        cards = []
+                        for question in questions:
+                            front = question.get('question')
+                            answer = question.get('correct_answer')
+                            if isinstance(front, str) and isinstance(answer, str) and front.strip() and answer.strip():
+                                options = question.get('options', [])
+                                if answer.strip() in list('ABCD') and len(options) > ord(answer.strip()) - 65:
+                                    answer = options[ord(answer.strip()) - 65]
+                                cards.append({'question': front, 'answer': answer, 'explanation': question.get('explanation', '')})
+                        if not cards:
+                            raise ValueError('No usable cards')
+                        st.session_state[deck_key] = {'cards': cards, 'index': 0, 'revealed': False}
+                    except (ValueError, TypeError, AttributeError, IndexError):
+                        st.error("The cards could not be read. Please try generating them again.")
+        deck = st.session_state.get(deck_key)
+        if deck:
+            def move_card(offset):
+                deck['index'] = (deck['index'] + offset) % len(deck['cards'])
+                deck['revealed'] = False
+            def flip_card():
+                deck['revealed'] = not deck['revealed']
+            def shuffle_cards():
+                random.shuffle(deck['cards'])
+                deck['index'] = 0
+                deck['revealed'] = False
+            st.caption(f"Card {deck['index'] + 1} of {len(deck['cards'])}")
+            card = deck['cards'][deck['index']]
+            with st.container(border=True, key="flashcard_face"):
+                st.caption("THINK IT THROUGH")
+                st.markdown(card['question'])
+                if deck['revealed']:
+                    st.divider()
+                    st.caption("ANSWER")
+                    st.markdown(card['answer'])
+                    if card['explanation']:
+                        st.markdown(card['explanation'])
+            controls = st.columns(4)
+            with controls[0]:
+                st.button("Previous", key="flashcard_previous", on_click=move_card, args=(-1,), use_container_width=True)
+            with controls[1]:
+                st.button("Hide answer" if deck['revealed'] else "Show answer", key="flashcard_flip", on_click=flip_card, use_container_width=True)
+            with controls[2]:
+                st.button("Next", key="flashcard_next", on_click=move_card, args=(1,), use_container_width=True)
+            with controls[3]:
+                st.button("Shuffle", key="flashcard_shuffle", on_click=shuffle_cards, use_container_width=True)
+
+
 def render_quiz_view():
     def get_true_correct(q_dict):
         opts = q_dict.get('options', [])
@@ -5233,6 +5298,7 @@ def main():
                     st.code(selected_mindmap, language="markdown")
                     
             with tab4, st.container(key="quiz_workspace"):
+                render_flashcards(summary_result, api_key, result_lang)
                 st.html("""<div class="quiz-welcome">
                     <div class="quiz-welcome-copy"><span class="quiz-kicker">YOUR STUDY BREAK</span>
                     <h3>Small steps.<br><em>Stronger understanding.</em></h3>
