@@ -1427,13 +1427,13 @@ def clear_quiz_runtime_state():
 def render_flashcards(summary, api_key, language):
     import hashlib
     import random
-    deck_key = 'flashcards_' + hashlib.sha256((summary + language).encode()).hexdigest()
-    with st.expander("Flashcards · Recall before you reveal", expanded=False):
+    deck_key = 'knowledge_cards_v2_' + hashlib.sha256((summary + language).encode()).hexdigest()
+    with st.expander("Flashcards · Recall before you reveal", expanded=True):
         st.caption("Generate question cards from this summary. Cards stay available during this session.")
         if st.button("Generate flashcards", key="generate_flashcards", disabled=not bool(summary and api_key)):
-            from summarizer import generate_quiz
+            from summarizer import generate_flashcards
             with st.spinner("Preparing your flashcards…"):
-                raw, error = generate_quiz(summary, api_key, language, "Medium")
+                raw, error = generate_flashcards(summary, api_key, language)
                 if error:
                     st.error(error)
                 else:
@@ -1453,7 +1453,7 @@ def render_flashcards(summary, api_key, language):
                                 cards.append({'question': front, 'answer': answer, 'explanation': question.get('explanation', '')})
                         if not cards:
                             raise ValueError('No usable cards')
-                        st.session_state[deck_key] = {'cards': cards, 'index': 0, 'revealed': False}
+                        st.session_state[deck_key] = {'cards': cards, 'index': 0, 'revealed': False, 'known': []}
                     except (ValueError, TypeError, AttributeError, IndexError):
                         st.error("The cards could not be read. Please try generating them again.")
         deck = st.session_state.get(deck_key)
@@ -1469,15 +1469,23 @@ def render_flashcards(summary, api_key, language):
                 deck['revealed'] = False
             st.caption(f"Card {deck['index'] + 1} of {len(deck['cards'])}")
             card = deck['cards'][deck['index']]
-            with st.container(border=True, key="flashcard_face"):
-                st.caption("THINK IT THROUGH")
-                st.markdown(card['question'])
-                if deck['revealed']:
-                    st.divider()
-                    st.caption("ANSWER")
-                    st.markdown(card['answer'])
-                    if card['explanation']:
-                        st.markdown(card['explanation'])
+            known = deck.setdefault('known', [])
+            st.progress(len(known) / len(deck['cards']), text=f"{len(known)} / {len(deck['cards'])} mastered")
+            st.caption("ANSWER · Click to flip back" if deck['revealed'] else "QUESTION · Click the card to reveal")
+            face_text = card['answer'] + ('\n\n' + str(card['explanation']) if card['explanation'] else '') if deck['revealed'] else card['question']
+            st.button(face_text, key="knowledge_card_face", on_click=flip_card, use_container_width=True)
+            def rate_card(mastered):
+                current = deck['cards'][deck['index']]['question']
+                if mastered and current not in known:
+                    known.append(current)
+                elif not mastered and current in known:
+                    known.remove(current)
+                move_card(1)
+            rating_cols = st.columns(2)
+            with rating_cols[0]:
+                st.button("再练 · Practice again", key="card_again", on_click=rate_card, args=(False,), disabled=not deck['revealed'], use_container_width=True)
+            with rating_cols[1]:
+                st.button("会了 · Got it", key="card_known", on_click=rate_card, args=(True,), disabled=not deck['revealed'], use_container_width=True)
             controls = st.columns(4)
             with controls[0]:
                 st.button("Previous", key="flashcard_previous", on_click=move_card, args=(-1,), use_container_width=True)
@@ -5298,15 +5306,10 @@ def main():
                     st.code(selected_mindmap, language="markdown")
                     
             with tab4, st.container(key="quiz_workspace"):
-                render_flashcards(summary_result, api_key, result_lang)
-                st.html("""<div class="quiz-welcome">
-                    <div class="quiz-welcome-copy"><span class="quiz-kicker">YOUR STUDY BREAK</span>
-                    <h3>Small steps.<br><em>Stronger understanding.</em></h3>
-                    <p>Turn what you have read into what you remember.</p></div>
-                    <div class="quiz-steps"><div><span>01</span>Choose your pace</div>
-                    <div><span>02</span>Test your understanding</div>
-                    <div><span>03</span>Learn from each answer</div></div>
-                </div>""")
+                st.html('<div class="quiz-hub-heading"><span>YOUR STUDY SPACE</span><h3>Practice at your own pace</h3><p>Choose a quiz, review cards, or revisit your progress.</p></div>')
+                quiz_section = st.radio("Study activity", ["Quiz", "Flashcards", "Study record"], horizontal=True, label_visibility="collapsed", key="quiz_hub_section")
+                if quiz_section == "Flashcards":
+                    render_flashcards(summary_result, api_key, result_lang)
                 
                 # Check user info
                 user_info = st.session_state.get("user")
@@ -5354,464 +5357,531 @@ def main():
                     norm_current = normalize_topic_for_match(current_topic)
                     history = [att for att in all_history if normalize_topic_for_match(att.get("topic")) == norm_current]
                 
-                # Active Quiz Session Card (if exists in state)
-                if st.session_state.get('quiz_data') is not None:
-                    with st.container(border=True):
-                        st.markdown("""
-                            <div style='display: flex; align-items: center; justify-content: space-between;'>
-                                <div>
-                                    <h5 style='margin: 0; color: #6366f1;'>🎒 Active Quiz Session</h5>
-                                    <p style='margin: 0; font-size: 0.8rem; color: #64748b;'>You have a quiz generated and ready to attempt.</p>
+                if quiz_section == "Quiz":
+                    # Active Quiz Session Card (if exists in state)
+                    if st.session_state.get('quiz_data') is not None:
+                        with st.container(border=True):
+                            st.markdown("""
+                                <div style='display: flex; align-items: center; justify-content: space-between;'>
+                                    <div>
+                                        <h5 style='margin: 0; color: #6366f1;'>🎒 Active Quiz Session</h5>
+                                        <p style='margin: 0; font-size: 0.8rem; color: #64748b;'>You have a quiz generated and ready to attempt.</p>
+                                    </div>
                                 </div>
-                            </div>
-                        """, unsafe_allow_html=True)
-                        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-                        col_act1, col_act2 = st.columns(2)
-                        with col_act1:
-                            if st.button("Resume Quiz ➡️", type="primary", use_container_width=True, key="resume_quiz_btn"):
-                                st.session_state.quiz_mode_active = True
-                                st.rerun()
-                        with col_act2:
-                            if st.button("Discard Quiz ❌", use_container_width=True, key="discard_quiz_btn"):
-                                st.session_state.quiz_data = None
-                                st.session_state.is_retry = False
-                                st.session_state.parent_attempt_id = ""
-                                st.rerun()
-                        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-                
-                # Keep quiz creation as the primary action.
-                with st.container(border=False, key="quiz_setup_card"):
-                    st.html('<div class="quiz-form-heading"><span class="quiz-kicker">MAKE IT YOURS</span><h4>Ready for a little challenge?</h4><p>Set your difficulty, time and translation. We will take it from here.</p></div>')
-                    
-                    config_col1, config_col2, config_col3 = st.columns([1, 1, 1])
-                    
-                    with config_col1:
-                        quiz_difficulty = st.selectbox("Difficulty", ["Easy", "Medium", "Hard"], index=1, help="Adjusts question vocabulary, complexity, and proof-reasoning requirements.")
-                    with config_col2:
-                        timer_option = st.selectbox("Time limit", ["No Limit", "5 Minutes", "10 Minutes", "15 Minutes"], index=0, help="Optional countdown timer to challenge your speed.")
-                    with config_col3:
-                        target_lang = st.selectbox("Translation", ["Chinese", "Malay", "Japanese", "French", "Spanish", "Korean", "German", "Tamil", "Hindi"])
-                        
-                    st.session_state.quiz_target_lang = target_lang
-                    st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
-                    
-                    if st.button("Generate quiz", type="primary", use_container_width=True, key="generate_quiz_action_btn"):
-                        with st.spinner(f"AI is generating a [{quiz_difficulty}] quiz with [{timer_option}] time limit, please wait..."):
-                            from summarizer import generate_quiz
-                            raw_json, err = generate_quiz(summary_result, api_key, target_lang, quiz_difficulty)
-                            if err:
-                                st.error(err)
-                            else:
-                                try:
-                                    cleaned_json = raw_json.strip()
-                                    if cleaned_json.startswith("```json"):
-                                        cleaned_json = cleaned_json[7:]
-                                    elif cleaned_json.startswith("```"):
-                                        cleaned_json = cleaned_json[3:]
-                                    if cleaned_json.endswith("```"):
-                                        cleaned_json = cleaned_json[:-3]
-                                    
-                                    import re
-                                    sanitized_json = re.sub(r'\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})', r'\\\\', cleaned_json)
-                                    parsed_data = json.loads(sanitized_json, strict=False)
-                                    
-                                    import random
-                                    # Shuffle options to avoid LLM biases
-                                    for q in parsed_data:
-                                        opts_en = q.get('options', [])
-                                        opts_trans = q.get('options_trans', [])
-                                        correct_ans_raw = q.get('correct_answer', '')
-
-                                        if isinstance(opts_en, list) and len(opts_en) > 1:
-                                            if isinstance(opts_trans, list) and len(opts_en) == len(opts_trans):
-                                                combined = list(zip(opts_en, opts_trans))
-                                                random.shuffle(combined)
-                                                shuffled_en, shuffled_trans = zip(*combined)
-                                                opts_en = list(shuffled_en)
-                                                opts_trans = list(shuffled_trans)
-                                            else:
-                                                random.shuffle(opts_en)
-
-                                        # Add A, B, C, D prefixes
-                                        prefixed_en = []
-                                        prefixed_trans = []
-                                        
-                                        for i, opt in enumerate(opts_en):
-                                            prefix = f"{chr(65+i)}. " # A., B., C., D.
-                                            prefixed_en.append(prefix + str(opt))
-                                            if str(opt) == str(correct_ans_raw):
-                                                q['correct_answer'] = prefix + str(opt)
-
-                                        for i, opt in enumerate(opts_trans):
-                                            prefix = f"{chr(65+i)}. "
-                                            prefixed_trans.append(prefix + str(opt))
-
-                                        q['options'] = prefixed_en
-                                        q['options_trans'] = prefixed_trans
-                                                
-                                    st.session_state.quiz_data = parsed_data
+                            """, unsafe_allow_html=True)
+                            st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+                            col_act1, col_act2 = st.columns(2)
+                            with col_act1:
+                                if st.button("Resume Quiz ➡️", type="primary", use_container_width=True, key="resume_quiz_btn"):
                                     st.session_state.quiz_mode_active = True
-                                    st.session_state.current_q_index = 0
-                                    st.session_state.quiz_finished = False
-                                    st.session_state.review_mode = False
+                                    st.rerun()
+                            with col_act2:
+                                if st.button("Discard Quiz ❌", use_container_width=True, key="discard_quiz_btn"):
+                                    st.session_state.quiz_data = None
                                     st.session_state.is_retry = False
                                     st.session_state.parent_attempt_id = ""
-                                    st.session_state.quiz_difficulty = quiz_difficulty
-                                    
-                                    # Timer setup
-                                    st.session_state.quiz_time_limit_minutes = 0
-                                    if timer_option != "No Limit":
-                                        mins = int(timer_option.split(" ")[0])
-                                        st.session_state.quiz_time_limit_minutes = mins
-                                        st.session_state.quiz_timer_start = time.time()
-                                    else:
-                                        st.session_state.quiz_timer_start = time.time() # track time anyway
-                                    
-                                    clear_quiz_runtime_state()
                                     st.rerun()
-                                except Exception as e:
-                                    st.error("The content generated by the LLM does not match the standard JSON format, please try again!\n" + str(e))
-                                    with st.expander("Show Raw LLM Output"):
-                                        st.text(raw_json)
+                            st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+                                    
+                    # Keep quiz creation as the primary action.
+                    with st.container(border=False, key="quiz_setup_card"):
+                        st.html('<div class="quiz-form-heading"><span class="quiz-kicker">MAKE IT YOURS</span><h4>Ready for a little challenge?</h4><p>Set your difficulty, time and translation. We will take it from here.</p></div>')
+                                    
+                        config_col1, config_col2, config_col3 = st.columns([1, 1, 1])
 
-                with st.expander("Your level & badges", expanded=False):
-                    if uid:
-                        current_xp = progression.get("xp", 0)
-                        current_level = progression.get("level", 1)
-                        badges = progression.get("badges", [])
+                        with config_col1:
+                            quiz_difficulty = st.selectbox("Difficulty", ["Easy", "Medium", "Hard"], index=1, help="Adjusts question vocabulary, complexity, and proof-reasoning requirements.")
+                        with config_col2:
+                            timer_option = st.selectbox("Time limit", ["No Limit", "5 Minutes", "10 Minutes", "15 Minutes"], index=0, help="Optional countdown timer to challenge your speed.")
+                        with config_col3:
+                            target_lang = st.selectbox("Translation", ["Chinese", "Malay", "Japanese", "French", "Spanish", "Korean", "German", "Tamil", "Hindi"])
                         
-                        level_xp = current_xp % 500
-                        xp_percent = min(int((level_xp / 500) * 100), 100)
+                        st.session_state.quiz_target_lang = target_lang
+                        st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
                         
-                        badge_display_html = ""
-                        badge_meta = {
-                            "first_steps": ("🏅 First Steps", "Completed 1st quiz"),
-                            "perfectionist": ("🏆 Perfectionist", "10/10 on Medium/Hard"),
-                            "speed_demon": ("⚡ Speed Demon", "Quiz in <2 mins with >=8/10 score"),
-                            "persistence": ("💪 Persistence", "100% on Retry Wrong quiz"),
-                            "level_5_master": ("🎓 Level 5 Master", "Reached Level 5"),
-                            "level_10_legend": ("👑 Level 10 Legend", "Reached Level 10")
-                        }
+                        if st.button("Generate quiz", type="primary", use_container_width=True, key="generate_quiz_action_btn"):
+                            with st.spinner(f"AI is generating a [{quiz_difficulty}] quiz with [{timer_option}] time limit, please wait..."):
+                                from summarizer import generate_quiz
+                                raw_json, err = generate_quiz(summary_result, api_key, target_lang, quiz_difficulty)
+                                if err:
+                                    st.error(err)
+                                else:
+                                    try:
+                                        cleaned_json = raw_json.strip()
+                                        if cleaned_json.startswith("```json"):
+                                            cleaned_json = cleaned_json[7:]
+                                        elif cleaned_json.startswith("```"):
+                                            cleaned_json = cleaned_json[3:]
+                                        if cleaned_json.endswith("```"):
+                                            cleaned_json = cleaned_json[:-3]
 
-                        for b_id in badges:
-                            if b_id in badge_meta:
-                                name, desc = badge_meta[b_id]
-                                badge_display_html += f'<span class="badge-tag" title="{desc}">{name}</span>'
+                                        import re
+                                        sanitized_json = re.sub(r'\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})', r'\\\\', cleaned_json)
+                                        parsed_data = json.loads(sanitized_json, strict=False)
                                 
-                        st.markdown(f"""
-                            <style>
-                            .badge-tag {{
-                                background: rgba(99, 102, 241, 0.1);
-                                color: #6366f1;
-                                padding: 3px 8px;
-                                border-radius: 99px;
-                                font-size: 0.85rem;
-                                font-weight: 700;
-                                border: 1px solid rgba(99, 102, 241, 0.2);
-                                display: inline-block;
-                                margin-left: 6px;
-                                margin-bottom: 2px;
-                            }}
-                            .progression-row {{
-                                display: flex;
-                                justify-content: space-between;
-                                align-items: center;
-                                flex-wrap: wrap;
-                                gap: 12px;
-                                margin-bottom: 8px;
-                            }}
-                            div[class*="st-key-generate_quiz_action_btn"] button,
-                            div[class*="st-key-generate_quiz_action_btn"] button *,
-                            .st-key-generate_quiz_action_btn button,
-                            .st-key-generate_quiz_action_btn button * {{
-                                color: #FFFFFF !important;
-                                font-weight: 700 !important;
-                            }}
-                            </style>
-                            <div class="progression-row">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 1.4rem; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">⚡ Level {current_level}</span>
-                                    <span style="font-size: 0.95rem; color: #64748b; font-weight: 600;">({current_xp} XP Total)</span>
+                                        import random
+                                        # Shuffle options to avoid LLM biases
+                                        for q in parsed_data:
+                                            opts_en = q.get('options', [])
+                                            opts_trans = q.get('options_trans', [])
+                                            correct_ans_raw = q.get('correct_answer', '')
+
+                                            if isinstance(opts_en, list) and len(opts_en) > 1:
+                                                if isinstance(opts_trans, list) and len(opts_en) == len(opts_trans):
+                                                    combined = list(zip(opts_en, opts_trans))
+                                                    random.shuffle(combined)
+                                                    shuffled_en, shuffled_trans = zip(*combined)
+                                                    opts_en = list(shuffled_en)
+                                                    opts_trans = list(shuffled_trans)
+                                                else:
+                                                    random.shuffle(opts_en)
+
+                                            # Add A, B, C, D prefixes
+                                            prefixed_en = []
+                                            prefixed_trans = []
+
+                                            for i, opt in enumerate(opts_en):
+                                                prefix = f"{chr(65+i)}. " # A., B., C., D.
+                                                prefixed_en.append(prefix + str(opt))
+                                                if str(opt) == str(correct_ans_raw):
+                                                    q['correct_answer'] = prefix + str(opt)
+
+                                            for i, opt in enumerate(opts_trans):
+                                                prefix = f"{chr(65+i)}. "
+                                                prefixed_trans.append(prefix + str(opt))
+
+                                            q['options'] = prefixed_en
+                                            q['options_trans'] = prefixed_trans
+
+                                        st.session_state.quiz_data = parsed_data
+                                        st.session_state.quiz_mode_active = True
+                                        st.session_state.current_q_index = 0
+                                        st.session_state.quiz_finished = False
+                                        st.session_state.review_mode = False
+                                        st.session_state.is_retry = False
+                                        st.session_state.parent_attempt_id = ""
+                                        st.session_state.quiz_difficulty = quiz_difficulty
+
+                                        # Timer setup
+                                        st.session_state.quiz_time_limit_minutes = 0
+                                        if timer_option != "No Limit":
+                                            mins = int(timer_option.split(" ")[0])
+                                            st.session_state.quiz_time_limit_minutes = mins
+                                            st.session_state.quiz_timer_start = time.time()
+                                        else:
+                                            st.session_state.quiz_timer_start = time.time() # track time anyway
+
+                                        clear_quiz_runtime_state()
+                                        st.rerun()
+                                    except Exception as e:
+                                        st.error("The content generated by the LLM does not match the standard JSON format, please try again!\n" + str(e))
+                                        with st.expander("Show Raw LLM Output"):
+                                            st.text(raw_json)
+
+                if quiz_section == "Study record":
+                    with st.expander("Your level & badges", expanded=False):
+                        if uid:
+                            current_xp = progression.get("xp", 0)
+                            current_level = progression.get("level", 1)
+                            badges = progression.get("badges", [])
+
+                            level_xp = current_xp % 500
+                            xp_percent = min(int((level_xp / 500) * 100), 100)
+
+                            badge_display_html = ""
+                            badge_meta = {
+                                "first_steps": ("🏅 First Steps", "Completed 1st quiz"),
+                                "perfectionist": ("🏆 Perfectionist", "10/10 on Medium/Hard"),
+                                "speed_demon": ("⚡ Speed Demon", "Quiz in <2 mins with >=8/10 score"),
+                                "persistence": ("💪 Persistence", "100% on Retry Wrong quiz"),
+                                "level_5_master": ("🎓 Level 5 Master", "Reached Level 5"),
+                                "level_10_legend": ("👑 Level 10 Legend", "Reached Level 10")
+                            }
+
+                            for b_id in badges:
+                                if b_id in badge_meta:
+                                    name, desc = badge_meta[b_id]
+                                    badge_display_html += f'<span class="badge-tag" title="{desc}">{name}</span>'
+
+                            st.markdown(f"""
+                                <style>
+                                .badge-tag {{
+                                    background: rgba(99, 102, 241, 0.1);
+                                    color: #6366f1;
+                                    padding: 3px 8px;
+                                    border-radius: 99px;
+                                    font-size: 0.85rem;
+                                    font-weight: 700;
+                                    border: 1px solid rgba(99, 102, 241, 0.2);
+                                    display: inline-block;
+                                    margin-left: 6px;
+                                    margin-bottom: 2px;
+                                }}
+                                .progression-row {{
+                                    display: flex;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                    flex-wrap: wrap;
+                                    gap: 12px;
+                                    margin-bottom: 8px;
+                                }}
+                                div[class*="st-key-generate_quiz_action_btn"] button,
+                                div[class*="st-key-generate_quiz_action_btn"] button *,
+                                .st-key-generate_quiz_action_btn button,
+                                .st-key-generate_quiz_action_btn button * {{
+                                    color: #FFFFFF !important;
+                                    font-weight: 700 !important;
+                                }}
+                                </style>
+                                <div class="progression-row">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 1.4rem; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">⚡ Level {current_level}</span>
+                                        <span style="font-size: 0.95rem; color: #64748b; font-weight: 600;">({current_xp} XP Total)</span>
+                                    </div>
+                                    <div style="font-size: 0.95rem; color: #475569; font-weight: 700;">{level_xp} / 500 XP to next level</div>
                                 </div>
-                                <div style="font-size: 0.95rem; color: #475569; font-weight: 700;">{level_xp} / 500 XP to next level</div>
-                            </div>
-                            <div style="width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 99px; overflow: hidden; display: flex; margin-bottom: 12px;">
-                                <div style="width: {xp_percent}%; height: 100%; background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%); border-radius: 99px;"></div>
-                            </div>
-                            <div style="display: flex; align-items: center; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.9rem;">
-                                <span style="font-weight: 700; color: #475569;">🏅 Earned Badges:</span>
-                                {badge_display_html if badge_display_html else '<span style="color: #94a3b8; font-style: italic; margin-left: 6px;">No badges unlocked yet.</span>'}
-                            </div>
-                            <div style="border-top: 1px solid rgba(226, 232, 240, 0.6); margin-bottom: 16px;"></div>
+                                <div style="width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 99px; overflow: hidden; display: flex; margin-bottom: 12px;">
+                                    <div style="width: {xp_percent}%; height: 100%; background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%); border-radius: 99px;"></div>
+                                </div>
+                                <div style="display: flex; align-items: center; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.9rem;">
+                                    <span style="font-weight: 700; color: #475569;">🏅 Earned Badges:</span>
+                                    {badge_display_html if badge_display_html else '<span style="color: #94a3b8; font-style: italic; margin-left: 6px;">No badges unlocked yet.</span>'}
+                                </div>
+                                <div style="border-top: 1px solid rgba(226, 232, 240, 0.6); margin-bottom: 16px;"></div>
+                            """, unsafe_allow_html=True)
+                        else:
+                            st.info("☁️ Log in to save your history, earn XP, and unlock badges!", icon="☁️")
+                            st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+
+
+                    # 2. Performance Analytics
+                    if history:
+                        with st.expander("Performance & study insights", expanded=False):
+                            st.markdown("<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;'>", unsafe_allow_html=True)
+                            # Calculate total stats
+                            total_quizzes = len(history)
+                            total_correct = 0
+                            total_questions = 0
+                            difficulty_counts = {"Easy": 0, "Medium": 0, "Hard": 0}
+                            total_xp_earned = 0
+                            scores = []
+
+                            for att in history:
+                                total_correct += att.get("score", 0)
+                                total_questions += att.get("total_questions", 10)
+                                diff = att.get("difficulty", "Medium")
+                                difficulty_counts[diff] = difficulty_counts.get(diff, 0) + 1
+                                total_xp_earned += att.get("xp_earned", 0)
+                                scores.append(att.get("score", 0))
+
+                            total_incorrect = max(0, total_questions - total_correct)
+                            correct_percent = (total_correct / total_questions * 100) if total_questions else 0
+                            incorrect_percent = 100 - correct_percent if total_questions else 0
+
+                            # Find preferred difficulty
+                            pref_difficulty = max(difficulty_counts, key=difficulty_counts.get) if total_quizzes > 0 else "Medium"
+                            avg_duration = sum(att.get("time_taken_seconds", 0) for att in history) // max(1, total_quizzes)
+
+                            # Average score math
+                            avg_score = total_correct / total_quizzes if total_quizzes else 0
+                            avg_total = total_questions / total_quizzes if total_quizzes else 10
+
+                            # Custom Visual Stacked Bar
+                            st.html(f"""<style>
+        .accuracy-container {{
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        margin-bottom: 15px;
+        }}
+        .accuracy-bar-wrapper {{
+        display: flex;
+        width: 100%;
+        height: 24px;
+        border-radius: 99px;
+        overflow: hidden;
+        background: #f1f5f9;
+        margin: 12px 0;
+        }}
+        .accuracy-bar-correct {{
+        width: {correct_percent}%;
+        background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 700;
+        line-height: 24px;
+        text-align: center;
+        transition: width 0.3s ease;
+        }}
+        .accuracy-bar-incorrect {{
+        width: {incorrect_percent}%;
+        background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 700;
+        line-height: 24px;
+        text-align: center;
+        transition: width 0.3s ease;
+        }}
+        .stat-grid-mini {{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 15px;
+        }}
+        .stat-item-mini {{
+        text-align: center;
+        padding: 8px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px dashed #e2e8f0;
+        }}
+        .stat-val-mini {{
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #1e293b;
+        }}
+        .stat-lbl-mini {{
+        font-size: 0.82rem;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        }}
+        </style>
+        <div class="accuracy-container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 1.0rem; font-weight: 700; color: #334155;">Answer Accuracy Breakdown</span>
+        <span style="font-size: 0.95rem; font-weight: 800; color: #10b981;">{correct_percent:.1f}% Correct</span>
+        </div>
+        <div class="accuracy-bar-wrapper">
+        {"<div class='accuracy-bar-correct'>" + f"{total_correct} Correct</div>" if correct_percent > 0 else ""}
+        {"<div class='accuracy-bar-incorrect'>" + f"{total_incorrect} Incorrect</div>" if incorrect_percent > 0 else ""}
+        {"" if total_questions > 0 else "<div style='width: 100%; color: #94a3b8; font-size: 0.85rem; line-height: 24px; text-align: center; font-style: italic;'>No answers recorded yet</div>"}
+        </div>
+        <div class="stat-grid-mini">
+        <div class="stat-item-mini">
+        <div class="stat-val-mini">🎯 {total_quizzes}</div>
+        <div class="stat-lbl-mini">Total Quizzes</div>
+        </div>
+        <div class="stat-item-mini">
+        <div class="stat-val-mini">⚡ {pref_difficulty}</div>
+        <div class="stat-lbl-mini">Preferred Diff</div>
+        </div>
+        <div class="stat-item-mini">
+        <div class="stat-val-mini">⏱️ {avg_duration}s</div>
+        <div class="stat-lbl-mini">Avg Duration</div>
+        </div>
+        </div>
+        </div>""")
+
+                            st.html(f"""<div style="display: flex; gap: 15px; margin-top: 10px;">
+        <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
+        <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Average Score</div>
+        <div style="font-size: 1.35rem; font-weight: 800; color: #4f46e5;">{avg_score:.1f}/{avg_total:.0f}</div>
+        </div>
+        <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
+        <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Total Quiz XP</div>
+        <div style="font-size: 1.35rem; font-weight: 800; color: #8b5cf6;">{total_xp_earned} XP</div>
+        </div>
+        <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
+        <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">High / Low Score</div>
+        <div style="font-size: 1.35rem; font-weight: 800; color: #f59e0b;">{max(scores)} / {min(scores)}</div>
+        </div>
+        </div>""")
+
+                            st.markdown("<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;'>", unsafe_allow_html=True)
+                            st.markdown("<div style='font-size: 1.1rem; font-weight: 700; color: #475569; margin-bottom: 10px;'>🎯 Topic Mastery & Study Guide</div>", unsafe_allow_html=True)
+
+                            # Process wrong answers by topic_tag
+                            topic_correct = {}
+                            topic_total = {}
+                            for att in history:
+                                for ans in att.get("answers", []):
+                                    t_tag = ans.get("topic_tag", "General")
+                                    topic_total[t_tag] = topic_total.get(t_tag, 0) + 1
+                                    if ans.get("is_correct", False):
+                                        topic_correct[t_tag] = topic_correct.get(t_tag, 0) + 1
+
+                            topic_mastery = []
+                            for t_tag in topic_total:
+                                correct = topic_correct.get(t_tag, 0)
+                                total = topic_total[t_tag]
+                                mastery = (correct / total) * 100
+                                topic_mastery.append({
+                                    "topic": t_tag,
+                                    "mastery": mastery,
+                                    "mistakes": total - correct
+                                })
+
+                            # Sort by mastery ascending (weakest first)
+                            topic_mastery.sort(key=lambda x: x["mastery"])
+
+                            weak_count = 0
+                            weak_topics_to_show = [tm for tm in topic_mastery if tm["mastery"] < 80]
+
+                            if weak_topics_to_show:
+                                num_cols = min(2, len(weak_topics_to_show))
+                                weak_cols = st.columns(num_cols)
+                                for idx_w, tm in enumerate(weak_topics_to_show[:2]):
+                                    with weak_cols[idx_w]:
+                                        st.markdown(f"""
+                                            <div style="background: rgba(239, 68, 68, 0.04); border-left: 3px solid #ef4444; border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; height: 100%;">
+                                                <div style="font-size: 0.95rem; font-weight: 700; color: #ef4444;">⚠️ Weak Topic: {tm['topic']} ({tm['mastery']:.0f}% mastery)</div>
+                                                <div style="font-size: 0.85rem; color: #64748b; margin-top: 3px;">Recommendation: Review related sections in the current document. Ask AI for detailed concept breakdown of '{tm['topic']}'.</div>
+                                            </div>
+                                        """, unsafe_allow_html=True)
+                                        weak_count += 1
+
+                            if weak_count == 0:
+                                st.success("🌟 Excellent! You have achieved >80% mastery in all topics. Keep maintaining this streak!", icon="✨")
+
+
+                    # 4. Quiz History List
+                    if history:
+                        st.markdown("<div style='margin-top: 25px;'></div>", unsafe_allow_html=True)
+                        st.markdown("#### Recent attempts")
+
+                        # Custom CSS to align elements nicely
+                        st.markdown("""
+                            <style>
+                            .history-row {
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                background: #ffffff;
+                                border: 1px solid #e2e8f0;
+                                border-radius: 10px;
+                                padding: 10px 16px;
+                                margin-bottom: 8px;
+                            }
+                            .history-meta {
+                                font-size: 0.92rem;
+                                color: #64748b;
+                            }
+                            .history-title {
+                                font-size: 1.05rem;
+                                font-weight: 700;
+                                color: #1e293b;
+                            }
+                            .history-score {
+                                font-size: 1.25rem;
+                                font-weight: 800;
+                                color: #4f46e5;
+                            }
+                            </style>
                         """, unsafe_allow_html=True)
-                    else:
-                        st.info("☁️ Log in to save your history, earn XP, and unlock badges!", icon="☁️")
-                        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
 
+                        mistakes_only = st.toggle("Show attempts with mistakes", key="quiz_mistakes_filter")
+                        visible_history = [att for att in history if att.get("score", 0) < att.get("total_questions", 10)] if mistakes_only else history
+                        if mistakes_only and not visible_history:
+                            st.success("No mistakes to revisit in your saved attempts for this document.")
+                        with st.container(height=350):
+                            for idx_hist, att in enumerate(visible_history):
+                                att_id = att.get("attempt_id", "")
+                                att_date = att.get("date", "")
+                                try:
+                                    # Format date nicely
+                                    date_obj = datetime.fromisoformat(att_date.replace("Z", "+00:00"))
+                                    formatted_date = date_obj.strftime("%Y-%m-%d %H:%M")
+                                except Exception:
+                                    formatted_date = att_date[:16].replace("T", " ")
 
-                # 2. Performance Analytics
-                if history:
-                    with st.expander("Performance & study insights", expanded=False):
-                        st.markdown("<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;'>", unsafe_allow_html=True)
-                        # Calculate total stats
-                        total_quizzes = len(history)
-                        total_correct = 0
-                        total_questions = 0
-                        difficulty_counts = {"Easy": 0, "Medium": 0, "Hard": 0}
-                        total_xp_earned = 0
-                        scores = []
+                                att_topic = att.get("topic", "General")
+                                att_difficulty = att.get("difficulty", "Medium")
+                                att_score = att.get("score", 0)
+                                att_total = att.get("total_questions", 10)
+                                att_is_retry = att.get("is_retry", False)
 
-                        for att in history:
-                            total_correct += att.get("score", 0)
-                            total_questions += att.get("total_questions", 10)
-                            diff = att.get("difficulty", "Medium")
-                            difficulty_counts[diff] = difficulty_counts.get(diff, 0) + 1
-                            total_xp_earned += att.get("xp_earned", 0)
-                            scores.append(att.get("score", 0))
+                                retry_label = " (Retry)" if att_is_retry else ""
 
-                        total_incorrect = max(0, total_questions - total_correct)
-                        correct_percent = (total_correct / total_questions * 100) if total_questions else 0
-                        incorrect_percent = 100 - correct_percent if total_questions else 0
-
-                        # Find preferred difficulty
-                        pref_difficulty = max(difficulty_counts, key=difficulty_counts.get) if total_quizzes > 0 else "Medium"
-                        avg_duration = sum(att.get("time_taken_seconds", 0) for att in history) // max(1, total_quizzes)
-
-                        # Average score math
-                        avg_score = total_correct / total_quizzes if total_quizzes else 0
-                        avg_total = total_questions / total_quizzes if total_quizzes else 10
-
-                        # Custom Visual Stacked Bar
-                        st.html(f"""<style>
-    .accuracy-container {{
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 18px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
-    margin-bottom: 15px;
-    }}
-    .accuracy-bar-wrapper {{
-    display: flex;
-    width: 100%;
-    height: 24px;
-    border-radius: 99px;
-    overflow: hidden;
-    background: #f1f5f9;
-    margin: 12px 0;
-    }}
-    .accuracy-bar-correct {{
-    width: {correct_percent}%;
-    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-    color: white;
-    font-size: 0.9rem;
-    font-weight: 700;
-    line-height: 24px;
-    text-align: center;
-    transition: width 0.3s ease;
-    }}
-    .accuracy-bar-incorrect {{
-    width: {incorrect_percent}%;
-    background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
-    color: white;
-    font-size: 0.9rem;
-    font-weight: 700;
-    line-height: 24px;
-    text-align: center;
-    transition: width 0.3s ease;
-    }}
-    .stat-grid-mini {{
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 15px;
-    }}
-    .stat-item-mini {{
-    text-align: center;
-    padding: 8px;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 1px dashed #e2e8f0;
-    }}
-    .stat-val-mini {{
-    font-size: 1.3rem;
-    font-weight: 800;
-    color: #1e293b;
-    }}
-    .stat-lbl-mini {{
-    font-size: 0.82rem;
-    color: #64748b;
-    font-weight: 600;
-    text-transform: uppercase;
-    }}
-    </style>
-    <div class="accuracy-container">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-    <span style="font-size: 1.0rem; font-weight: 700; color: #334155;">Answer Accuracy Breakdown</span>
-    <span style="font-size: 0.95rem; font-weight: 800; color: #10b981;">{correct_percent:.1f}% Correct</span>
-    </div>
-    <div class="accuracy-bar-wrapper">
-    {"<div class='accuracy-bar-correct'>" + f"{total_correct} Correct</div>" if correct_percent > 0 else ""}
-    {"<div class='accuracy-bar-incorrect'>" + f"{total_incorrect} Incorrect</div>" if incorrect_percent > 0 else ""}
-    {"" if total_questions > 0 else "<div style='width: 100%; color: #94a3b8; font-size: 0.85rem; line-height: 24px; text-align: center; font-style: italic;'>No answers recorded yet</div>"}
-    </div>
-    <div class="stat-grid-mini">
-    <div class="stat-item-mini">
-    <div class="stat-val-mini">🎯 {total_quizzes}</div>
-    <div class="stat-lbl-mini">Total Quizzes</div>
-    </div>
-    <div class="stat-item-mini">
-    <div class="stat-val-mini">⚡ {pref_difficulty}</div>
-    <div class="stat-lbl-mini">Preferred Diff</div>
-    </div>
-    <div class="stat-item-mini">
-    <div class="stat-val-mini">⏱️ {avg_duration}s</div>
-    <div class="stat-lbl-mini">Avg Duration</div>
-    </div>
-    </div>
-    </div>""")
-
-                        st.html(f"""<div style="display: flex; gap: 15px; margin-top: 10px;">
-    <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
-    <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Average Score</div>
-    <div style="font-size: 1.35rem; font-weight: 800; color: #4f46e5;">{avg_score:.1f}/{avg_total:.0f}</div>
-    </div>
-    <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
-    <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Total Quiz XP</div>
-    <div style="font-size: 1.35rem; font-weight: 800; color: #8b5cf6;">{total_xp_earned} XP</div>
-    </div>
-    <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
-    <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">High / Low Score</div>
-    <div style="font-size: 1.35rem; font-weight: 800; color: #f59e0b;">{max(scores)} / {min(scores)}</div>
-    </div>
-    </div>""")
-
-                        st.markdown("<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;'>", unsafe_allow_html=True)
-                        st.markdown("<div style='font-size: 1.1rem; font-weight: 700; color: #475569; margin-bottom: 10px;'>🎯 Topic Mastery & Study Guide</div>", unsafe_allow_html=True)
-
-                        # Process wrong answers by topic_tag
-                        topic_correct = {}
-                        topic_total = {}
-                        for att in history:
-                            for ans in att.get("answers", []):
-                                t_tag = ans.get("topic_tag", "General")
-                                topic_total[t_tag] = topic_total.get(t_tag, 0) + 1
-                                if ans.get("is_correct", False):
-                                    topic_correct[t_tag] = topic_correct.get(t_tag, 0) + 1
-
-                        topic_mastery = []
-                        for t_tag in topic_total:
-                            correct = topic_correct.get(t_tag, 0)
-                            total = topic_total[t_tag]
-                            mastery = (correct / total) * 100
-                            topic_mastery.append({
-                                "topic": t_tag,
-                                "mastery": mastery,
-                                "mistakes": total - correct
-                            })
-
-                        # Sort by mastery ascending (weakest first)
-                        topic_mastery.sort(key=lambda x: x["mastery"])
-
-                        weak_count = 0
-                        weak_topics_to_show = [tm for tm in topic_mastery if tm["mastery"] < 80]
-
-                        if weak_topics_to_show:
-                            num_cols = min(2, len(weak_topics_to_show))
-                            weak_cols = st.columns(num_cols)
-                            for idx_w, tm in enumerate(weak_topics_to_show[:2]):
-                                with weak_cols[idx_w]:
+                                col_h1, col_h2, col_h3 = st.columns([5.0, 1.0, 3.0])
+                                with col_h1:
                                     st.markdown(f"""
-                                        <div style="background: rgba(239, 68, 68, 0.04); border-left: 3px solid #ef4444; border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; height: 100%;">
-                                            <div style="font-size: 0.95rem; font-weight: 700; color: #ef4444;">⚠️ Weak Topic: {tm['topic']} ({tm['mastery']:.0f}% mastery)</div>
-                                            <div style="font-size: 0.85rem; color: #64748b; margin-top: 3px;">Recommendation: Review related sections in the current document. Ask AI for detailed concept breakdown of '{tm['topic']}'.</div>
+                                        <div style='padding-top: 4px;'>
+                                            <span class='history-title'>{att_topic}</span><span style='color: #6366f1; font-weight: 600; font-size: 0.9rem;'>{retry_label}</span>
+                                            <div class='history-meta'>📅 {formatted_date} • 🎯 Difficulty: {att_difficulty}</div>
                                         </div>
                                     """, unsafe_allow_html=True)
-                                    weak_count += 1
+                                with col_h2:
+                                    st.markdown(f"""
+                                        <div style='text-align: center; padding-top: 8px;'>
+                                            <span class='history-score'>{att_score} / {att_total}</span>
+                                        </div>
+                                    """, unsafe_allow_html=True)
+                                with col_h3:
+                                    show_retry = (att_score < att_total)
+                                    if show_retry:
+                                        btn_rev_col, btn_ret_col = st.columns(2)
+                                        with btn_rev_col:
+                                            if st.button("Review 🔍", key=f"rev_att_{att_id}", use_container_width=True):
+                                                st.session_state.quiz_data = att.get("answers", [])
+                                                st.session_state.review_mode = True
+                                                st.session_state.quiz_mode_active = True
+                                                st.session_state.current_q_index = 0
+                                                st.session_state.quiz_finished = False
+                                                st.session_state.is_retry = False
+                                                st.session_state.quiz_difficulty = att_difficulty
+                                                st.session_state.quiz_time_limit_minutes = 0
+                                                st.session_state.quiz_timer_start = None
+                                                st.rerun()
+                                        with btn_ret_col:
+                                            if st.button("Practice mistakes", key=f"ret_att_{att_id}", use_container_width=True, type="primary"):
+                                                # Filter wrong answers
+                                                wrong_answers = [ans for ans in att.get("answers", []) if not ans.get("is_correct", False)]
+                                                # Re-shuffle/strip prefixes to allow re-answering
+                                                clean_wrong_answers = []
+                                                for ans in wrong_answers:
+                                                    opts_stripped = []
+                                                    for opt in ans.get("options", []):
+                                                        if len(opt) > 3 and opt[0].isalpha() and opt[1:3] == ". ":
+                                                            opts_stripped.append(opt[3:])
+                                                        else:
+                                                            opts_stripped.append(opt)
+                                                    correct_ans_stripped = ans.get("correct_answer", "")
+                                                    if len(correct_ans_stripped) > 3 and correct_ans_stripped[0].isalpha() and correct_ans_stripped[1:3] == ". ":
+                                                        correct_ans_stripped = correct_ans_stripped[3:]
 
-                        if weak_count == 0:
-                            st.success("🌟 Excellent! You have achieved >80% mastery in all topics. Keep maintaining this streak!", icon="✨")
+                                                    import random
+                                                    random.shuffle(opts_stripped)
 
+                                                    prefixed_en = []
+                                                    correct_ans_prefixed = correct_ans_stripped
+                                                    for idx_o, opt in enumerate(opts_stripped):
+                                                        prefix = f"{chr(65+idx_o)}. "
+                                                        prefixed_en.append(prefix + str(opt))
+                                                        if str(opt) == str(correct_ans_stripped):
+                                                            correct_ans_prefixed = prefix + str(opt)
 
-                # 4. Quiz History List
-                if history:
-                    st.markdown("<div style='margin-top: 25px;'></div>", unsafe_allow_html=True)
-                    st.markdown("#### Recent attempts")
+                                                    clean_wrong_answers.append({
+                                                        "question": ans.get("question", ""),
+                                                        "options": prefixed_en,
+                                                        "correct_answer": correct_ans_prefixed,
+                                                        "explanation": ans.get("explanation", ""),
+                                                        "topic_tag": ans.get("topic_tag", "General")
+                                                    })
                     
-                    # Custom CSS to align elements nicely
-                    st.markdown("""
-                        <style>
-                        .history-row {
-                            display: flex;
-                            align-items: center;
-                            justify-content: space-between;
-                            background: #ffffff;
-                            border: 1px solid #e2e8f0;
-                            border-radius: 10px;
-                            padding: 10px 16px;
-                            margin-bottom: 8px;
-                        }
-                        .history-meta {
-                            font-size: 0.92rem;
-                            color: #64748b;
-                        }
-                        .history-title {
-                            font-size: 1.05rem;
-                            font-weight: 700;
-                            color: #1e293b;
-                        }
-                        .history-score {
-                            font-size: 1.25rem;
-                            font-weight: 800;
-                            color: #4f46e5;
-                        }
-                        </style>
-                    """, unsafe_allow_html=True)
+                                                st.session_state.quiz_data = clean_wrong_answers
+                                                st.session_state.parent_attempt_id = att_id
+                                                st.session_state.is_retry = True
+                                                st.session_state.quiz_mode_active = True
+                                                st.session_state.current_q_index = 0
+                                                st.session_state.quiz_finished = False
+                                                st.session_state.review_mode = False
+                                                st.session_state.quiz_difficulty = att_difficulty
+                                                st.session_state.quiz_time_limit_minutes = 0
+                                                st.session_state.quiz_timer_start = time.time()
                     
-                    mistakes_only = st.toggle("Show attempts with mistakes", key="quiz_mistakes_filter")
-                    visible_history = [att for att in history if att.get("score", 0) < att.get("total_questions", 10)] if mistakes_only else history
-                    if mistakes_only and not visible_history:
-                        st.success("No mistakes to revisit in your saved attempts for this document.")
-                    with st.container(height=350):
-                        for idx_hist, att in enumerate(visible_history):
-                            att_id = att.get("attempt_id", "")
-                            att_date = att.get("date", "")
-                            try:
-                                # Format date nicely
-                                date_obj = datetime.fromisoformat(att_date.replace("Z", "+00:00"))
-                                formatted_date = date_obj.strftime("%Y-%m-%d %H:%M")
-                            except Exception:
-                                formatted_date = att_date[:16].replace("T", " ")
-
-                            att_topic = att.get("topic", "General")
-                            att_difficulty = att.get("difficulty", "Medium")
-                            att_score = att.get("score", 0)
-                            att_total = att.get("total_questions", 10)
-                            att_is_retry = att.get("is_retry", False)
-
-                            retry_label = " (Retry)" if att_is_retry else ""
-
-                            col_h1, col_h2, col_h3 = st.columns([5.0, 1.0, 3.0])
-                            with col_h1:
-                                st.markdown(f"""
-                                    <div style='padding-top: 4px;'>
-                                        <span class='history-title'>{att_topic}</span><span style='color: #6366f1; font-weight: 600; font-size: 0.9rem;'>{retry_label}</span>
-                                        <div class='history-meta'>📅 {formatted_date} • 🎯 Difficulty: {att_difficulty}</div>
-                                    </div>
-                                """, unsafe_allow_html=True)
-                            with col_h2:
-                                st.markdown(f"""
-                                    <div style='text-align: center; padding-top: 8px;'>
-                                        <span class='history-score'>{att_score} / {att_total}</span>
-                                    </div>
-                                """, unsafe_allow_html=True)
-                            with col_h3:
-                                show_retry = (att_score < att_total)
-                                if show_retry:
-                                    btn_rev_col, btn_ret_col = st.columns(2)
-                                    with btn_rev_col:
+                                                clear_quiz_runtime_state()
+                                                st.rerun()
+                                    else:
                                         if st.button("Review 🔍", key=f"rev_att_{att_id}", use_container_width=True):
+                                            clear_quiz_runtime_state()
                                             st.session_state.quiz_data = att.get("answers", [])
+                                            for i_ans, ans_obj in enumerate(att.get("answers", [])):
+                                                st.session_state[f"user_ans_{i_ans}"] = ans_obj.get("user_answer", "")
+                                                st.session_state[f"q_submitted_{i_ans}"] = True
                                             st.session_state.review_mode = True
                                             st.session_state.quiz_mode_active = True
                                             st.session_state.current_q_index = 0
@@ -5821,71 +5891,6 @@ def main():
                                             st.session_state.quiz_time_limit_minutes = 0
                                             st.session_state.quiz_timer_start = None
                                             st.rerun()
-                                    with btn_ret_col:
-                                        if st.button("Practice mistakes", key=f"ret_att_{att_id}", use_container_width=True, type="primary"):
-                                            # Filter wrong answers
-                                            wrong_answers = [ans for ans in att.get("answers", []) if not ans.get("is_correct", False)]
-                                            # Re-shuffle/strip prefixes to allow re-answering
-                                            clean_wrong_answers = []
-                                            for ans in wrong_answers:
-                                                opts_stripped = []
-                                                for opt in ans.get("options", []):
-                                                    if len(opt) > 3 and opt[0].isalpha() and opt[1:3] == ". ":
-                                                        opts_stripped.append(opt[3:])
-                                                    else:
-                                                        opts_stripped.append(opt)
-                                                correct_ans_stripped = ans.get("correct_answer", "")
-                                                if len(correct_ans_stripped) > 3 and correct_ans_stripped[0].isalpha() and correct_ans_stripped[1:3] == ". ":
-                                                    correct_ans_stripped = correct_ans_stripped[3:]
-
-                                                import random
-                                                random.shuffle(opts_stripped)
-
-                                                prefixed_en = []
-                                                correct_ans_prefixed = correct_ans_stripped
-                                                for idx_o, opt in enumerate(opts_stripped):
-                                                    prefix = f"{chr(65+idx_o)}. "
-                                                    prefixed_en.append(prefix + str(opt))
-                                                    if str(opt) == str(correct_ans_stripped):
-                                                        correct_ans_prefixed = prefix + str(opt)
-
-                                                clean_wrong_answers.append({
-                                                    "question": ans.get("question", ""),
-                                                    "options": prefixed_en,
-                                                    "correct_answer": correct_ans_prefixed,
-                                                    "explanation": ans.get("explanation", ""),
-                                                    "topic_tag": ans.get("topic_tag", "General")
-                                                })
-
-                                            st.session_state.quiz_data = clean_wrong_answers
-                                            st.session_state.parent_attempt_id = att_id
-                                            st.session_state.is_retry = True
-                                            st.session_state.quiz_mode_active = True
-                                            st.session_state.current_q_index = 0
-                                            st.session_state.quiz_finished = False
-                                            st.session_state.review_mode = False
-                                            st.session_state.quiz_difficulty = att_difficulty
-                                            st.session_state.quiz_time_limit_minutes = 0
-                                            st.session_state.quiz_timer_start = time.time()
-
-                                            clear_quiz_runtime_state()
-                                            st.rerun()
-                                else:
-                                    if st.button("Review 🔍", key=f"rev_att_{att_id}", use_container_width=True):
-                                        clear_quiz_runtime_state()
-                                        st.session_state.quiz_data = att.get("answers", [])
-                                        for i_ans, ans_obj in enumerate(att.get("answers", [])):
-                                            st.session_state[f"user_ans_{i_ans}"] = ans_obj.get("user_answer", "")
-                                            st.session_state[f"q_submitted_{i_ans}"] = True
-                                        st.session_state.review_mode = True
-                                        st.session_state.quiz_mode_active = True
-                                        st.session_state.current_q_index = 0
-                                        st.session_state.quiz_finished = False
-                                        st.session_state.is_retry = False
-                                        st.session_state.quiz_difficulty = att_difficulty
-                                        st.session_state.quiz_time_limit_minutes = 0
-                                        st.session_state.quiz_timer_start = None
-                                        st.rerun()
 
         st.markdown("<br>", unsafe_allow_html=True)
 
