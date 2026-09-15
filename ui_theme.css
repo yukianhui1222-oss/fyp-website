@@ -845,3 +845,15 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 .st-key-knowledge_card_face button { min-height: 300px; padding: 36px !important; border-radius: 24px !important; border: 1px solid #cdbce5 !important; background: linear-gradient(135deg, #f0e8fc, #e9f4fc) !important; box-shadow: 0 8px 24px #70579412 !important; }
 .st-key-quiz_workspace .st-key-knowledge_card_face button p { font-size: 1.3rem !important; line-height: 1.8 !important; color: #423751 !important; white-space: pre-wrap; }
 .st-key-card_known button { background: #e4f3e9 !important; border-color: #aed6bf !important; }
+
+/* Segmented study navigation: retain native radio keyboard semantics. */
+.st-key-quiz_hub_section [role="radiogroup"] { display: flex !important; flex-wrap: nowrap !important; width: 100%; gap: 6px !important; padding: 6px; border: 1px solid #e6e0ef; border-radius: 16px; background: #f5f3f9; box-sizing: border-box; }
+.st-key-quiz_hub_section [role="radiogroup"] label { flex: 1 1 0 !important; min-width: 0; margin: 0 !important; padding: 14px 10px !important; display: flex !important; align-items: center; justify-content: center; border: 1px solid transparent !important; border-radius: 11px !important; background: transparent !important; cursor: pointer; }
+.st-key-quiz_hub_section [role="radiogroup"] label > div:first-child { position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip-path: inset(50%); }
+.st-key-quiz_hub_section [role="radiogroup"] label > div:last-child { padding: 0 !important; margin: 0 !important; }
+.st-key-quiz_hub_section [role="radiogroup"] label p { margin: 0 !important; color: #736980 !important; font-size: 1rem !important; font-weight: 600 !important; text-align: center; }
+.st-key-quiz_hub_section [role="radiogroup"] label:has(input:checked) { background: #eee5fc !important; border-color: #b69ad8 !important; box-shadow: 0 2px 5px #70529410; }
+.st-key-quiz_hub_section [role="radiogroup"] label:has(input:checked) p { color: #60408a !important; font-weight: 750 !important; }
+.st-key-quiz_hub_section [role="radiogroup"] label:hover:not(:has(input:checked)) { background: #ece8f2 !important; }
+.st-key-quiz_hub_section [role="radiogroup"] label:has(input:focus-visible) { outline: 3px solid #9779c1; outline-offset: 2px; }
+@media(max-width:480px) { .st-key-quiz_hub_section [role="radiogroup"] label { padding: 12px 4px !important; } .st-key-quiz_hub_section [role="radiogroup"] label p { font-size: .85rem !important; } }
