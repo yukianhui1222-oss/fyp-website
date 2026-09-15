@@ -5763,5 +5763,21 @@ def main():
 
         st.markdown("<br>", unsafe_allow_html=True)
 
+    st.html("""
+        <footer class="documind-footer" aria-label="About DocuMind">
+            <div class="footer-about">
+                <span class="footer-eyebrow">ABOUT DOCUMIND</span>
+                <h2>A little clarity.<br>A lot more possibility.</h2>
+                <p>DocuMind helps you turn lecture notes and documents into a clearer path to learning — with summaries, translations, mind maps, and quizzes in one place.</p>
+            </div>
+            <div class="footer-purpose">
+                <h3>Made for your study rhythm</h3>
+                <p>Find the key ideas. Explore the connections. Practice what you have learned.</p>
+                <div class="footer-topics"><span>Understand</span><span>Connect</span><span>Practice</span></div>
+            </div>
+            <div class="footer-signoff"><strong>DocuMind <span aria-hidden="true">✦</span></strong><span>Less reading. More understanding.</span></div>
+        </footer>
+    """)
+
 if __name__ == "__main__":
     main()
