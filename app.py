@@ -4262,6 +4262,66 @@ def main():
                     st.button("🗑️ Clear Results", type="secondary", use_container_width=True, disabled=True, key="main_clear_disabled_btn")
 
     if not has_results and not st.session_state.is_processing:
+        with st.container(key="home_continue_learning", border=True):
+            st.markdown("### Pick up where you left off")
+            st.caption("Recently saved documents")
+            recent_docs = saved_docs if uid and not err else []
+            if recent_docs:
+                for recent_index, recent_doc in enumerate(recent_docs[:3]):
+                    if st.button(recent_doc.get("title", "Untitled"), key=f"resume_saved_{recent_index}", use_container_width=True):
+                        recent_id = recent_doc.get("id")
+                        st.session_state.ocr_results = {
+                            'id': recent_id, 'raw_text': recent_doc.get('raw_text', ''),
+                            'summary': recent_doc.get('summary', ''), 'translation': recent_doc.get('translation', ''),
+                            'mindmap_eng': recent_doc.get('mindmap_eng', ''), 'mindmap_trans': recent_doc.get('mindmap_trans', ''),
+                            'time': 0.0, 'lang': recent_doc.get('language', 'Chinese'),
+                            'is_loaded_from_db': True, 'filename': recent_doc.get('title', 'Untitled'),
+                            'chat_history': recent_doc.get('chat_history', '')
+                        }
+                        try:
+                            stored_chat = recent_doc.get('chat_history', '')
+                            st.session_state[f'chat_history_{recent_id}'] = json.loads(stored_chat) if stored_chat else []
+                        except (ValueError, TypeError):
+                            st.session_state[f'chat_history_{recent_id}'] = []
+                        clear_quiz_runtime_state()
+                        for stale_key in ('quiz_data', 'quiz_submitted'):
+                            st.session_state.pop(stale_key, None)
+                        st.session_state.quiz_mode_active = False
+                        st.session_state.is_processing = False
+                        st.rerun()
+            elif uid and err:
+                st.caption("Saved documents could not be loaded. Please try again later.")
+            else:
+                st.caption("Save an analysis to your library and it will appear here.")
+
+        with st.expander("Mistake notebook · Review across documents", expanded=False):
+            # Load on request rather than adding a history request to every home render.
+            if st.button("Open mistake notebook", key="open_mistake_notebook"):
+                notebook_attempts, notebook_error = fetch_quiz_attempts(uid, id_token) if uid else (st.session_state.get('guest_quiz_attempts', []), None)
+                st.session_state['mistake_notebook_data'] = notebook_attempts if not notebook_error else None
+                st.session_state['mistake_notebook_owner'] = uid
+            if st.session_state.get('mistake_notebook_owner') == uid and 'mistake_notebook_data' in st.session_state:
+                notebook_data = st.session_state['mistake_notebook_data']
+                if notebook_data is None:
+                    st.warning("Could not load your quiz history. Try opening the notebook again.")
+                else:
+                    topics = sorted({str(attempt.get('topic', 'General')) for attempt in notebook_data})
+                    selected_topic = st.selectbox("Document", ['All documents'] + topics, key='notebook_topic')
+                    mistakes = [(attempt, answer) for attempt in notebook_data
+                                if selected_topic == 'All documents' or str(attempt.get('topic', 'General')) == selected_topic
+                                for answer in attempt.get('answers', []) if answer.get('is_correct') is False]
+                    st.caption(f"{len(mistakes)} incorrect answers from saved attempts")
+                    if not mistakes:
+                        st.info("No saved mistakes here yet. Completed quizzes will build your notebook.")
+                    for mistake_index, (attempt, answer) in enumerate(mistakes):
+                        with st.container(border=True):
+                            st.caption(str(attempt.get('topic', 'General')))
+                            st.markdown(str(answer.get('question', '')))
+                            st.caption(f"Your answer: {answer.get('user_answer', 'Not answered')}")
+                            if st.checkbox("Reveal answer & explanation", key=f"notebook_reveal_{selected_topic}_{mistake_index}"):
+                                st.success(str(answer.get('correct_answer', '')))
+                                st.markdown(str(answer.get('explanation', '')))
+
         with st.container(key="home_learning_guide"):
             st.html("""
                 <div class="learning-guide-heading"><span>MAKE IT YOURS</span><h2>A little plan for your next study session</h2></div>
