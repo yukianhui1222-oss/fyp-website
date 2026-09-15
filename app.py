@@ -2654,7 +2654,7 @@ def main():
         }
         
         #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
+        footer:not(.documind-footer) {visibility: hidden;}
         
         /* Style the profile container to look like a clean Notion-style profile row */
         div[data-testid="stHorizontalBlock"]:has(.st-key-sidebar_edit_profile_gear_btn) {
