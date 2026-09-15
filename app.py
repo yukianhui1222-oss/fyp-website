@@ -1862,7 +1862,6 @@ def render_quiz_view():
                 
                 with st.container(key="quiz_tutor_launcher"), st.popover("AI Tutor", icon="🎓", help="Ask about the current question. Press Escape or click outside to close."), st.container(key="quiz_tutor_panel"):
                     st.markdown(f"#### AI Tutor · Question {idx + 1}")
-                    st.markdown("<p style='font-size: 0.86rem; color: #475569; margin-bottom: 10px;'>Need further clarification, misconception diagnosis, or option breakdown? Ask the AI Tutor below:</p>", unsafe_allow_html=True)
                     
                     qa_col1, qa_col2, qa_col3 = st.columns(3)
                     tutor_action_prompt = None
@@ -1892,9 +1891,9 @@ def render_quiz_view():
                             else:
                                 tutor_action_prompt = f"Please break down each of these options ({', '.join(opts_list)}), explaining why each incorrect option is a distractor and why '{correct_ans_disp}' is academically defensible."
                     
-                    input_ph = "例如：为什么不能选 C？/ 实际应用场景是什么？" if show_trans else "e.g. Why is option C wrong? / Could you give a practical example?"
-                    inquiry_input = st.text_input("Or enter your question about this quiz item:", placeholder=input_ph, key=f"tutor_custom_input_{idx}")
-                    if st.button("🚀 Ask AI Tutor", key=f"tutor_submit_{idx}", type="primary", use_container_width=False):
+                    input_ph = "问问这道题…" if show_trans else "Ask about this question…"
+                    inquiry_input = st.text_input("Your question", placeholder=input_ph, label_visibility="collapsed", key=f"tutor_custom_input_{idx}")
+                    if st.button("Send", key=f"tutor_submit_{idx}", type="primary", use_container_width=False):
                         if inquiry_input.strip():
                             tutor_action_prompt = inquiry_input.strip()
                     
