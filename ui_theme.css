@@ -751,3 +751,28 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
   .star-three { display: none; }
   .workspace-tags { font-size: .75rem; gap: 8px; }
 }
+
+/* VoltAgent Claude reference adaptation; see DESIGN.md and docs/design/LICENSE. */
+:root { --study-canvas: #faf9f5; --study-line: #e6dfd8; --study-accent: #a9583e; }
+[data-testid="stAppViewContainer"]:has(.workspace-heading, .results-heading, .quiz-answer-heading) { background: var(--study-canvas) !important; }
+.st-key-results_reading { border-color: var(--study-line) !important; box-shadow: none !important; }
+.st-key-results_reading [role="tabpanel"] { padding-top: 24px; }
+.quiz-welcome { background: #252320; border-radius: 16px; }
+.st-key-quiz_workspace .quiz-welcome h3 { font-family: Georgia, 'Times New Roman', serif !important; font-size: clamp(1.8rem, 3.5vw, 2.6rem) !important; font-weight: 400 !important; line-height: 1.15 !important; }
+.quiz-welcome em { color: #e8ad96; }
+.st-key-quiz_workspace .st-key-quiz_setup_card { background: #f5f0e8 !important; border-color: var(--study-line) !important; border-radius: 16px !important; padding: 32px !important; }
+.quiz-form-heading { margin-bottom: 24px; }
+.st-key-quiz_question_card { border-color: var(--study-line) !important; border-radius: 16px !important; box-shadow: none !important; padding: 32px !important; }
+.st-key-quiz_question_card [data-baseweb="radio"] { border-radius: 10px !important; }
+.st-key-quiz_question_card [data-baseweb="radio"]:has(input:checked) { background: #fbede5 !important; border-color: var(--study-accent) !important; box-shadow: inset 3px 0 var(--study-accent); }
+.st-key-quiz_workspace .st-key-generate_quiz_action_btn button,
+.st-key-quiz_answer_workspace button:is([data-testid="stBaseButton-primary"], [data-testid="baseButton-primary"]),
+.st-key-quiz_tutor_launcher [data-testid="stPopover"] button { background: var(--study-accent) !important; border-radius: 12px !important; box-shadow: none !important; }
+.st-key-quiz_workspace .st-key-generate_quiz_action_btn button:disabled,
+.st-key-quiz_answer_workspace button:disabled { opacity: .55 !important; cursor: not-allowed; }
+:is(.st-key-quiz_workspace, .st-key-quiz_answer_workspace, .st-key-quiz_tutor_panel, .st-key-chatbot_container) :focus-visible { outline: 3px solid var(--study-accent) !important; outline-offset: 3px; }
+[data-testid="stPopoverBody"]:has(.st-key-quiz_tutor_panel, .st-key-chatbot_container) { background: var(--study-canvas) !important; border-color: var(--study-line) !important; border-radius: 16px !important; }
+@media (max-width: 640px) {
+  .quiz-welcome, .st-key-quiz_question_card, .st-key-quiz_workspace .st-key-quiz_setup_card { padding: 20px 16px !important; }
+  .st-key-results_reading [role="tabpanel"] { padding-top: 16px; }
+}
