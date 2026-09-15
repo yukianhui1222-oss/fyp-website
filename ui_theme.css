@@ -559,27 +559,38 @@ div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b8
 .st-key-quiz_workspace [class*="st-key-ret_att_"] button { background: #f0ebfa !important; border: 1px solid #ddd3ee !important; box-shadow: none !important; }
 .st-key-quiz_workspace [class*="st-key-ret_att_"] button p { color: #70549c !important; }
 
-/* Four balanced result tabs with an unmistakable selected state. */
+/* Folder-style result tabs: selected tab rises and joins its content sheet. */
 .st-key-results_reading [data-baseweb="tab-list"] {
   display: flex !important;
   width: 100% !important;
   gap: 8px !important;
-  padding: 6px !important;
-  background: #f6f4fb !important;
-  border: 1px solid #e8e2f2 !important;
-  border-radius: 14px !important;
+  padding: 12px 0 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid #cfc3e1 !important;
+  border-radius: 0 !important;
+  align-items: flex-end !important;
 }
 .st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"] {
+  position: relative;
   flex: 1 1 0 !important;
   min-width: 0 !important;
   width: 0 !important;
   justify-content: center !important;
   padding: 12px 8px !important;
-  min-height: 50px !important;
+  min-height: 52px !important;
   height: auto !important;
-  border-radius: 9px !important;
+  border: 1px solid #ddd5e9 !important;
+  border-bottom: none !important;
+  border-radius: 14px 14px 0 0 !important;
+  background: #ede7f5 !important;
   white-space: normal !important;
+  margin: 0 !important;
 }
+.st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-of-type(2) { background: #e7eff9 !important; }
+.st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-of-type(3) { background: #e5f2ec !important; }
+.st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-of-type(4) { background: #f5e9f0 !important; }
 .st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"] p {
   text-align: center !important;
   white-space: normal !important;
@@ -589,18 +600,26 @@ div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b8
   font-weight: 500 !important;
 }
 .st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] {
-  background: #e9dff8 !important;
-  box-shadow: inset 0 -3px 0 #8057bb !important;
+  background: #fff !important;
+  padding-top: 22px !important;
+  padding-bottom: 16px !important;
+  margin-bottom: -1px !important;
+  border-color: #cfc3e1 !important;
+  border-top: 3px solid #9572c3 !important;
+  border-bottom: 1px solid #fff !important;
+  box-shadow: 0 -5px 12px #6550840a !important;
+  z-index: 1;
 }
 .st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] p {
   color: #593789 !important;
   font-weight: 750 !important;
 }
-.st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"]:hover { background: #eee8f7 !important; }
+.st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"]:hover:not([aria-selected="true"]) { filter: brightness(.98); }
 .st-key-results_reading [data-baseweb="tab-highlight"],
 .st-key-results_reading [data-baseweb="tab-border"] { display: none !important; }
 @media (max-width: 600px) {
-  .st-key-results_reading [data-baseweb="tab-list"] { gap: 4px !important; padding: 4px !important; }
-  .st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"] { padding: 10px 4px !important; }
+  .st-key-results_reading [data-baseweb="tab-list"] { gap: 4px !important; }
+  .st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"] { padding: 10px 4px !important; border-radius: 10px 10px 0 0 !important; }
+  .st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] { padding-top: 20px !important; padding-bottom: 14px !important; }
   .st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"] p { font-size: .9rem !important; }
 }
