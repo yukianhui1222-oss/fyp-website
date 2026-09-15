@@ -5117,8 +5117,8 @@ def main():
                 with st.expander("📋 View/Copy Mindmap Markdown Source", expanded=False):
                     st.code(selected_mindmap, language="markdown")
                     
-            with tab4:
-                st.markdown("### 📝 Document-Based Smart Quiz")
+            with tab4, st.container(key="quiz_workspace"):
+                st.markdown("### Practice quiz")
                 st.caption("Test your understanding of the document's core content")
                 
                 # Check user info
@@ -5192,96 +5192,23 @@ def main():
                                 st.rerun()
                         st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
                 
-                # 1. Combined Progression & Configuration Card
-                with st.container(border=True):
-                    if uid:
-                        current_xp = progression.get("xp", 0)
-                        current_level = progression.get("level", 1)
-                        badges = progression.get("badges", [])
-                        
-                        level_xp = current_xp % 500
-                        xp_percent = min(int((level_xp / 500) * 100), 100)
-                        
-                        badge_display_html = ""
-                        badge_meta = {
-                            "first_steps": ("🏅 First Steps", "Completed 1st quiz"),
-                            "perfectionist": ("🏆 Perfectionist", "10/10 on Medium/Hard"),
-                            "speed_demon": ("⚡ Speed Demon", "Quiz in <2 mins with >=8/10 score"),
-                            "persistence": ("💪 Persistence", "100% on Retry Wrong quiz"),
-                            "level_5_master": ("🎓 Level 5 Master", "Reached Level 5"),
-                            "level_10_legend": ("👑 Level 10 Legend", "Reached Level 10")
-                        }
-                        
-                        for b_id in badges:
-                            if b_id in badge_meta:
-                                name, desc = badge_meta[b_id]
-                                badge_display_html += f'<span class="badge-tag" title="{desc}">{name}</span>'
-                                
-                        st.markdown(f"""
-                            <style>
-                            .badge-tag {{
-                                background: rgba(99, 102, 241, 0.1);
-                                color: #6366f1;
-                                padding: 3px 8px;
-                                border-radius: 99px;
-                                font-size: 0.85rem;
-                                font-weight: 700;
-                                border: 1px solid rgba(99, 102, 241, 0.2);
-                                display: inline-block;
-                                margin-left: 6px;
-                                margin-bottom: 2px;
-                            }}
-                            .progression-row {{
-                                display: flex;
-                                justify-content: space-between;
-                                align-items: center;
-                                flex-wrap: wrap;
-                                gap: 12px;
-                                margin-bottom: 8px;
-                            }}
-                            div[class*="st-key-generate_quiz_action_btn"] button,
-                            div[class*="st-key-generate_quiz_action_btn"] button *,
-                            .st-key-generate_quiz_action_btn button,
-                            .st-key-generate_quiz_action_btn button * {{
-                                color: #FFFFFF !important;
-                                font-weight: 700 !important;
-                            }}
-                            </style>
-                            <div class="progression-row">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 1.4rem; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">⚡ Level {current_level}</span>
-                                    <span style="font-size: 0.95rem; color: #64748b; font-weight: 600;">({current_xp} XP Total)</span>
-                                </div>
-                                <div style="font-size: 0.95rem; color: #475569; font-weight: 700;">{level_xp} / 500 XP to next level</div>
-                            </div>
-                            <div style="width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 99px; overflow: hidden; display: flex; margin-bottom: 12px;">
-                                <div style="width: {xp_percent}%; height: 100%; background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%); border-radius: 99px;"></div>
-                            </div>
-                            <div style="display: flex; align-items: center; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.9rem;">
-                                <span style="font-weight: 700; color: #475569;">🏅 Earned Badges:</span>
-                                {badge_display_html if badge_display_html else '<span style="color: #94a3b8; font-style: italic; margin-left: 6px;">No badges unlocked yet.</span>'}
-                            </div>
-                            <div style="border-top: 1px solid rgba(226, 232, 240, 0.6); margin-bottom: 16px;"></div>
-                        """, unsafe_allow_html=True)
-                    else:
-                        st.info("☁️ Log in to save your history, earn XP, and unlock badges!", icon="☁️")
-                        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
-
-                    st.markdown("<h6 style='margin-top: 0; margin-bottom: 14px; color: #1e293b; font-family: \"Poppins\", sans-serif; font-weight: 700; font-size: 1.15rem;'>⚙️ Configure New Custom Quiz</h6>", unsafe_allow_html=True)
+                # Keep quiz creation as the primary action.
+                with st.container(border=False, key="quiz_setup_card"):
+                    st.markdown("<h6 style='margin-top: 0; margin-bottom: 14px; color: #1e293b; font-family: \"Poppins\", sans-serif; font-weight: 700; font-size: 1.15rem;'>Start a new quiz</h6>", unsafe_allow_html=True)
                     
                     config_col1, config_col2, config_col3 = st.columns([1, 1, 1])
                     
                     with config_col1:
-                        quiz_difficulty = st.selectbox("🎯 Difficulty Level", ["Easy", "Medium", "Hard"], index=1, help="Adjusts question vocabulary, complexity, and proof-reasoning requirements.")
+                        quiz_difficulty = st.selectbox("Difficulty", ["Easy", "Medium", "Hard"], index=1, help="Adjusts question vocabulary, complexity, and proof-reasoning requirements.")
                     with config_col2:
-                        timer_option = st.selectbox("⏱️ Time Limit", ["No Limit", "5 Minutes", "10 Minutes", "15 Minutes"], index=0, help="Optional countdown timer to challenge your speed.")
+                        timer_option = st.selectbox("Time limit", ["No Limit", "5 Minutes", "10 Minutes", "15 Minutes"], index=0, help="Optional countdown timer to challenge your speed.")
                     with config_col3:
-                        target_lang = st.selectbox("🌐 Translation Language", ["Chinese", "Malay", "Japanese", "French", "Spanish", "Korean", "German", "Tamil", "Hindi"])
+                        target_lang = st.selectbox("Translation", ["Chinese", "Malay", "Japanese", "French", "Spanish", "Korean", "German", "Tamil", "Hindi"])
                         
                     st.session_state.quiz_target_lang = target_lang
                     st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
                     
-                    if st.button("🚀 Generate Custom Quiz", type="primary", use_container_width=True, key="generate_quiz_action_btn"):
+                    if st.button("Generate quiz", type="primary", use_container_width=True, key="generate_quiz_action_btn"):
                         with st.spinner(f"AI is generating a [{quiz_difficulty}] quiz with [{timer_option}] time limit, please wait..."):
                             from summarizer import generate_quiz
                             raw_json, err = generate_quiz(summary_result, api_key, target_lang, quiz_difficulty)
@@ -5360,193 +5287,269 @@ def main():
                                     with st.expander("Show Raw LLM Output"):
                                         st.text(raw_json)
 
+                with st.expander("Your level & badges", expanded=False):
+                    if uid:
+                        current_xp = progression.get("xp", 0)
+                        current_level = progression.get("level", 1)
+                        badges = progression.get("badges", [])
+                        
+                        level_xp = current_xp % 500
+                        xp_percent = min(int((level_xp / 500) * 100), 100)
+                        
+                        badge_display_html = ""
+                        badge_meta = {
+                            "first_steps": ("🏅 First Steps", "Completed 1st quiz"),
+                            "perfectionist": ("🏆 Perfectionist", "10/10 on Medium/Hard"),
+                            "speed_demon": ("⚡ Speed Demon", "Quiz in <2 mins with >=8/10 score"),
+                            "persistence": ("💪 Persistence", "100% on Retry Wrong quiz"),
+                            "level_5_master": ("🎓 Level 5 Master", "Reached Level 5"),
+                            "level_10_legend": ("👑 Level 10 Legend", "Reached Level 10")
+                        }
+
+                        for b_id in badges:
+                            if b_id in badge_meta:
+                                name, desc = badge_meta[b_id]
+                                badge_display_html += f'<span class="badge-tag" title="{desc}">{name}</span>'
+                                
+                        st.markdown(f"""
+                            <style>
+                            .badge-tag {{
+                                background: rgba(99, 102, 241, 0.1);
+                                color: #6366f1;
+                                padding: 3px 8px;
+                                border-radius: 99px;
+                                font-size: 0.85rem;
+                                font-weight: 700;
+                                border: 1px solid rgba(99, 102, 241, 0.2);
+                                display: inline-block;
+                                margin-left: 6px;
+                                margin-bottom: 2px;
+                            }}
+                            .progression-row {{
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                flex-wrap: wrap;
+                                gap: 12px;
+                                margin-bottom: 8px;
+                            }}
+                            div[class*="st-key-generate_quiz_action_btn"] button,
+                            div[class*="st-key-generate_quiz_action_btn"] button *,
+                            .st-key-generate_quiz_action_btn button,
+                            .st-key-generate_quiz_action_btn button * {{
+                                color: #FFFFFF !important;
+                                font-weight: 700 !important;
+                            }}
+                            </style>
+                            <div class="progression-row">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 1.4rem; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">⚡ Level {current_level}</span>
+                                    <span style="font-size: 0.95rem; color: #64748b; font-weight: 600;">({current_xp} XP Total)</span>
+                                </div>
+                                <div style="font-size: 0.95rem; color: #475569; font-weight: 700;">{level_xp} / 500 XP to next level</div>
+                            </div>
+                            <div style="width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 99px; overflow: hidden; display: flex; margin-bottom: 12px;">
+                                <div style="width: {xp_percent}%; height: 100%; background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%); border-radius: 99px;"></div>
+                            </div>
+                            <div style="display: flex; align-items: center; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.9rem;">
+                                <span style="font-weight: 700; color: #475569;">🏅 Earned Badges:</span>
+                                {badge_display_html if badge_display_html else '<span style="color: #94a3b8; font-style: italic; margin-left: 6px;">No badges unlocked yet.</span>'}
+                            </div>
+                            <div style="border-top: 1px solid rgba(226, 232, 240, 0.6); margin-bottom: 16px;"></div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.info("☁️ Log in to save your history, earn XP, and unlock badges!", icon="☁️")
+                        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+
+
                 # 2. Performance Analytics
                 if history:
-                    st.markdown("<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;'>", unsafe_allow_html=True)
-                    st.markdown("#### 📊 Quiz Analytics & Insights")
-                    # Calculate total stats
-                    total_quizzes = len(history)
-                    total_correct = 0
-                    total_questions = 0
-                    difficulty_counts = {"Easy": 0, "Medium": 0, "Hard": 0}
-                    total_xp_earned = 0
-                    scores = []
-                    
-                    for att in history:
-                        total_correct += att.get("score", 0)
-                        total_questions += att.get("total_questions", 10)
-                        diff = att.get("difficulty", "Medium")
-                        difficulty_counts[diff] = difficulty_counts.get(diff, 0) + 1
-                        total_xp_earned += att.get("xp_earned", 0)
-                        scores.append(att.get("score", 0))
-                        
-                    total_incorrect = max(0, total_questions - total_correct)
-                    correct_percent = (total_correct / total_questions * 100) if total_questions else 0
-                    incorrect_percent = 100 - correct_percent if total_questions else 0
-                    
-                    # Find preferred difficulty
-                    pref_difficulty = max(difficulty_counts, key=difficulty_counts.get) if total_quizzes > 0 else "Medium"
-                    avg_duration = sum(att.get("time_taken_seconds", 0) for att in history) // max(1, total_quizzes)
-                    
-                    # Average score math
-                    avg_score = total_correct / total_quizzes if total_quizzes else 0
-                    avg_total = total_questions / total_quizzes if total_quizzes else 10
-                    
-                    # Custom Visual Stacked Bar
-                    st.markdown(f"""<style>
-.accuracy-container {{
-background: #ffffff;
-border: 1px solid #e2e8f0;
-border-radius: 12px;
-padding: 18px;
-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
-margin-bottom: 15px;
-}}
-.accuracy-bar-wrapper {{
-display: flex;
-width: 100%;
-height: 24px;
-border-radius: 99px;
-overflow: hidden;
-background: #f1f5f9;
-margin: 12px 0;
-}}
-.accuracy-bar-correct {{
-width: {correct_percent}%;
-background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-color: white;
-font-size: 0.9rem;
-font-weight: 700;
-line-height: 24px;
-text-align: center;
-transition: width 0.3s ease;
-}}
-.accuracy-bar-incorrect {{
-width: {incorrect_percent}%;
-background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
-color: white;
-font-size: 0.9rem;
-font-weight: 700;
-line-height: 24px;
-text-align: center;
-transition: width 0.3s ease;
-}}
-.stat-grid-mini {{
-display: grid;
-grid-template-columns: repeat(3, 1fr);
-gap: 10px;
-margin-top: 15px;
-}}
-.stat-item-mini {{
-text-align: center;
-padding: 8px;
-background: #f8fafc;
-border-radius: 8px;
-border: 1px dashed #e2e8f0;
-}}
-.stat-val-mini {{
-font-size: 1.3rem;
-font-weight: 800;
-color: #1e293b;
-}}
-.stat-lbl-mini {{
-font-size: 0.82rem;
-color: #64748b;
-font-weight: 600;
-text-transform: uppercase;
-}}
-</style>
-<div class="accuracy-container">
-<div style="display: flex; justify-content: space-between; align-items: center;">
-<span style="font-size: 1.0rem; font-weight: 700; color: #334155;">Answer Accuracy Breakdown</span>
-<span style="font-size: 0.95rem; font-weight: 800; color: #10b981;">{correct_percent:.1f}% Correct</span>
-</div>
-<div class="accuracy-bar-wrapper">
-{"<div class='accuracy-bar-correct'>" + f"{total_correct} Correct</div>" if correct_percent > 0 else ""}
-{"<div class='accuracy-bar-incorrect'>" + f"{total_incorrect} Incorrect</div>" if incorrect_percent > 0 else ""}
-{"" if total_questions > 0 else "<div style='width: 100%; color: #94a3b8; font-size: 0.85rem; line-height: 24px; text-align: center; font-style: italic;'>No answers recorded yet</div>"}
-</div>
-<div class="stat-grid-mini">
-<div class="stat-item-mini">
-<div class="stat-val-mini">🎯 {total_quizzes}</div>
-<div class="stat-lbl-mini">Total Quizzes</div>
-</div>
-<div class="stat-item-mini">
-<div class="stat-val-mini">⚡ {pref_difficulty}</div>
-<div class="stat-lbl-mini">Preferred Diff</div>
-</div>
-<div class="stat-item-mini">
-<div class="stat-val-mini">⏱️ {avg_duration}s</div>
-<div class="stat-lbl-mini">Avg Duration</div>
-</div>
-</div>
-</div>""", unsafe_allow_html=True)
-                    
-                    st.markdown(f"""<div style="display: flex; gap: 15px; margin-top: 10px;">
-<div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
-<div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Average Score</div>
-<div style="font-size: 1.35rem; font-weight: 800; color: #4f46e5;">{avg_score:.1f}/{avg_total:.0f}</div>
-</div>
-<div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
-<div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Total Quiz XP</div>
-<div style="font-size: 1.35rem; font-weight: 800; color: #8b5cf6;">{total_xp_earned} XP</div>
-</div>
-<div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
-<div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">High / Low Score</div>
-<div style="font-size: 1.35rem; font-weight: 800; color: #f59e0b;">{max(scores)} / {min(scores)}</div>
-</div>
-</div>""", unsafe_allow_html=True)
-                    
-                    st.markdown("<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;'>", unsafe_allow_html=True)
-                    st.markdown("<div style='font-size: 1.1rem; font-weight: 700; color: #475569; margin-bottom: 10px;'>🎯 Topic Mastery & Study Guide</div>", unsafe_allow_html=True)
-                    
-                    # Process wrong answers by topic_tag
-                    topic_correct = {}
-                    topic_total = {}
-                    for att in history:
-                        for ans in att.get("answers", []):
-                            t_tag = ans.get("topic_tag", "General")
-                            topic_total[t_tag] = topic_total.get(t_tag, 0) + 1
-                            if ans.get("is_correct", False):
-                                topic_correct[t_tag] = topic_correct.get(t_tag, 0) + 1
-                                
-                    topic_mastery = []
-                    for t_tag in topic_total:
-                        correct = topic_correct.get(t_tag, 0)
-                        total = topic_total[t_tag]
-                        mastery = (correct / total) * 100
-                        topic_mastery.append({
-                            "topic": t_tag,
-                            "mastery": mastery,
-                            "mistakes": total - correct
-                        })
-                        
-                    # Sort by mastery ascending (weakest first)
-                    topic_mastery.sort(key=lambda x: x["mastery"])
-                    
-                    weak_count = 0
-                    weak_topics_to_show = [tm for tm in topic_mastery if tm["mastery"] < 80]
-                    
-                    if weak_topics_to_show:
-                        num_cols = min(2, len(weak_topics_to_show))
-                        weak_cols = st.columns(num_cols)
-                        for idx_w, tm in enumerate(weak_topics_to_show[:2]):
-                            with weak_cols[idx_w]:
-                                st.markdown(f"""
-                                    <div style="background: rgba(239, 68, 68, 0.04); border-left: 3px solid #ef4444; border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; height: 100%;">
-                                        <div style="font-size: 0.95rem; font-weight: 700; color: #ef4444;">⚠️ Weak Topic: {tm['topic']} ({tm['mastery']:.0f}% mastery)</div>
-                                        <div style="font-size: 0.85rem; color: #64748b; margin-top: 3px;">Recommendation: Review related sections in the current document. Ask AI for detailed concept breakdown of '{tm['topic']}'.</div>
-                                    </div>
-                                """, unsafe_allow_html=True)
-                                weak_count += 1
-                                
-                    if weak_count == 0:
-                        st.success("🌟 Excellent! You have achieved >80% mastery in all topics. Keep maintaining this streak!", icon="✨")
+                    with st.expander("Performance & study insights", expanded=False):
+                        st.markdown("<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;'>", unsafe_allow_html=True)
+                        # Calculate total stats
+                        total_quizzes = len(history)
+                        total_correct = 0
+                        total_questions = 0
+                        difficulty_counts = {"Easy": 0, "Medium": 0, "Hard": 0}
+                        total_xp_earned = 0
+                        scores = []
+
+                        for att in history:
+                            total_correct += att.get("score", 0)
+                            total_questions += att.get("total_questions", 10)
+                            diff = att.get("difficulty", "Medium")
+                            difficulty_counts[diff] = difficulty_counts.get(diff, 0) + 1
+                            total_xp_earned += att.get("xp_earned", 0)
+                            scores.append(att.get("score", 0))
+
+                        total_incorrect = max(0, total_questions - total_correct)
+                        correct_percent = (total_correct / total_questions * 100) if total_questions else 0
+                        incorrect_percent = 100 - correct_percent if total_questions else 0
+
+                        # Find preferred difficulty
+                        pref_difficulty = max(difficulty_counts, key=difficulty_counts.get) if total_quizzes > 0 else "Medium"
+                        avg_duration = sum(att.get("time_taken_seconds", 0) for att in history) // max(1, total_quizzes)
+
+                        # Average score math
+                        avg_score = total_correct / total_quizzes if total_quizzes else 0
+                        avg_total = total_questions / total_quizzes if total_quizzes else 10
+
+                        # Custom Visual Stacked Bar
+                        st.markdown(f"""<style>
+    .accuracy-container {{
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    margin-bottom: 15px;
+    }}
+    .accuracy-bar-wrapper {{
+    display: flex;
+    width: 100%;
+    height: 24px;
+    border-radius: 99px;
+    overflow: hidden;
+    background: #f1f5f9;
+    margin: 12px 0;
+    }}
+    .accuracy-bar-correct {{
+    width: {correct_percent}%;
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 24px;
+    text-align: center;
+    transition: width 0.3s ease;
+    }}
+    .accuracy-bar-incorrect {{
+    width: {incorrect_percent}%;
+    background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 24px;
+    text-align: center;
+    transition: width 0.3s ease;
+    }}
+    .stat-grid-mini {{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+    }}
+    .stat-item-mini {{
+    text-align: center;
+    padding: 8px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px dashed #e2e8f0;
+    }}
+    .stat-val-mini {{
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #1e293b;
+    }}
+    .stat-lbl-mini {{
+    font-size: 0.82rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    }}
+    </style>
+    <div class="accuracy-container">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+    <span style="font-size: 1.0rem; font-weight: 700; color: #334155;">Answer Accuracy Breakdown</span>
+    <span style="font-size: 0.95rem; font-weight: 800; color: #10b981;">{correct_percent:.1f}% Correct</span>
+    </div>
+    <div class="accuracy-bar-wrapper">
+    {"<div class='accuracy-bar-correct'>" + f"{total_correct} Correct</div>" if correct_percent > 0 else ""}
+    {"<div class='accuracy-bar-incorrect'>" + f"{total_incorrect} Incorrect</div>" if incorrect_percent > 0 else ""}
+    {"" if total_questions > 0 else "<div style='width: 100%; color: #94a3b8; font-size: 0.85rem; line-height: 24px; text-align: center; font-style: italic;'>No answers recorded yet</div>"}
+    </div>
+    <div class="stat-grid-mini">
+    <div class="stat-item-mini">
+    <div class="stat-val-mini">🎯 {total_quizzes}</div>
+    <div class="stat-lbl-mini">Total Quizzes</div>
+    </div>
+    <div class="stat-item-mini">
+    <div class="stat-val-mini">⚡ {pref_difficulty}</div>
+    <div class="stat-lbl-mini">Preferred Diff</div>
+    </div>
+    <div class="stat-item-mini">
+    <div class="stat-val-mini">⏱️ {avg_duration}s</div>
+    <div class="stat-lbl-mini">Avg Duration</div>
+    </div>
+    </div>
+    </div>""", unsafe_allow_html=True)
+
+                        st.markdown(f"""<div style="display: flex; gap: 15px; margin-top: 10px;">
+    <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
+    <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Average Score</div>
+    <div style="font-size: 1.35rem; font-weight: 800; color: #4f46e5;">{avg_score:.1f}/{avg_total:.0f}</div>
+    </div>
+    <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
+    <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Total Quiz XP</div>
+    <div style="font-size: 1.35rem; font-weight: 800; color: #8b5cf6;">{total_xp_earned} XP</div>
+    </div>
+    <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
+    <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">High / Low Score</div>
+    <div style="font-size: 1.35rem; font-weight: 800; color: #f59e0b;">{max(scores)} / {min(scores)}</div>
+    </div>
+    </div>""", unsafe_allow_html=True)
+
+                        st.markdown("<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;'>", unsafe_allow_html=True)
+                        st.markdown("<div style='font-size: 1.1rem; font-weight: 700; color: #475569; margin-bottom: 10px;'>🎯 Topic Mastery & Study Guide</div>", unsafe_allow_html=True)
+
+                        # Process wrong answers by topic_tag
+                        topic_correct = {}
+                        topic_total = {}
+                        for att in history:
+                            for ans in att.get("answers", []):
+                                t_tag = ans.get("topic_tag", "General")
+                                topic_total[t_tag] = topic_total.get(t_tag, 0) + 1
+                                if ans.get("is_correct", False):
+                                    topic_correct[t_tag] = topic_correct.get(t_tag, 0) + 1
+
+                        topic_mastery = []
+                        for t_tag in topic_total:
+                            correct = topic_correct.get(t_tag, 0)
+                            total = topic_total[t_tag]
+                            mastery = (correct / total) * 100
+                            topic_mastery.append({
+                                "topic": t_tag,
+                                "mastery": mastery,
+                                "mistakes": total - correct
+                            })
+
+                        # Sort by mastery ascending (weakest first)
+                        topic_mastery.sort(key=lambda x: x["mastery"])
+
+                        weak_count = 0
+                        weak_topics_to_show = [tm for tm in topic_mastery if tm["mastery"] < 80]
+
+                        if weak_topics_to_show:
+                            num_cols = min(2, len(weak_topics_to_show))
+                            weak_cols = st.columns(num_cols)
+                            for idx_w, tm in enumerate(weak_topics_to_show[:2]):
+                                with weak_cols[idx_w]:
+                                    st.markdown(f"""
+                                        <div style="background: rgba(239, 68, 68, 0.04); border-left: 3px solid #ef4444; border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; height: 100%;">
+                                            <div style="font-size: 0.95rem; font-weight: 700; color: #ef4444;">⚠️ Weak Topic: {tm['topic']} ({tm['mastery']:.0f}% mastery)</div>
+                                            <div style="font-size: 0.85rem; color: #64748b; margin-top: 3px;">Recommendation: Review related sections in the current document. Ask AI for detailed concept breakdown of '{tm['topic']}'.</div>
+                                        </div>
+                                    """, unsafe_allow_html=True)
+                                    weak_count += 1
+
+                        if weak_count == 0:
+                            st.success("🌟 Excellent! You have achieved >80% mastery in all topics. Keep maintaining this streak!", icon="✨")
+
 
                 # 4. Quiz History List
                 if history:
                     st.markdown("<div style='margin-top: 25px;'></div>", unsafe_allow_html=True)
-                    st.markdown("#### 📚 Quiz History (Recent Attempts)")
+                    st.markdown("#### Recent attempts")
                     
                     # Custom CSS to align elements nicely
                     st.markdown("""

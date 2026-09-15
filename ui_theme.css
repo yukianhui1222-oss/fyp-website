@@ -548,3 +548,13 @@ div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b8
 .study-chat-empty span { color: #756d83; font-size: .9rem; }
 .st-key-chatbot_container [data-testid="stChatInput"] { border: 1px solid #e6e1ee !important; box-shadow: none !important; border-radius: 14px !important; }
 .st-key-chatbot_container [data-testid="stChatInput"] textarea { font-size: 1rem !important; font-weight: 400 !important; }
+
+/* Quiz landing view: one primary action, optional supporting detail. */
+.st-key-quiz_workspace { padding-top: 12px; }
+.st-key-quiz_setup_card { background: #f8f7fc !important; border: none !important; border-radius: 16px !important; padding: 22px !important; margin: 8px 0 18px; box-shadow: none !important; }
+.st-key-quiz_workspace [data-testid="stExpander"] details { background: #fff !important; border: 1px solid #ebe7f2 !important; border-radius: 12px !important; }
+.st-key-quiz_workspace [data-testid="stExpander"] summary p { color: #625877 !important; font-weight: 600 !important; }
+.st-key-quiz_workspace .history-row { border: none !important; border-bottom: 1px solid #ebe7f2 !important; border-radius: 0 !important; box-shadow: none !important; padding: 16px 0 !important; }
+.st-key-quiz_workspace [data-testid="stVerticalBlock"]:has(> [data-testid="stHorizontalBlock"] [class*="st-key-rev_att_"]) { box-shadow: none !important; }
+.st-key-quiz_workspace [class*="st-key-ret_att_"] button { background: #f0ebfa !important; border: 1px solid #ddd3ee !important; box-shadow: none !important; }
+.st-key-quiz_workspace [class*="st-key-ret_att_"] button p { color: #70549c !important; }
