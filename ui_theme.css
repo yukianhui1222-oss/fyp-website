@@ -488,3 +488,41 @@ div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b8
   .st-key-results_reading { padding: 18px 16px !important; border-radius: 16px; }
   .st-key-results_reading [data-baseweb="tab-list"] { gap: 18px !important; }
 }
+
+/* On-demand study drawer, anchored to the right edge of the viewport. */
+.st-key-study_assistant_launcher {
+  position: fixed !important;
+  right: 24px !important;
+  bottom: 24px !important;
+  width: auto !important;
+  z-index: 999990 !important;
+}
+.st-key-study_assistant_launcher [data-testid="stPopover"] button {
+  background: linear-gradient(115deg, #6650c8, #8051c9 52%, #ab397f) !important;
+  border: 1px solid #ffffff70 !important;
+  border-radius: 18px !important;
+  min-height: 52px;
+  padding: 12px 20px !important;
+  box-shadow: 0 8px 28px #6650c833 !important;
+}
+.st-key-study_assistant_launcher button p,
+.st-key-study_assistant_launcher button svg { color: #fff !important; }
+[data-testid="stPopoverBody"]:has(.st-key-chatbot_container) {
+  width: min(440px, calc(100vw - 32px)) !important;
+  max-width: calc(100vw - 32px) !important;
+  max-height: calc(100dvh - 180px) !important;
+  overflow-y: auto !important;
+  padding: 16px !important;
+  background: #fff !important;
+  border: 1px solid #ded7ee !important;
+  border-radius: 22px !important;
+  box-shadow: 0 20px 70px #3c2c6429 !important;
+}
+[data-testid="stPopoverBody"] .st-key-chatbot_container { padding: 0 !important; }
+[data-testid="stPopoverBody"] .st-key-chatbot_container [data-testid="stVerticalBlockBorderWrapper"]:has([data-testid="stChatMessage"]) { max-height: 36dvh !important; }
+[data-testid="stPopoverBody"] .st-key-chatbot_container [data-testid="stChatInput"] { position: relative !important; bottom: auto !important; }
+.block-container:has(.results-heading) { padding-bottom: 110px !important; }
+@media (max-width: 640px) {
+  .st-key-study_assistant_launcher { right: 16px !important; bottom: 16px !important; }
+  [data-testid="stPopoverBody"]:has(.st-key-chatbot_container) { max-height: calc(100dvh - 150px) !important; }
+}

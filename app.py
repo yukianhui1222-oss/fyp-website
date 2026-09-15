@@ -1329,7 +1329,7 @@ def render_left_panel(raw_text, summary_result, api_key, results):
     st.markdown("<hr style='margin: 0.5rem 0; opacity: 0.1;'>", unsafe_allow_html=True)
     
     # Chat Messages Container
-    chat_container = st.container(height=450)
+    chat_container = st.container(height=220)
     with chat_container:
         if len(st.session_state[chat_history_key]) == 0:
             st.info("👋 Ask anything about these lecture notes!")
@@ -4566,9 +4566,10 @@ def main():
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        with st.expander("Study assistant · Ask about this document", expanded=False):
-            with st.container(key="chatbot_container"):
-                render_left_panel(raw_text, summary_result, api_key, results)
+        with st.container(key="study_assistant_launcher"):
+            with st.popover("Study assistant", icon="💬", help="Open your study assistant. Click outside the panel or press Escape to close."):
+                with st.container(key="chatbot_container"):
+                    render_left_panel(raw_text, summary_result, api_key, results)
 
         with st.container(key="results_reading"):
             tab1, tab2, tab3, tab4 = st.tabs(["Summary", f"{result_lang} translation", "Mind map", "Quiz"])
