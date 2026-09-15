@@ -857,3 +857,14 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 .st-key-quiz_hub_section [role="radiogroup"] label:hover:not(:has(input:checked)) { background: #ece8f2 !important; }
 .st-key-quiz_hub_section [role="radiogroup"] label:has(input:focus-visible) { outline: 3px solid #9779c1; outline-offset: 2px; }
 @media(max-width:480px) { .st-key-quiz_hub_section [role="radiogroup"] label { padding: 12px 4px !important; } .st-key-quiz_hub_section [role="radiogroup"] label p { font-size: .85rem !important; } }
+
+/* Native equal-width buttons avoid version-dependent radio label markup. */
+.st-key-quiz_hub_buttons { width: 100% !important; padding: 6px !important; background: #f5f3f9; border: 1px solid #e6e0ef; border-radius: 16px; margin-bottom: 22px; }
+.st-key-quiz_hub_buttons [data-testid="stHorizontalBlock"] { flex-wrap: nowrap !important; gap: 6px !important; }
+.st-key-quiz_hub_buttons [data-testid="stColumn"] { flex: 1 1 0 !important; min-width: 0 !important; width: 0 !important; }
+.st-key-quiz_hub_buttons button { width: 100% !important; min-height: 52px; padding: 10px 6px !important; border-radius: 11px !important; box-shadow: none !important; background: transparent !important; border: 1px solid transparent !important; }
+.st-key-quiz_hub_buttons button p { white-space: nowrap !important; font-size: 1rem !important; color: #736980 !important; }
+.st-key-quiz_hub_buttons button[kind="primary"] { background: #eee5fc !important; border-color: #b69ad8 !important; }
+.st-key-quiz_hub_buttons button[kind="primary"] p { color: #60408a !important; font-weight: 750 !important; }
+.st-key-quiz_hub_buttons button:focus-visible { outline: 3px solid #9779c1 !important; outline-offset: 2px; }
+@media(max-width:480px) { .st-key-quiz_hub_buttons button p { font-size: .8rem !important; } }

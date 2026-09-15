@@ -5307,7 +5307,14 @@ def main():
                     
             with tab4, st.container(key="quiz_workspace"):
                 st.html('<div class="quiz-hub-heading"><span>YOUR STUDY SPACE</span><h3>Practice at your own pace</h3><p>Choose a quiz, review cards, or revisit your progress.</p></div>')
-                quiz_section = st.radio("Study activity", ["Quiz", "Flashcards", "Study record"], horizontal=True, label_visibility="collapsed", key="quiz_hub_section")
+                quiz_section = st.session_state.get("quiz_hub_section", "Quiz")
+                def select_quiz_section(section):
+                    st.session_state.quiz_hub_section = section
+                with st.container(key="quiz_hub_buttons"):
+                    activity_columns = st.columns(3, gap="small")
+                    for activity_column, activity in zip(activity_columns, ["Quiz", "Flashcards", "Study record"]):
+                        with activity_column:
+                            st.button(activity, key=f"quiz_activity_{activity}", type="primary" if quiz_section == activity else "secondary", use_container_width=True, on_click=select_quiz_section, args=(activity,))
                 if quiz_section == "Flashcards":
                     render_flashcards(summary_result, api_key, result_lang)
                 
