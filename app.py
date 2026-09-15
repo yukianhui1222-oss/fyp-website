@@ -5395,7 +5395,7 @@ def main():
                         avg_total = total_questions / total_quizzes if total_quizzes else 10
 
                         # Custom Visual Stacked Bar
-                        st.markdown(f"""<style>
+                        st.html(f"""<style>
     .accuracy-container {{
     background: #ffffff;
     border: 1px solid #e2e8f0;
@@ -5482,9 +5482,9 @@ def main():
     <div class="stat-lbl-mini">Avg Duration</div>
     </div>
     </div>
-    </div>""", unsafe_allow_html=True)
+    </div>""")
 
-                        st.markdown(f"""<div style="display: flex; gap: 15px; margin-top: 10px;">
+                        st.html(f"""<div style="display: flex; gap: 15px; margin-top: 10px;">
     <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; text-align: center;">
     <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Average Score</div>
     <div style="font-size: 1.35rem; font-weight: 800; color: #4f46e5;">{avg_score:.1f}/{avg_total:.0f}</div>
@@ -5497,7 +5497,7 @@ def main():
     <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">High / Low Score</div>
     <div style="font-size: 1.35rem; font-weight: 800; color: #f59e0b;">{max(scores)} / {min(scores)}</div>
     </div>
-    </div>""", unsafe_allow_html=True)
+    </div>""")
 
                         st.markdown("<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;'>", unsafe_allow_html=True)
                         st.markdown("<div style='font-size: 1.1rem; font-weight: 700; color: #475569; margin-bottom: 10px;'>🎯 Topic Mastery & Study Guide</div>", unsafe_allow_html=True)
