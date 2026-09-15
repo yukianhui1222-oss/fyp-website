@@ -117,7 +117,7 @@ div[data-baseweb="tab-list"] button { min-height: 42px !important; white-space: 
 }
 
 /* Soft lavender, sky and mint surfaces echo the spectrum wordmark. */
-[data-testid="stAppViewContainer"]:has(.workspace-title) {
+[data-testid="stAppViewContainer"]:has(.workspace-title, .quiz-answer-heading) {
   background: radial-gradient(ellipse at 15% 8%, #e5dcfb 0, transparent 52%),
     radial-gradient(ellipse at 90% 25%, #dcedfc 0, transparent 50%),
     radial-gradient(ellipse at 65% 95%, #dff4ed 0, transparent 55%), #f7f8fd !important;
@@ -687,7 +687,6 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 }
 
 /* Focused answer screen, using the warm quiz palette. */
-[data-testid="stAppViewContainer"]:has(.quiz-answer-heading) { background: radial-gradient(ellipse at 15% 5%, #f3e5dc, transparent 55%), #faf8f5 !important; }
 .quiz-answer-heading { padding: 24px 0 22px; }
 .quiz-answer-heading > span { color: #a16a50; font-size: .75rem; font-weight: 650; letter-spacing: .14em; }
 .quiz-answer-heading h1 { font-size: clamp(1.8rem, 4vw, 2.5rem) !important; font-weight: 650 !important; color: #302924 !important; letter-spacing: -.04em; margin: 8px 0 !important; padding: 0 !important; }
