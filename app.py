@@ -3630,19 +3630,13 @@ def main():
             background: transparent !important;
         }
 
-        /* AI Study Assistant Chatbot Card Container styling */
-        div[class*="st-key-chatbot_container"],
-        div[data-testid="stBorderedContainer"][class*="st-key-chatbot_container"],
-        div[class*="st-key-chatbot_container"] div[data-testid="stBorderedContainer"],
-        div[data-testid="column"] div[class*="st-key-chatbot_container"],
-        div[data-testid="stHorizontalBlock"] div[data-testid="column"]:last-child div[data-testid="stBorderedContainer"],
-        div[data-testid="stHorizontalBlock"] div[data-testid="column"]:last-of-type div[data-testid="stBorderedContainer"] {
-            background-color: #FFFFFF !important;
-            border: 1px solid #E5E7EB !important;
-            border-radius: 16px !important;
-            padding: 24px !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
-            margin-bottom: 1.5rem !important;
+        /* The assistant uses the popover shell; no nested card around its title. */
+        div.st-key-chatbot_container {
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            margin-bottom: 0 !important;
         }
 
         /* st.popover body container: Force white background, border and light theme text/contents */
