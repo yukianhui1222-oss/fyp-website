@@ -1758,6 +1758,8 @@ def render_quiz_view():
         with t_col2:
             show_trans = st.toggle("Translate", key="quiz_translate_toggle")
 
+        answered_count = sum(bool(st.session_state.get(f'q_submitted_{i}', False) or review_mode) for i in range(total_q))
+        st.html(f'<div class="quiz-journey"><span>✦ YOUR LEARNING JOURNEY</span><strong>{answered_count} / {total_q} answered</strong></div>')
         st.progress((idx + 1) / total_q)
         
         # Horizontal Question Tracker Grid
@@ -1792,7 +1794,8 @@ def render_quiz_view():
             
             # Show topic tag inside card
             q_topic = q.get('topic_tag', 'General')
-            st.markdown(f"<span style='background-color: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;'>🏷️ {q_topic}</span>", unsafe_allow_html=True)
+            from html import escape
+            st.html(f'<div class="question-identity"><div class="question-number"><small>QUESTION</small><strong>{idx + 1:02d}</strong></div><span class="question-topic">✦ {escape(str(q_topic))}</span><span class="question-flourish" aria-hidden="true">✧</span></div>')
             st.markdown(f"<h3 style='margin-top: 8px; line-height: 1.4;'>{question_text}</h3>", unsafe_allow_html=True)
             st.markdown("<br>", unsafe_allow_html=True)
             

@@ -775,3 +775,27 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
   .quiz-welcome, .st-key-quiz_question_card, .st-key-quiz_workspace .st-key-quiz_setup_card { padding: 20px 16px !important; }
   .st-key-results_reading [role="tabpanel"] { padding-top: 16px; }
 }
+
+/* Stationery-inspired question card: small accents, generous reading space. */
+.quiz-journey { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: #706284; font-size: .85rem; }
+.quiz-journey > span { font-weight: 700; letter-spacing: .07em; }
+.quiz-journey strong { color: #6551a1; font-weight: 600; }
+.question-identity { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+.question-number { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 76px; height: 82px; flex-shrink: 0; border-radius: 14px 14px 24px 14px; background: linear-gradient(145deg, #ece7ff, #f9e9ef); color: #6650a3; transform: rotate(-3deg); }
+.question-number small { font-size: .6rem; font-weight: 750; letter-spacing: .1em; }
+.question-number strong { font-size: 2rem; line-height: 1.2; }
+.question-topic { background: #edf4f8; border: 1px solid #dce8ef; color: #456578; border-radius: 99px; padding: 7px 14px; font-size: .9rem; font-weight: 600; overflow-wrap: anywhere; }
+.question-flourish { margin-left: auto; color: #d7b174; font-size: 2.6rem; padding-right: 8px; }
+.st-key-quiz_question_card { border-top: 4px solid #c9b8e8 !important; }
+.st-key-quiz_question_card [role="radiogroup"] { width: 100% !important; }
+.st-key-quiz_question_card [data-baseweb="radio"] { min-height: 60px; width: 100% !important; max-width: none !important; background: #faf9fd !important; border-color: #e4dfed !important; box-shadow: 0 2px 3px #51447704; }
+.st-key-quiz_question_card [data-baseweb="radio"]:has(input:not(:disabled)):hover { border-color: #b9a6df !important; background: #f5f1fc !important; }
+.st-key-quiz_question_card [data-baseweb="radio"]:has(input:checked) { background: #f0eafa !important; border-color: #9580bf !important; box-shadow: inset 4px 0 #9580bf; }
+.st-key-quiz_question_card [data-testid="stAlert"] { border-radius: 14px; padding: 18px !important; }
+@media (max-width: 640px) {
+ .question-identity { gap: 12px; }
+ .question-number { width: 62px; height: 70px; }
+ .question-topic { font-size: .8rem; padding: 6px 10px; }
+ .question-flourish { display: none; }
+ .quiz-journey { font-size: .75rem; }
+}
