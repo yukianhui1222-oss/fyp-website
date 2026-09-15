@@ -712,3 +712,15 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
   .st-key-quiz_question_card { padding: 20px 16px !important; }
   .st-key-quiz_question_card [data-baseweb="radio"] { padding: 12px !important; }
 }
+
+/* Keep question-specific tutoring within reach beside the quiz. */
+.st-key-quiz_tutor_launcher { position: fixed !important; right: 24px !important; bottom: 24px !important; width: auto !important; z-index: 999990 !important; }
+.st-key-quiz_tutor_launcher [data-testid="stPopover"] button { background: linear-gradient(110deg, #fa7626, #ef5159 58%, #be4489) !important; border: none !important; border-radius: 18px !important; min-height: 52px; padding: 12px 22px !important; box-shadow: 0 8px 28px #c9683529 !important; }
+.st-key-quiz_tutor_launcher button p, .st-key-quiz_tutor_launcher button svg { color: #fff !important; }
+[data-testid="stPopoverBody"]:has(.st-key-quiz_tutor_panel) { width: min(480px, calc(100vw - 32px)) !important; max-width: calc(100vw - 32px) !important; max-height: calc(100dvh - 150px) !important; overflow-y: auto !important; padding: 22px !important; border: 1px solid #e9ddd3 !important; border-radius: 22px !important; background: #fffdfb !important; box-shadow: 0 20px 60px #48332120 !important; }
+.st-key-quiz_tutor_panel h4 { font-size: 1.15rem !important; font-weight: 650 !important; }
+.st-key-quiz_tutor_panel [data-testid="stMarkdownContainer"] p { font-size: 1rem !important; line-height: 1.7 !important; font-weight: 400 !important; }
+.st-key-quiz_tutor_panel button { border-radius: 12px !important; min-height: 42px; }
+.st-key-quiz_tutor_panel [data-testid="stTextInput"] input { font-size: 1rem !important; }
+.block-container:has(.quiz-answer-heading) { padding-bottom: 110px !important; }
+@media (max-width: 640px) { .st-key-quiz_tutor_launcher { right: 16px !important; bottom: 16px !important; } }

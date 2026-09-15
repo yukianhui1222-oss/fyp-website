@@ -1859,18 +1859,18 @@ def render_quiz_view():
                 st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
                 
                 tutor_resp_key = f"tutor_response_q_{idx}"
-                has_tutor_resp = bool(st.session_state.get(tutor_resp_key))
                 
-                with st.expander("🤖 Ask AI Tutor About This Question / 向 AI 助教深入追问", expanded=has_tutor_resp):
+                with st.container(key="quiz_tutor_launcher"), st.popover("AI Tutor", icon="🎓", help="Ask about the current question. Press Escape or click outside to close."), st.container(key="quiz_tutor_panel"):
+                    st.markdown(f"#### AI Tutor · Question {idx + 1}")
                     st.markdown("<p style='font-size: 0.86rem; color: #475569; margin-bottom: 10px;'>Need further clarification, misconception diagnosis, or option breakdown? Ask the AI Tutor below:</p>", unsafe_allow_html=True)
                     
                     qa_col1, qa_col2, qa_col3 = st.columns(3)
                     tutor_action_prompt = None
                     target_lang = st.session_state.get("quiz_target_lang", "Chinese")
                     
-                    btn_why_label = "❓ 为什么我选错？" if show_trans else "❓ Why is my choice wrong?"
-                    btn_concept_label = "💡 深入底层原理" if show_trans else "💡 Deep Conceptual Mechanism"
-                    btn_opts_label = "🔍 逐项分析拆解" if show_trans else "🔍 Distractor Breakdown"
+                    btn_why_label = "❓ 为什么我选错？" if show_trans else "My answer"
+                    btn_concept_label = "💡 深入底层原理" if show_trans else "Concept"
+                    btn_opts_label = "🔍 逐项分析拆解" if show_trans else "Options"
                     
                     with qa_col1:
                         if st.button(btn_why_label, key=f"tutor_why_wrong_{idx}", use_container_width=True):
@@ -1927,17 +1927,8 @@ Official Explanation: {q.get('explanation', '')}"""
                             st.rerun()
                     
                     if st.session_state.get(tutor_resp_key):
-                        st.markdown("<hr style='margin: 12px 0; border: 0; border-top: 1px dashed #cbd5e1;'>", unsafe_allow_html=True)
-                        st.markdown(f"""
-                        <div style='background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #6366f1; border-radius: 8px; padding: 14px 16px; margin-top: 8px;'>
-                            <div style='font-size: 0.88rem; font-weight: 700; color: #4338ca; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;'>
-                                🎓 AI Tutor Response
-                            </div>
-                            <div style='font-size: 0.92rem; color: #1e293b; line-height: 1.6;'>
-                                {st.session_state[tutor_resp_key]}
-                            </div>
-                        </div>
-                        """, unsafe_allow_html=True)
+                        st.divider()
+                        st.markdown(st.session_state[tutor_resp_key])
 
         st.markdown("<br>", unsafe_allow_html=True)
         nav_cols = st.columns(4)
