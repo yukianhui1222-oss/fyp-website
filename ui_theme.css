@@ -654,3 +654,34 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
   flex-shrink: 0 !important;
   margin: 0 !important;
 }
+
+/* Login-inspired quiz: warm charcoal, cream surfaces and coral accents. */
+.st-key-quiz_workspace { padding: 16px 0 8px; }
+.quiz-welcome { display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: center; padding: 32px; margin-bottom: 22px; border-radius: 24px; background: #27221f; color: #fff9f3; position: relative; overflow: hidden; }
+.quiz-welcome::after { content: ''; position: absolute; right: -65px; top: -100px; width: 270px; height: 270px; border: 1px solid #ffffff0d; border-radius: 50%; pointer-events: none; }
+.quiz-kicker { display: block; color: #a66b51; font-size: .75rem; letter-spacing: .12em; font-weight: 650; margin-bottom: 10px; }
+.quiz-welcome .quiz-kicker { color: #d6bbaa; }
+.st-key-quiz_workspace .quiz-welcome h3 { color: #fff9f3 !important; font-size: clamp(1.5rem, 3vw, 2rem) !important; font-weight: 650 !important; line-height: 1.3 !important; padding: 0 !important; margin: 0 0 12px !important; letter-spacing: -.035em; }
+.quiz-welcome em { color: #ffb293; font-style: normal; }
+.quiz-welcome p { color: #d3c7bf; font-size: 1rem; line-height: 1.6; margin: 0; }
+.quiz-steps { display: grid; gap: 18px; position: relative; }
+.quiz-steps > div { display: flex; align-items: center; gap: 12px; color: #e7dcd5; font-size: .9rem; }
+.quiz-steps span { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; flex-shrink: 0; border: 1px solid #ffffff20; border-radius: 11px; color: #ffb293; font-size: .75rem; }
+.st-key-quiz_workspace .st-key-quiz_setup_card { background: #faf7f3 !important; border: 1px solid #eee5de !important; border-radius: 22px !important; padding: 28px !important; margin: 0 0 18px; }
+.quiz-form-heading { margin-bottom: 14px; }
+.st-key-quiz_workspace .quiz-form-heading h4 { color: #342c27 !important; font-size: 1.4rem !important; font-weight: 650 !important; padding: 0 !important; margin: 0 0 8px; }
+.quiz-form-heading p { color: #786b63; font-size: .95rem; line-height: 1.6; margin: 0; }
+.st-key-quiz_setup_card [data-baseweb="select"] > div { background: #fff !important; border: 1px solid #e4dcd5 !important; border-radius: 12px !important; min-height: 46px; }
+.st-key-quiz_setup_card [data-testid="stWidgetLabel"] p { color: #68584e !important; font-weight: 600 !important; }
+.st-key-quiz_workspace .st-key-generate_quiz_action_btn button { background: linear-gradient(110deg, #fa7626, #ef5159 58%, #be4489) !important; border: none !important; border-radius: 99px !important; min-height: 48px; box-shadow: 0 5px 16px #e96b3820 !important; }
+.st-key-quiz_workspace .st-key-generate_quiz_action_btn button p { color: #fff !important; }
+.st-key-quiz_workspace [data-testid="stExpander"] details { border-color: #ece3dc !important; background: #fffdfb !important; }
+.st-key-quiz_workspace [data-testid="stExpander"] summary p { color: #6d5c50 !important; }
+.st-key-quiz_workspace [class*="st-key-ret_att_"] button { background: #f7ede5 !important; border-color: #e4cdbb !important; }
+.st-key-quiz_workspace [class*="st-key-ret_att_"] button p { color: #975331 !important; }
+.st-key-quiz_workspace :focus-visible { outline-color: #df906e !important; }
+@media (max-width: 640px) {
+  .quiz-welcome { grid-template-columns: 1fr; gap: 22px; padding: 24px; }
+  .quiz-steps { gap: 12px; }
+  .st-key-quiz_workspace .st-key-quiz_setup_card { padding: 20px !important; }
+}

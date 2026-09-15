@@ -5118,8 +5118,14 @@ def main():
                     st.code(selected_mindmap, language="markdown")
                     
             with tab4, st.container(key="quiz_workspace"):
-                st.markdown("### Practice quiz")
-                st.caption("Test your understanding of the document's core content")
+                st.html("""<div class="quiz-welcome">
+                    <div class="quiz-welcome-copy"><span class="quiz-kicker">YOUR STUDY BREAK</span>
+                    <h3>Small steps.<br><em>Stronger understanding.</em></h3>
+                    <p>Turn what you have read into what you remember.</p></div>
+                    <div class="quiz-steps"><div><span>01</span>Choose your pace</div>
+                    <div><span>02</span>Test your understanding</div>
+                    <div><span>03</span>Learn from each answer</div></div>
+                </div>""")
                 
                 # Check user info
                 user_info = st.session_state.get("user")
@@ -5194,7 +5200,7 @@ def main():
                 
                 # Keep quiz creation as the primary action.
                 with st.container(border=False, key="quiz_setup_card"):
-                    st.markdown("<h6 style='margin-top: 0; margin-bottom: 14px; color: #1e293b; font-family: \"Poppins\", sans-serif; font-weight: 700; font-size: 1.15rem;'>Start a new quiz</h6>", unsafe_allow_html=True)
+                    st.html('<div class="quiz-form-heading"><span class="quiz-kicker">MAKE IT YOURS</span><h4>Ready for a little challenge?</h4><p>Set your difficulty, time and translation. We will take it from here.</p></div>')
                     
                     config_col1, config_col2, config_col3 = st.columns([1, 1, 1])
                     
