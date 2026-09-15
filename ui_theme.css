@@ -536,7 +536,7 @@ div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b8
 .st-key-chatbot_container [data-testid="stExpander"] details { border: none !important; background: #f8f7fc; border-radius: 10px !important; }
 .st-key-chatbot_container [data-testid="stExpander"] summary p { font-size: .9rem !important; font-weight: 500 !important; color: #6c6380 !important; }
 .st-key-study_chat_messages { height: clamp(170px, calc(100dvh - 365px), 380px) !important; overflow-y: auto !important; border: none !important; padding: 4px 0 !important; }
-.st-key-study_chat_messages [data-testid="stChatMessage"] { background: #f8f7fc !important; border: none !important; border-radius: 14px !important; padding: 14px !important; gap: 10px !important; margin-bottom: 12px; }
+.st-key-study_chat_messages [data-testid="stChatMessage"] { background: transparent !important; border: none !important; border-radius: 0 !important; box-shadow: none !important; padding: 8px 0 !important; gap: 10px !important; margin-bottom: 20px; }
 .st-key-study_chat_messages [data-testid="stChatMessageAvatarAssistant"],
 .st-key-study_chat_messages [data-testid="stChatMessageAvatarUser"] { width: 24px !important; height: 24px !important; flex: 0 0 24px !important; }
 [data-testid="stPopoverBody"] .st-key-study_chat_messages [data-testid="stMarkdownContainer"] p,
