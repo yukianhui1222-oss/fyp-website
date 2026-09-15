@@ -4012,7 +4012,7 @@ def main():
         id_token = user_info.get("idToken") if user_info else None
         
         with p_col1:
-            with st.popover("📂 Documents", use_container_width=True):
+            with st.popover("Documents", icon="📂", use_container_width=True):
                 st.markdown("<div class='drawer-heading'>Your documents</div>", unsafe_allow_html=True)
                 if not uid:
                     st.caption("Log in to view saved summaries.")
@@ -4075,7 +4075,7 @@ def main():
                                         st.error(msg)
                                         
         with p_col2:
-            with st.popover("⚙️ Settings", use_container_width=True):
+            with st.popover("Settings", icon="⚙️", use_container_width=True):
                 st.markdown("<div class='drawer-heading'>Workspace settings</div>", unsafe_allow_html=True)
                 st.markdown("""
                     <div class="drawer-settings-card" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px;">
@@ -4127,7 +4127,7 @@ def main():
             else:
                 avatar_html = f'<div style="width: 32px; height: 32px; border-radius: 50%; background: #EEF2FF; color: #6366F1; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: 700 !important; font-size: 0.85rem !important; font-family: \'Poppins\', sans-serif !important;">{initials}</div>'
                 
-            with st.popover("👤 Profile", use_container_width=True):
+            with st.popover("Profile", icon="👤", use_container_width=True):
                 st.markdown(f"""
                     <div class="drawer-profile-card" style="display: flex; align-items: center; gap: 12px;">
                         {avatar_html}
