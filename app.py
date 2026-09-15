@@ -4165,8 +4165,16 @@ def main():
 
     st.markdown("""
         <div class="workspace-heading">
+            <div class="workspace-art" aria-hidden="true">
+                <span class="title-star star-one">✦</span><span class="title-star star-two">✧</span>
+                <span class="title-star star-three">✦</span><span class="title-orbit"></span>
+                <span class="title-sticker sticker-notes">📄</span><span class="title-sticker sticker-ideas">💡</span>
+            </div>
+            <div class="workspace-eyebrow"><span></span> A LITTLE CURIOSITY GOES A LONG WAY</div>
             <h1 class="workspace-title">DocuMind</h1>
+            <div class="title-underline" aria-hidden="true"></div>
             <p class="workspace-tagline">Less reading. More understanding.</p>
+            <div class="workspace-tags"><span>Read less</span><i aria-hidden="true">✦</i><span>Connect ideas</span><i aria-hidden="true">✦</i><span>Learn more</span></div>
         </div>
     """, unsafe_allow_html=True)
 

@@ -724,3 +724,30 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 .st-key-quiz_tutor_panel [data-testid="stTextInput"] input { font-size: 1rem !important; }
 .block-container:has(.quiz-answer-heading) { padding-bottom: 110px !important; }
 @media (max-width: 640px) { .st-key-quiz_tutor_launcher { right: 16px !important; bottom: 16px !important; } }
+
+/* Playful stationery accents frame the rainbow wordmark. */
+.workspace-heading { position: relative; isolation: isolate; padding: 42px 70px 34px; }
+.workspace-heading::before { content: ''; position: absolute; inset: 8% 22%; background: radial-gradient(ellipse, #ffffffa8, #ffffff00 70%); z-index: -1; pointer-events: none; }
+.workspace-art { position: absolute; inset: 0; pointer-events: none; z-index: -1; overflow: hidden; }
+.workspace-eyebrow { display: flex; justify-content: center; align-items: center; gap: 8px; color: #7a7090; font-size: .7rem; font-weight: 650; letter-spacing: .13em; margin-bottom: 14px; }
+.workspace-eyebrow > span { width: 7px; height: 7px; border-radius: 50%; background: #9a79c5; box-shadow: 0 0 0 4px #ab8dd519; }
+.title-sticker { position: absolute; display: flex; justify-content: center; align-items: center; width: 65px; height: 75px; border: 1px solid #fff; border-radius: 18px; box-shadow: 0 10px 22px #69588812; font-size: 2rem; }
+.sticker-notes { left: 6%; top: 33%; transform: rotate(-14deg); background: linear-gradient(135deg, #fffdf6, #e6e8fc); }
+.sticker-ideas { right: 6%; top: 27%; transform: rotate(13deg); background: linear-gradient(135deg, #fff8df, #f9e1ec); }
+.title-star { position: absolute; color: #b58bd3; font-size: 1.7rem; }
+.star-one { left: 21%; top: 20%; color: #e9af59; transform: rotate(12deg); }
+.star-two { right: 21%; top: 14%; font-size: 2.1rem; }
+.star-three { right: 17%; bottom: 21%; font-size: 1rem; color: #65aa99; }
+.title-orbit { position: absolute; width: 120px; height: 120px; border: 1px dashed #b5a2d34d; border-radius: 50%; left: 3%; top: 26%; }
+.title-underline { width: 140px; height: 5px; border-radius: 50%; margin: 8px auto 0; background: linear-gradient(90deg, #e5ae72, #cb85b7, #a393d7, #87bfb1); transform: rotate(-2deg); }
+.workspace-tags { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 18px; color: #766a86; font-size: .8rem; font-weight: 500; }
+.workspace-tags i { color: #b7a1cb; font-style: normal; font-size: .65rem; }
+@media (max-width: 640px) {
+  .workspace-heading { padding: 34px 4px 26px; }
+  .workspace-eyebrow { font-size: .6rem; letter-spacing: .06em; }
+  .title-sticker, .title-orbit { display: none; }
+  .star-one { left: 4%; top: 12%; font-size: 1rem; }
+  .star-two { right: 4%; top: 12%; font-size: 1.2rem; }
+  .star-three { display: none; }
+  .workspace-tags { font-size: .75rem; gap: 8px; }
+}
