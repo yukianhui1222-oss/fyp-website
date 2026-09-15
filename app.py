@@ -1303,7 +1303,7 @@ def render_left_panel(raw_text, summary_result, api_key, results):
     # Header Row with Title and Clear Chat Button side-by-side to save space and align cleanly
     title_col, clear_col = st.columns([7, 3], vertical_alignment="center")
     with title_col:
-        st.markdown("<h3 style='font-size: 1.6rem; font-weight: 800; color: #0f172a; margin: 0; font-family: \"Poppins\", sans-serif; display: flex; align-items: center; gap: 8px;'>💬 AI Study Assistant</h3>", unsafe_allow_html=True)
+        st.markdown('<h3 class="study-chat-title">Study assistant</h3>', unsafe_allow_html=True)
     with clear_col:
         if st.button("Clear chat", key=f"clear_chat_{doc_id}", use_container_width=True):
             st.session_state[chat_history_key] = []
@@ -1314,25 +1314,21 @@ def render_left_panel(raw_text, summary_result, api_key, results):
             st.toast("Chat history cleared!", icon="🧹")
             st.rerun()
     
-    st.markdown("<div style='font-size: 0.88rem; color: #6b7280; margin-top: 2px; margin-bottom: 16px;'>Context-aware answers from your notes.</div>", unsafe_allow_html=True)
-    
-    # Quick Action Buttons
-    st.markdown("<div style='margin-bottom: 5px; font-size: 0.8rem; font-weight: 600; color: #4b5563;'>⚡ Quick Prompts:</div>", unsafe_allow_html=True)
-    q_col1, q_col2 = st.columns(2)
-    with q_col1:
-        if st.button("Explain simply", key=f"quick_simpler_{doc_id}", use_container_width=True, help="Explain the last concept in simpler terms"):
-            st.session_state[f"quick_question_{doc_id}"] = "Can you explain the last concept/topic in simpler terms?"
-    with q_col2:
-        if st.button("Give an example", key=f"quick_example_{doc_id}", use_container_width=True, help="Provide a practical example of the current topic"):
-            st.session_state[f"quick_question_{doc_id}"] = "Can you give me a clear, practical example of this concept?"
-    
-    st.markdown("<hr style='margin: 0.5rem 0; opacity: 0.1;'>", unsafe_allow_html=True)
-    
+    with st.expander("Suggested questions", expanded=False):
+        q_col1, q_col2 = st.columns(2)
+        with q_col1:
+            if st.button("Explain simply", key=f"quick_simpler_{doc_id}", use_container_width=True, help="Explain the last concept in simpler terms"):
+                st.session_state[f"quick_question_{doc_id}"] = "Can you explain the last concept/topic in simpler terms?"
+        with q_col2:
+            if st.button("Give an example", key=f"quick_example_{doc_id}", use_container_width=True, help="Provide a practical example of the current topic"):
+                st.session_state[f"quick_question_{doc_id}"] = "Can you give me a clear, practical example of this concept?"
+
+
     # Chat Messages Container
-    chat_container = st.container(height=220)
+    chat_container = st.container(height=340, border=False, key="study_chat_messages")
     with chat_container:
         if len(st.session_state[chat_history_key]) == 0:
-            st.info("👋 Ask anything about these lecture notes!")
+            st.markdown('<div class="study-chat-empty">What would you like to understand?<br><span>Ask a question about your document.</span></div>', unsafe_allow_html=True)
         else:
             for msg in st.session_state[chat_history_key]:
                 with st.chat_message(msg["role"]):
