@@ -864,7 +864,7 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 .st-key-quiz_hub_buttons [data-testid="stColumn"] { flex: 1 1 0 !important; min-width: 0 !important; width: 0 !important; }
 .st-key-quiz_hub_buttons button { width: 100% !important; min-height: 52px; padding: 10px 6px !important; border-radius: 11px !important; box-shadow: none !important; background: transparent !important; border: 1px solid transparent !important; }
 .st-key-quiz_hub_buttons button p { white-space: nowrap !important; font-size: 1rem !important; color: #736980 !important; }
-.st-key-quiz_hub_buttons button[kind="primary"] { background: #eee5fc !important; border-color: #b69ad8 !important; }
-.st-key-quiz_hub_buttons button[kind="primary"] p { color: #60408a !important; font-weight: 750 !important; }
+.st-key-quiz_hub_buttons button[kind="primary"] { background: #f6f2fc !important; border-color: #ded3ee !important; }
+.st-key-quiz_hub_buttons button[kind="primary"] p { color: #75618e !important; font-weight: 700 !important; }
 .st-key-quiz_hub_buttons button:focus-visible { outline: 3px solid #9779c1 !important; outline-offset: 2px; }
 @media(max-width:480px) { .st-key-quiz_hub_buttons button p { font-size: .8rem !important; } }
