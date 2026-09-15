@@ -5313,8 +5313,8 @@ def main():
                 with st.container(key="quiz_hub_buttons"):
                     activity_columns = st.columns(3, gap="small")
                     for activity_column, activity in zip(activity_columns, ["Quiz", "Flashcards", "Study record"]):
-                        with activity_column:
-                            st.button(activity, key=f"quiz_activity_{activity}", type="primary" if quiz_section == activity else "secondary", use_container_width=True, on_click=select_quiz_section, args=(activity,))
+                        with activity_column, st.container(key="quiz_activity_selected" if quiz_section == activity else f"quiz_activity_idle_{activity}"):
+                            st.button(activity, key=f"quiz_activity_{activity}", type="secondary", use_container_width=True, on_click=select_quiz_section, args=(activity,))
                 if quiz_section == "Flashcards":
                     render_flashcards(summary_result, api_key, result_lang)
                 

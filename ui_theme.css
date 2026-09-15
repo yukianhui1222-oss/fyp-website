@@ -868,3 +868,14 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 .st-key-quiz_hub_buttons button[kind="primary"] p { color: #75618e !important; font-weight: 700 !important; }
 .st-key-quiz_hub_buttons button:focus-visible { outline: 3px solid #9779c1 !important; outline-offset: 2px; }
 @media(max-width:480px) { .st-key-quiz_hub_buttons button p { font-size: .8rem !important; } }
+
+/* Own selection marker avoids Streamlit primary-button gradients and DOM variants. */
+.st-key-results_reading .st-key-quiz_workspace .st-key-quiz_hub_buttons button,
+.st-key-results_reading .st-key-quiz_workspace .st-key-quiz_hub_buttons button:hover {
+ background: #f8f7fb !important; background-image: none !important; border: 1px solid transparent !important; border-radius: 12px !important; box-shadow: none !important;
+}
+.st-key-results_reading .st-key-quiz_workspace .st-key-quiz_hub_buttons .st-key-quiz_activity_selected button,
+.st-key-results_reading .st-key-quiz_workspace .st-key-quiz_hub_buttons .st-key-quiz_activity_selected button:hover {
+ background: #f1ebf9 !important; background-image: none !important; border-color: #d8cae8 !important;
+}
+.st-key-results_reading .st-key-quiz_workspace .st-key-quiz_hub_buttons .st-key-quiz_activity_selected button p { color: #705985 !important; font-weight: 700 !important; }
