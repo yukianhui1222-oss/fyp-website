@@ -4589,7 +4589,32 @@ def main():
                 with sum_col2:
                     copy_to_clipboard(summary_result, "Copy Summary")
                 
-                st.markdown(summary_result)
+                import re
+                from html import escape
+                summary_lines = summary_result.splitlines()
+                headings = []
+                fenced = False
+                for line_index, line in enumerate(summary_lines):
+                    if line.lstrip().startswith(('```', '~~~')):
+                        fenced = not fenced
+                    match = re.match(r'^#{1,3}\s+(.+)', line) if not fenced else None
+                    if match:
+                        headings.append((line_index, match.group(1)))
+                st.caption(f"About {max(1, (len(summary_result.split()) + 199) // 200)} min read · {len(headings)} sections")
+                if headings:
+                    with st.expander("On this page", expanded=False):
+                        st.html('<nav aria-label="Summary sections">' + ''.join(
+                            f'<p><a href="#summary-section-{n}">{escape(title)}</a></p>'
+                            for n, (_, title) in enumerate(headings)) + '</nav>')
+                    section_start = 0
+                    for n, (line_index, _) in enumerate(headings):
+                        if line_index > section_start:
+                            st.markdown('\n'.join(summary_lines[section_start:line_index]))
+                        st.html(f'<span id="summary-section-{n}" style="scroll-margin-top:90px"></span>')
+                        section_start = line_index
+                    st.markdown('\n'.join(summary_lines[section_start:]))
+                else:
+                    st.markdown(summary_result)
                 
                 # --- Quick Share Bar in Summary Tab ---
                 doc_fname = results.get('filename', 'DocuMind')
@@ -4801,7 +4826,17 @@ def main():
                 
                 if translation_result:
                     copy_to_clipboard(translation_result, f"Copy {result_lang} Translation")
-                    st.markdown(translation_result)
+                    compare_translation = st.toggle("Compare with original summary", key="translation_compare")
+                    if compare_translation:
+                        original_col, translated_col = st.columns(2, gap="large")
+                        with original_col:
+                            st.caption("ORIGINAL SUMMARY")
+                            st.markdown(summary_result)
+                        with translated_col:
+                            st.caption(f"{result_lang.upper()} TRANSLATION")
+                            st.markdown(translation_result)
+                    else:
+                        st.markdown(translation_result)
                     
                     # Quick Share in Tab 2 as well
                     st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)
@@ -5130,7 +5165,9 @@ def main():
                 """
                 
                 # Render inside an iframe component
-                components.html(markmap_html, height=500)
+                expanded_map = st.toggle("Large map view", key="large_mindmap_view")
+                st.caption("Scroll to zoom · Drag to move · Use the map toolbar to fit the whole map")
+                components.html(markmap_html, height=800 if expanded_map else 500)
                 
                 with st.expander("📋 View/Copy Mindmap Markdown Source", expanded=False):
                     st.code(selected_mindmap, language="markdown")
@@ -5605,8 +5642,12 @@ def main():
                         </style>
                     """, unsafe_allow_html=True)
                     
+                    mistakes_only = st.toggle("Show attempts with mistakes", key="quiz_mistakes_filter")
+                    visible_history = [att for att in history if att.get("score", 0) < att.get("total_questions", 10)] if mistakes_only else history
+                    if mistakes_only and not visible_history:
+                        st.success("No mistakes to revisit in your saved attempts for this document.")
                     with st.container(height=350):
-                        for idx_hist, att in enumerate(history):
+                        for idx_hist, att in enumerate(visible_history):
                             att_id = att.get("attempt_id", "")
                             att_date = att.get("date", "")
                             try:
@@ -5655,7 +5696,7 @@ def main():
                                             st.session_state.quiz_timer_start = None
                                             st.rerun()
                                     with btn_ret_col:
-                                        if st.button("Retry 💪", key=f"ret_att_{att_id}", use_container_width=True, type="primary"):
+                                        if st.button("Practice mistakes", key=f"ret_att_{att_id}", use_container_width=True, type="primary"):
                                             # Filter wrong answers
                                             wrong_answers = [ans for ans in att.get("answers", []) if not ans.get("is_correct", False)]
                                             # Re-shuffle/strip prefixes to allow re-answering
