@@ -1,4 +1,4 @@
-"""Presentation-only styles shared by the DocuMind Streamlit views."""
+"""Shared styles, including role-based result tabs across Streamlit versions."""
 from pathlib import Path
 
 

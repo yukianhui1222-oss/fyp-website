@@ -560,7 +560,7 @@ div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b8
 .st-key-quiz_workspace [class*="st-key-ret_att_"] button p { color: #70549c !important; }
 
 /* Folder-style result tabs: selected tab rises and joins its content sheet. */
-.st-key-results_reading [data-baseweb="tab-list"] {
+.st-key-results_reading :is([data-baseweb="tab-list"], [role="tablist"]) {
   display: flex !important;
   width: 100% !important;
   gap: 8px !important;
@@ -572,7 +572,7 @@ div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b8
   border-radius: 0 !important;
   align-items: flex-end !important;
 }
-.st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"] {
+.st-key-results_reading :is([data-baseweb="tab-list"], [role="tablist"]) [role="tab"] {
   position: relative;
   flex: 1 1 0 !important;
   min-width: 0 !important;
@@ -588,10 +588,10 @@ div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b8
   white-space: normal !important;
   margin: 0 !important;
 }
-.st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-of-type(2) { background: #e7eff9 !important; }
-.st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-of-type(3) { background: #e5f2ec !important; }
-.st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-of-type(4) { background: #f5e9f0 !important; }
-.st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"] p {
+.st-key-results_reading :is([data-baseweb="tab-list"], [role="tablist"]) [role="tab"]:nth-of-type(2) { background: #e7eff9 !important; }
+.st-key-results_reading :is([data-baseweb="tab-list"], [role="tablist"]) [role="tab"]:nth-of-type(3) { background: #e5f2ec !important; }
+.st-key-results_reading :is([data-baseweb="tab-list"], [role="tablist"]) [role="tab"]:nth-of-type(4) { background: #f5e9f0 !important; }
+.st-key-results_reading :is([data-baseweb="tab-list"], [role="tablist"]) [role="tab"] p {
   text-align: center !important;
   white-space: normal !important;
   overflow-wrap: anywhere;
@@ -599,7 +599,7 @@ div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b8
   color: #69627c !important;
   font-weight: 500 !important;
 }
-.st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] {
+.st-key-results_reading :is([data-baseweb="tab-list"], [role="tablist"]) [role="tab"][aria-selected="true"] {
   background: #fff !important;
   padding-top: 22px !important;
   padding-bottom: 16px !important;
@@ -610,16 +610,16 @@ div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b8
   box-shadow: 0 -5px 12px #6550840a !important;
   z-index: 1;
 }
-.st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] p {
+.st-key-results_reading :is([data-baseweb="tab-list"], [role="tablist"]) [role="tab"][aria-selected="true"] p {
   color: #593789 !important;
   font-weight: 750 !important;
 }
-.st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"]:hover:not([aria-selected="true"]) { filter: brightness(.98); }
+.st-key-results_reading :is([data-baseweb="tab-list"], [role="tablist"]) [role="tab"]:hover:not([aria-selected="true"]) { filter: brightness(.98); }
 .st-key-results_reading [data-baseweb="tab-highlight"],
 .st-key-results_reading [data-baseweb="tab-border"] { display: none !important; }
 @media (max-width: 600px) {
-  .st-key-results_reading [data-baseweb="tab-list"] { gap: 4px !important; }
-  .st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"] { padding: 10px 4px !important; border-radius: 10px 10px 0 0 !important; }
-  .st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] { padding-top: 20px !important; padding-bottom: 14px !important; }
-  .st-key-results_reading [data-baseweb="tab-list"] [data-baseweb="tab"] p { font-size: .9rem !important; }
+  .st-key-results_reading :is([data-baseweb="tab-list"], [role="tablist"]) { gap: 4px !important; }
+  .st-key-results_reading :is([data-baseweb="tab-list"], [role="tablist"]) [role="tab"] { padding: 10px 4px !important; border-radius: 10px 10px 0 0 !important; }
+  .st-key-results_reading :is([data-baseweb="tab-list"], [role="tablist"]) [role="tab"][aria-selected="true"] { padding-top: 20px !important; padding-bottom: 14px !important; }
+  .st-key-results_reading :is([data-baseweb="tab-list"], [role="tablist"]) [role="tab"] p { font-size: .9rem !important; }
 }
