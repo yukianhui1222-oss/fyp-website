@@ -1744,11 +1744,10 @@ def render_quiz_view():
 
     # --- ACTIVE QUIZ QUESTION SCREEN ---
     spacer1, main_quiz_col, spacer2 = st.columns([1, 6, 1])
-    
-    with main_quiz_col:
-        title_str = "🔍 Review Mode" if review_mode else ("💪 Retry wrong questions" if is_retry else "📝 Knowledge Quiz")
-        st.markdown(f"<h1 style='text-align: center; color: #1e293b; margin-bottom: 0;'>{title_str}</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #64748b; margin-bottom: 2rem;'>Test your understanding of the document</p>", unsafe_allow_html=True)
+
+    with main_quiz_col, st.container(key="quiz_answer_workspace"):
+        title_str = "Review your answers" if review_mode else ("Try it again" if is_retry else "One question at a time")
+        st.html(f'<div class="quiz-answer-heading"><span>DOCUMIND PRACTICE</span><h1>{title_str}</h1><p>Take your time. Every answer is a chance to learn.</p></div>')
 
         idx = st.session_state.get('current_q_index', 0)
         
@@ -1757,12 +1756,12 @@ def render_quiz_view():
             timer_html = f"<span style='color: #ef4444; font-weight: 700; margin-left: 15px;'>{time_display_str}</span>" if time_display_str else ""
             st.markdown(f"<div style='color: #6b7280; font-weight: 600; font-size: 0.95rem; margin-top: 0.4rem; margin-bottom: 0.5rem;'>Question {idx + 1} of {total_q} {timer_html}</div>", unsafe_allow_html=True)
         with t_col2:
-            show_trans = st.toggle("🌐 Translate", key="quiz_translate_toggle")
+            show_trans = st.toggle("Translate", key="quiz_translate_toggle")
 
         st.progress((idx + 1) / total_q)
         
         # Horizontal Question Tracker Grid
-        with st.container(key="quiz_nav_container"):
+        with st.expander("Question navigator", expanded=False), st.container(key="quiz_nav_container"):
             nav_cols = st.columns(total_q)
             for i in range(total_q):
                 with nav_cols[i]:
@@ -1787,7 +1786,7 @@ def render_quiz_view():
                     if st.button(btn_label, key=f"nav_q_{i}", type=btn_type, use_container_width=True):
                         st.session_state.current_q_index = i
         
-        with st.container(border=True):
+        with st.container(border=False, key="quiz_question_card"):
             q = quiz_data[idx]
             question_text = q.get('question_trans', q.get('question', '')) if show_trans else q.get('question', '')
             
