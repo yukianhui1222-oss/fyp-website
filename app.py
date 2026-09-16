@@ -4335,39 +4335,45 @@ def main():
                     st.button("🗑️ Clear Results", type="secondary", use_container_width=True, disabled=True, key="main_clear_disabled_btn")
 
     if not has_results and not st.session_state.is_processing:
-        with st.container(key="home_continue_learning", border=True):
-            st.markdown("### Pick up where you left off")
-            st.caption("Recently saved documents")
+        with st.container(key="home_continue_learning", border=False):
+            st.markdown("### Continue learning")
+            st.caption("Your latest saved documents · Pick one to continue")
             recent_docs = saved_docs if uid and not err else []
             if recent_docs:
+                recent_columns = st.columns(3, gap="medium")
                 for recent_index, recent_doc in enumerate(recent_docs[:3]):
-                    if st.button(recent_doc.get("title", "Untitled"), key=f"resume_saved_{recent_index}", use_container_width=True):
-                        recent_id = recent_doc.get("id")
-                        st.session_state.ocr_results = {
-                            'id': recent_id, 'raw_text': recent_doc.get('raw_text', ''),
-                            'summary': recent_doc.get('summary', ''), 'translation': recent_doc.get('translation', ''),
-                            'mindmap_eng': recent_doc.get('mindmap_eng', ''), 'mindmap_trans': recent_doc.get('mindmap_trans', ''),
-                            'time': 0.0, 'lang': recent_doc.get('language', 'Chinese'),
-                            'is_loaded_from_db': True, 'filename': recent_doc.get('title', 'Untitled'),
-                            'chat_history': recent_doc.get('chat_history', '')
-                        }
-                        try:
-                            stored_chat = recent_doc.get('chat_history', '')
-                            st.session_state[f'chat_history_{recent_id}'] = json.loads(stored_chat) if stored_chat else []
-                        except (ValueError, TypeError):
-                            st.session_state[f'chat_history_{recent_id}'] = []
-                        clear_quiz_runtime_state()
-                        for stale_key in ('quiz_data', 'quiz_submitted'):
-                            st.session_state.pop(stale_key, None)
-                        st.session_state.quiz_mode_active = False
-                        st.session_state.is_processing = False
-                        st.rerun()
+                    with recent_columns[recent_index], st.container(key=f"recent_document_{recent_index}"):
+                        from html import escape
+                        display_doc_title = str(recent_doc.get("title", "Untitled"))
+                        st.html(f'<div class="recent-doc-heading"><span class="recent-doc-icon" aria-hidden="true">▤</span><span>SAVED DOCUMENT</span></div><div class="recent-doc-title" title="{escape(display_doc_title, quote=True)}">{escape(display_doc_title.replace("_", " "))}</div>')
+                        st.caption(f"{recent_doc.get('language', 'Chinese')} translation available" if recent_doc.get('translation') else "Summary ready to review")
+                        if st.button("Open document →", key=f"resume_saved_{recent_index}", use_container_width=True):
+                            recent_id = recent_doc.get("id")
+                            st.session_state.ocr_results = {
+                                'id': recent_id, 'raw_text': recent_doc.get('raw_text', ''),
+                                'summary': recent_doc.get('summary', ''), 'translation': recent_doc.get('translation', ''),
+                                'mindmap_eng': recent_doc.get('mindmap_eng', ''), 'mindmap_trans': recent_doc.get('mindmap_trans', ''),
+                                'time': 0.0, 'lang': recent_doc.get('language', 'Chinese'),
+                                'is_loaded_from_db': True, 'filename': recent_doc.get('title', 'Untitled'),
+                                'chat_history': recent_doc.get('chat_history', '')
+                            }
+                            try:
+                                stored_chat = recent_doc.get('chat_history', '')
+                                st.session_state[f'chat_history_{recent_id}'] = json.loads(stored_chat) if stored_chat else []
+                            except (ValueError, TypeError):
+                                st.session_state[f'chat_history_{recent_id}'] = []
+                            clear_quiz_runtime_state()
+                            for stale_key in ('quiz_data', 'quiz_submitted'):
+                                st.session_state.pop(stale_key, None)
+                            st.session_state.quiz_mode_active = False
+                            st.session_state.is_processing = False
+                            st.rerun()
             elif uid and err:
                 st.caption("Saved documents could not be loaded. Please try again later.")
             else:
                 st.caption("Save an analysis to your library and it will appear here.")
 
-        with st.expander("Mistake notebook · Review across documents", expanded=False):
+        with st.expander("📒 Mistake notebook · Revisit tricky questions", expanded=False):
             # Load on request rather than adding a history request to every home render.
             if st.button("Open mistake notebook", key="open_mistake_notebook"):
                 notebook_attempts, notebook_error = fetch_quiz_attempts(uid, id_token) if uid else (st.session_state.get('guest_quiz_attempts', []), None)

@@ -879,3 +879,16 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
  background: #f1ebf9 !important; background-image: none !important; border-color: #d8cae8 !important;
 }
 .st-key-results_reading .st-key-quiz_workspace .st-key-quiz_hub_buttons .st-key-quiz_activity_selected button p { color: #705985 !important; font-weight: 700 !important; }
+
+/* Recent work presented as readable document cards rather than long pill buttons. */
+.st-key-home_continue_learning { margin-top: 28px; padding: 0 !important; }
+.st-key-home_continue_learning h3 { font-size: 1.45rem !important; margin-bottom: 0 !important; }
+.st-key-home_continue_learning [class*="st-key-recent_document_"] { background: #ffffffde; border: 1px solid #e3dfee; border-radius: 18px; padding: 22px !important; }
+.recent-doc-heading { display: flex; align-items: center; gap: 10px; color: #81738f; font-size: .68rem; font-weight: 700; letter-spacing: .08em; }
+.recent-doc-icon { display: grid; place-items: center; width: 36px; height: 40px; border-radius: 10px; background: #eee5fa; color: #8867af; font-size: 1.5rem; }
+.st-key-recent_document_1 .recent-doc-icon { background: #e4eefb; color: #5a7aab; }
+.st-key-recent_document_2 .recent-doc-icon { background: #e2f2ea; color: #558772; }
+.recent-doc-title { font-size: 1.08rem; line-height: 1.55; font-weight: 650; color: #3f3b4c; margin: 18px 0 8px; min-height: 3.1em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.st-key-home_continue_learning [class*="st-key-recent_document_"] button { border-radius: 10px !important; background: #f6f3fa !important; border: 1px solid #e5ddef !important; box-shadow: none !important; }
+.st-key-home_continue_learning [class*="st-key-recent_document_"] button p { color: #73578e !important; font-size: .95rem !important; }
+@media(max-width:700px) { .st-key-home_continue_learning [data-testid="stHorizontalBlock"] { flex-wrap: wrap !important; } .st-key-home_continue_learning [data-testid="stColumn"] { flex: 1 1 100% !important; width: 100% !important; min-width: 0 !important; } }
