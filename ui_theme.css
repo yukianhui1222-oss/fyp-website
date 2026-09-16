@@ -892,3 +892,16 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 .st-key-home_continue_learning [class*="st-key-recent_document_"] button { border-radius: 10px !important; background: #f6f3fa !important; border: 1px solid #e5ddef !important; box-shadow: none !important; }
 .st-key-home_continue_learning [class*="st-key-recent_document_"] button p { color: #73578e !important; font-size: .95rem !important; }
 @media(max-width:700px) { .st-key-home_continue_learning [data-testid="stHorizontalBlock"] { flex-wrap: wrap !important; } .st-key-home_continue_learning [data-testid="stColumn"] { flex: 1 1 100% !important; width: 100% !important; min-width: 0 !important; } }
+
+/* Distinct section identities without competing with the document cards. */
+.home-section-heading { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.home-section-icon { display: grid; place-items: center; width: 48px; height: 48px; flex-shrink: 0; border-radius: 14px; background: #e9dff6; color: #7b5da0; font-size: 1.5rem; }
+.home-section-kicker { color: #79638e; font-size: .72rem; font-weight: 700; letter-spacing: .12em; }
+.home-section-heading h2, .home-section-heading h3 { margin: 5px 0 0 !important; padding: 0 !important; color: #3e3a50 !important; font-size: 1.45rem !important; line-height: 1.35 !important; }
+.st-key-home_learning_guide { margin-top: 36px; padding: 28px !important; background: #eef7f6c9; border: 1px solid #d6e9e3; border-radius: 24px; border-top: 3px solid #bad9ce; }
+.guide-section-heading { margin-bottom: 24px; }
+.guide-section-heading .home-section-icon { background: #dcefe7; color: #527f6d; }
+.guide-section-heading .home-section-kicker { color: #597d70; }
+.st-key-home_learning_guide .learning-route article { background: #ffffffc9; border-color: #deebe5; }
+.documind-footer { margin-top: 48px; padding: 36px 28px 24px; border: 1px solid #dfd8eb; border-top: 3px solid #cec0e1; border-radius: 24px; background: #f3eef9c9; }
+@media(max-width:640px) { .st-key-home_learning_guide { padding: 20px 16px !important; } .documind-footer { padding: 28px 18px 22px; } .home-section-heading h2, .home-section-heading h3 { font-size: 1.25rem !important; } }

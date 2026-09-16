@@ -4336,7 +4336,7 @@ def main():
 
     if not has_results and not st.session_state.is_processing:
         with st.container(key="home_continue_learning", border=False):
-            st.markdown("### Continue learning")
+            st.html('<div class="home-section-heading"><span class="home-section-icon" aria-hidden="true">▤</span><div><span class="home-section-kicker">YOUR LIBRARY</span><h3>Continue learning</h3></div></div>')
             st.caption("Your latest saved documents · Pick one to continue")
             recent_docs = saved_docs if uid and not err else []
             if recent_docs:
@@ -4403,7 +4403,7 @@ def main():
 
         with st.container(key="home_learning_guide"):
             st.html("""
-                <div class="learning-guide-heading"><span>MAKE IT YOURS</span><h2>A little plan for your next study session</h2></div>
+                <div class="home-section-heading guide-section-heading"><span class="home-section-icon" aria-hidden="true">✦</span><div><span class="home-section-kicker">STUDY GUIDE</span><h2>Your next steps, made simple</h2></div></div>
                 <div class="learning-route">
                     <article><span class="route-number" aria-hidden="true">01</span><h3>Find the essentials</h3><p>Upload your notes, then use Summary to review the key ideas.</p><span class="route-tag">Start with the big picture</span></article>
                     <article><span class="route-number" aria-hidden="true">02</span><h3>Connect the ideas</h3><p>Explore the Mind map or read a translation to clarify unfamiliar concepts.</p><span class="route-tag">Make it click</span></article>
