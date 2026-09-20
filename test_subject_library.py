@@ -58,6 +58,14 @@ class LibraryTests(unittest.TestCase):
             questions = lib.generate_paper(docs, 'key', 'English', 1, 1)
             self.assertEqual(set(x for q in questions for x in q['sources']), {d['id'] for d in docs})
 
+    def test_real_sdk_accepts_both_question_schemas(self):
+        # Keep the real SDK constructor: mocking it previously hid incompatible fields.
+        import json
+        from types import SimpleNamespace
+        with patch('summarizer._get_model_name', return_value='gemini-2.5-flash'), patch('summarizer._generate_with_retry', side_effect=[SimpleNamespace(text=json.dumps(q)) for q in QUESTIONS]):
+            questions = lib.generate_paper([{'id':'d1','summary':'A'}, {'id':'d2','summary':'B'}], 'offline-key', 'English', 1, 1)
+            self.assertEqual([q['type'] for q in questions], ['mcq', 'short'])
+
     def test_generation_stops_after_three_invalid_responses(self):
         from types import SimpleNamespace
         with patch('summarizer._get_model_name', return_value='test'), patch('summarizer.genai.GenerativeModel'), patch('summarizer._generate_with_retry', return_value=SimpleNamespace(text='{"questions": []}')) as generate:

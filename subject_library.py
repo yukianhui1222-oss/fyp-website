@@ -106,7 +106,7 @@ def generate_paper(docs, api_key, language, mcq_count=4, short_count=2, on_progr
         kind = 'mcq' if index < mcq_count else 'short'
         properties = {'question': {'type': 'STRING'}, 'answer': {'type': 'STRING'}}
         if kind == 'mcq':
-            properties['options'] = {'type': 'ARRAY', 'items': {'type': 'STRING'}, 'minItems': 4, 'maxItems': 4}
+            properties['options'] = {'type': 'ARRAY', 'items': {'type': 'STRING'}}
         else:
             properties['rubric'] = {'type': 'STRING'}
         model = genai.GenerativeModel(model_name, generation_config={
