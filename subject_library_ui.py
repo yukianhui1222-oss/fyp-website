@@ -90,7 +90,11 @@ def render_library(api_key):
             if st.button('Generate mixed paper', type='primary', disabled=not source_ids or not api_key):
                 try:
                     with st.spinner('Building a paper across your course materials…'):
-                        questions = library.generate_paper([candidates[x] for x in source_ids], api_key, language, mcq_count, short_count)
+                        progress = st.progress(0, text='Preparing questions…')
+                        def show_progress(done, total, attempt):
+                            text = 'Paper ready' if done == total else f'Question {done + 1} of {total}' + (f' · correcting attempt {attempt + 1}' if attempt else '')
+                            progress.progress(done / total, text=text)
+                        questions = library.generate_paper([candidates[x] for x in source_ids], api_key, language, mcq_count, short_count, on_progress=show_progress)
                     st.session_state[paper_key] = {'id': uuid.uuid4().hex, 'folder': folder_names.get(folder_id, 'Unfiled'), 'sources': {x: candidates[x].get('title', x) for x in source_ids}, 'questions': questions, 'answers': {}, 'grades': None}
                 except Exception as exc:
                     st.error(str(exc) if isinstance(exc, ValueError) else 'Paper generation failed. Please retry; no existing work was replaced.')

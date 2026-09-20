@@ -36,14 +36,27 @@ class LibraryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             lib.validate_paper({'questions': invalid}, {'d1','d2'}, 1, 1)
 
-    def test_generation_repairs_wrong_count(self):
+    def test_generation_repairs_only_invalid_question(self):
         import json
         from types import SimpleNamespace
-        with patch('summarizer._get_model_name', return_value='test'), patch('summarizer.genai.GenerativeModel'), patch('summarizer._generate_with_retry', side_effect=[SimpleNamespace(text=json.dumps({'questions': QUESTIONS[:1]})), SimpleNamespace(text=json.dumps({'questions': QUESTIONS}))]) as generate:
-            result = lib.generate_paper([{'id':'d1','summary':'A'}, {'id':'d2','summary':'B'}], 'key', 'English', 1, 1)
+        mcq = dict(QUESTIONS[0], answer='A')
+        short = QUESTIONS[1]
+        with patch('summarizer._get_model_name', return_value='test'), patch('summarizer.genai.GenerativeModel') as model, patch('summarizer._generate_with_retry', side_effect=[SimpleNamespace(text='{"questions": []}'), SimpleNamespace(text=json.dumps(mcq)), SimpleNamespace(text=json.dumps(short))]) as generate:
+            result = lib.generate_paper([{'id':'long-file-name-1','summary':'A'}, {'id':'long-file-name-2','summary':'B'}], 'key', 'English', 1, 1)
             self.assertEqual(len(result), 2)
-            self.assertEqual(generate.call_count, 2)
-            self.assertIn('EXACTLY 2', generate.call_args.args[1])
+            self.assertEqual(generate.call_count, 3)
+            self.assertEqual(result[0]['sources'], ['long-file-name-1'])
+            self.assertEqual(result[1]['sources'], ['long-file-name-2'])
+            self.assertEqual(result[1]['id'], 'q2')
+            self.assertIn('response_schema', model.call_args.kwargs['generation_config'])
+
+    def test_generation_covers_more_documents_than_questions(self):
+        import json
+        from types import SimpleNamespace
+        docs = [{'id':str(i), 'summary':'Course text'} for i in range(5)]
+        with patch('summarizer._get_model_name', return_value='test'), patch('summarizer.genai.GenerativeModel'), patch('summarizer._generate_with_retry', side_effect=[SimpleNamespace(text=json.dumps(q)) for q in QUESTIONS]):
+            questions = lib.generate_paper(docs, 'key', 'English', 1, 1)
+            self.assertEqual(set(x for q in questions for x in q['sources']), {d['id'] for d in docs})
 
     def test_generation_stops_after_three_invalid_responses(self):
         from types import SimpleNamespace
