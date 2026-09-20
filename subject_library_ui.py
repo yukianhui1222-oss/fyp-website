@@ -57,11 +57,24 @@ def render_library(api_key):
                     st.rerun()
         if not folder_docs:
             st.info('This folder is empty. Save an analysis first, then use Organize documents to move it here.')
-        for doc in folder_docs:
-            with st.container(border=True):
-                title_col, open_col = st.columns([4, 1], vertical_alignment="center")
-                title_col.write(doc.get('title', 'Untitled'))
-                if open_col.button('Open →', key=f'folder_open_{doc["id"]}', use_container_width=True):
+        search = st.text_input('Find a course material', placeholder='Search document titles…', key=f'library_search_{uid}_{folder_id}')
+        visible_docs = [doc for doc in folder_docs if search.casefold() in doc.get('title', '').casefold()]
+        if folder_docs:
+            st.caption(f'{len(visible_docs)} of {len(folder_docs)} materials')
+        if folder_docs and not visible_docs:
+            st.info('No matching titles. Try a different search.')
+        for doc_index, doc in enumerate(visible_docs):
+            if doc_index % 2 == 0:
+                document_columns = st.columns(2, gap="medium")
+            with document_columns[doc_index % 2], st.container(key=f"course_material_card_{doc_index}", border=False):
+                title = str(doc.get('title', 'Untitled'))
+                extension = title.rsplit('.', 1)[-1].lower() if '.' in title else ''
+                file_kind = 'PDF' if extension == 'pdf' else ('SLIDES' if extension in ('ppt', 'pptx') else ('WORD' if extension in ('doc', 'docx') else 'NOTES'))
+                tone = {'PDF':'rose', 'SLIDES':'blue', 'WORD':'mint', 'NOTES':'purple'}[file_kind]
+                statuses = [label for field, label in [('summary','Summary'), ('translation','Translation'), ('mindmap_eng','Mind map')] if doc.get(field)]
+                badges = ''.join(f'<span>{label}</span>' for label in statuses) or '<span>Saved material</span>'
+                st.html(f'<div class="material-topline"><span class="material-file {tone}">{file_kind}</span><span class="material-saved">IN YOUR LIBRARY</span></div><h4 class="material-title" title="{escape(title, quote=True)}">{escape(title.replace("_", " "))}</h4><div class="material-badges">{badges}</div>')
+                if st.button('Open material →', key=f'folder_open_{doc["id"]}', use_container_width=True):
                     st.session_state.ocr_results = dict(doc, filename=doc.get('title', 'Untitled'), lang=doc.get('language', 'Chinese'), time=0.0, is_loaded_from_db=True)
                     try:
                         st.session_state[f'chat_history_{doc["id"]}'] = json.loads(doc.get('chat_history') or '[]')
