@@ -196,3 +196,35 @@ def list_saved_documents(uid, token):
         page = data.get('nextPageToken')
         if not page:
             return sorted(docs, key=lambda doc: doc.get('timestamp', ''), reverse=True)
+
+
+def save_paper(uid, token, paper):
+    """Persist one owned paper snapshot without modifying course documents."""
+    from datetime import datetime, timezone
+    data = json.dumps(paper, ensure_ascii=False)
+    if len(data.encode('utf-8')) > 850000:
+        raise ValueError('This paper is too large to save. Download the result instead.')
+    paper_id = paper['id']
+    url = f'{ROOT}/users/{urllib.parse.quote(uid, safe="")}/papers/{urllib.parse.quote(paper_id, safe="")}'
+    request_json(url, token, 'PATCH', {'fields': {
+        'snapshot': {'stringValue': data},
+        'updated_at': {'stringValue': datetime.now(timezone.utc).isoformat()},
+    }})
+
+
+def list_papers(uid, token):
+    papers, page = [], ''
+    while True:
+        url = f'{ROOT}/users/{urllib.parse.quote(uid, safe="")}/papers?pageSize=100'
+        if page:
+            url += '&pageToken=' + urllib.parse.quote(page, safe='')
+        data = request_json(url, token)
+        for item in data.get('documents', []):
+            fields = item.get('fields', {})
+            paper = json.loads(fields['snapshot']['stringValue'])
+            if paper.get('id') != item['name'].split('/')[-1] or not isinstance(paper.get('questions'), list):
+                raise ValueError('A saved paper could not be read.')
+            papers.append({'paper': paper, 'updated_at': fields.get('updated_at', {}).get('stringValue', '')})
+        page = data.get('nextPageToken')
+        if not page:
+            return sorted(papers, key=lambda row: row['updated_at'], reverse=True)

@@ -74,9 +74,30 @@ def render_library(api_key):
                     st.rerun()
     with paper_tab:
         st.html('<div class="library-section-label paper-section-label"><span>02</span><div><strong>Your practice paper</strong><p>Select materials, build a paper, then submit all answers together.</p></div></div>')
-        st.caption('Papers are kept for this session. Download your results after marking.')
+        st.caption('Save a draft to continue later, or save your marked paper for revision.')
         paper_key = f'subject_paper_{uid}'
         paper = st.session_state.get(paper_key)
+        with st.expander('Saved papers · Continue or review'):
+            if st.button('Load saved papers', key='load_saved_papers'):
+                try:
+                    st.session_state[f'saved_papers_{uid}'] = library.list_papers(uid, token)
+                except Exception:
+                    st.error('Could not load saved papers. Check your connection and account permissions.')
+            saved_papers = st.session_state.get(f'saved_papers_{uid}', [])
+            if f'saved_papers_{uid}' in st.session_state and not saved_papers:
+                st.caption('No saved papers yet.')
+            replace_allowed = not paper or st.checkbox('Replace the current session paper with a saved paper', key='replace_paper_allowed')
+            for row in saved_papers:
+                saved = row['paper']
+                status = 'Marked' if saved.get('grades') else 'Draft'
+                st.caption(f"{saved.get('folder', 'Subject')} · {status} · {row['updated_at'][:16].replace('T', ' ')} UTC")
+                if st.button('Open saved paper', key=f"restore_{saved['id']}", disabled=not replace_allowed):
+                    import copy
+                    st.session_state[paper_key] = copy.deepcopy(saved)
+                    for question in saved['questions']:
+                        answer = saved.get('answers', {}).get(question['id'])
+                        st.session_state[f"paper_{saved['id']}_{question['id']}"] = answer if question['type'] == 'mcq' else (answer or '')
+                    st.rerun()
         if not paper:
             candidates = {doc['id']: doc for doc in folder_docs}
             with st.expander('1 · Select course materials', expanded=True):
@@ -126,6 +147,17 @@ def render_library(api_key):
                             answers[question['id']] = st.text_area('Your answer', height=150, max_chars=12000, key=key)
                 st.caption('Unanswered questions receive 0 marks. Short answers receive AI practice feedback, not an official grade.')
                 submit = st.form_submit_button('Submit paper for marking', type='primary')
+                save_draft = st.form_submit_button('Save draft to account')
+            if save_draft:
+                paper['answers'] = answers
+                try:
+                    library.save_paper(uid, token, paper)
+                except Exception:
+                    st.error('Draft was not saved. Your answers remain here; please retry.')
+                else:
+                    st.session_state.pop(f'saved_papers_{uid}', None)
+                    st.success('Draft saved to your account. Open Saved papers to continue later.')
+
             if submit:
                 paper['answers'] = answers
                 try:
@@ -148,6 +180,14 @@ def render_library(api_key):
                     st.write(grade['feedback'])
                     if question['type'] == 'short':
                         st.caption('AI assessment · ' + question['rubric'])
+            if st.button('Save marked paper to account', key='save_marked_paper'):
+                try:
+                    library.save_paper(uid, token, paper)
+                except Exception:
+                    st.error('The marked paper was not saved. Please retry or download a copy.')
+                else:
+                    st.session_state.pop(f'saved_papers_{uid}', None)
+                    st.success('Marked paper saved to your account.')
             st.download_button('Download marked paper', json.dumps(paper, ensure_ascii=False, indent=2), file_name='marked-practice-paper.json', mime='application/json')
         with st.expander('Start a different paper'):
             discard = st.checkbox('Discard this paper and its session answers', key=f'discard_{paper["id"]}')

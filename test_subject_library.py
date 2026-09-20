@@ -73,6 +73,28 @@ class LibraryTests(unittest.TestCase):
                 lib.generate_paper([{'id':'d1','summary':'A'}], 'key', 'English', 1, 1)
             self.assertEqual(generate.call_count, 3)
 
+    def test_draft_save_and_restore_answers(self):
+        paper = {'id':'savedtest', 'folder':'Physics', 'sources':{'d1':'Lecture 1','d2':'Lecture 2'}, 'questions':copy.deepcopy(QUESTIONS), 'answers':{}, 'grades':None}
+        source = "import streamlit as st\nfrom subject_library_ui import render_library\nst.session_state.user={'uid':'test','idToken':'token'}\nrender_library('key')"
+        with patch.object(lib, 'list_folders', return_value=[]), patch.object(lib, 'list_saved_documents', return_value=[]), patch.object(lib, 'save_paper') as save:
+            app = AppTest.from_string(source)
+            app.session_state['subject_paper_test'] = paper
+            app.run()
+            app.radio[0].set_value('B')
+            app.text_area[0].set_value('Draft explanation')
+            next(b for b in app.button if b.label == 'Save draft to account').click().run()
+            self.assertFalse(app.exception)
+            snapshot = copy.deepcopy(save.call_args.args[2])
+            self.assertEqual(snapshot['answers']['q2'], 'Draft explanation')
+            self.assertIsNone(snapshot['grades'])
+            with patch.object(lib, 'list_papers', return_value=[{'paper':snapshot, 'updated_at':'2026-09-20T00:00:00Z'}]):
+                other = AppTest.from_string(source).run()
+                other.button(key='load_saved_papers').click().run()
+                other.button(key='restore_savedtest').click().run()
+                self.assertFalse(other.exception)
+                self.assertEqual(other.radio[0].value, 'B')
+                self.assertEqual(other.text_area[0].value, 'Draft explanation')
+
     def test_blank_answers_score_zero_without_ai(self):
         self.assertEqual(sum(x['score'] for x in lib.grade_paper(QUESTIONS, {}, '').values()), 0)
 
