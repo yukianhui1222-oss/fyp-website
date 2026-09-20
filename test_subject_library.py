@@ -80,7 +80,7 @@ class LibraryTests(unittest.TestCase):
             app = AppTest.from_string(source)
             app.session_state['subject_paper_test'] = paper
             app.run()
-            app.radio[0].set_value('B')
+            next(r for r in app.radio if r.label == 'Select one answer').set_value('B')
             app.text_area[0].set_value('Draft explanation')
             next(b for b in app.button if b.label == 'Save draft to account').click().run()
             self.assertFalse(app.exception)
@@ -92,7 +92,7 @@ class LibraryTests(unittest.TestCase):
                 other.button(key='load_saved_papers').click().run()
                 other.button(key='restore_savedtest').click().run()
                 self.assertFalse(other.exception)
-                self.assertEqual(other.radio[0].value, 'B')
+                self.assertEqual(next(r for r in other.radio if r.label == 'Select one answer').value, 'B')
                 self.assertEqual(other.text_area[0].value, 'Draft explanation')
 
     def test_blank_answers_score_zero_without_ai(self):
@@ -111,7 +111,7 @@ render_library('test-key')
             app.selectbox(key='folder_browse_test').select('f').run()
             next(b for b in app.button if b.label == 'Generate mixed paper').click().run()
             self.assertFalse(app.exception)
-            app.radio[0].set_value('A')
+            next(r for r in app.radio if r.label == 'Select one answer').set_value('A')
             app.text_area[0].set_value('My explanation')
             next(b for b in app.button if b.label == 'Submit paper for marking').click().run()
             self.assertEqual(app.text_area[0].value, 'My explanation')

@@ -6,6 +6,19 @@ import streamlit as st
 import subject_library as library
 
 
+def open_course_material(doc):
+    st.session_state.ocr_results = dict(doc, filename=doc.get('title', 'Untitled'), lang=doc.get('language', 'Chinese'), time=0.0, is_loaded_from_db=True)
+    try:
+        st.session_state[f'chat_history_{doc["id"]}'] = json.loads(doc.get('chat_history') or '[]')
+    except (ValueError, TypeError):
+        st.session_state[f'chat_history_{doc["id"]}'] = []
+    st.session_state.subject_library_active = False
+    st.session_state.is_processing = False
+    st.session_state.quiz_data = None
+    st.session_state.quiz_mode_active = False
+    st.rerun()
+
+
 def render_library(api_key):
     user = st.session_state.get('user') or {}
     uid, token = user.get('uid'), user.get('idToken')
@@ -63,7 +76,26 @@ def render_library(api_key):
             st.caption(f'{len(visible_docs)} of {len(folder_docs)} materials')
         if folder_docs and not visible_docs:
             st.info('No matching titles. Try a different search.')
-        for doc_index, doc in enumerate(visible_docs):
+        shelf_view = st.radio('Material view', ['Flowing shelf', 'Card grid'], horizontal=True, key='material_view')
+        if shelf_view == 'Flowing shelf' and visible_docs:
+            from pathlib import Path
+            import streamlit.components.v1 as components
+            carousel = components.declare_component('material_carousel', path=str(Path(__file__).with_name('material_carousel')))
+            metadata = []
+            for doc in visible_docs:
+                title = str(doc.get('title', 'Untitled'))
+                ext = title.rsplit('.', 1)[-1].lower() if '.' in title else ''
+                kind = {'pdf':'PDF', 'ppt':'SLIDES', 'pptx':'SLIDES', 'doc':'WORD', 'docx':'WORD'}.get(ext, 'NOTES')
+                metadata.append({'id':doc['id'], 'title':title.replace('_', ' '), 'kind':kind,
+                    'tone':{'PDF':'rose', 'SLIDES':'blue', 'WORD':'mint', 'NOTES':'purple'}[kind],
+                    'tools':[label for field, label in [('summary','Summary'), ('translation','Translation'), ('mindmap_eng','Mind map')] if doc.get(field)]})
+            event = carousel(documents=metadata, key=f'material_shelf_{uid}_{folder_id}', default=None)
+            if isinstance(event, dict) and event.get('event') != st.session_state.get('material_shelf_last_event'):
+                match = next((doc for doc in visible_docs if doc['id'] == event.get('id')), None)
+                if match is not None:
+                    st.session_state.material_shelf_last_event = event.get('event')
+                    open_course_material(match)
+        for doc_index, doc in enumerate(visible_docs if shelf_view == 'Card grid' else []):
             if doc_index % 2 == 0:
                 document_columns = st.columns(2, gap="medium")
             with document_columns[doc_index % 2], st.container(key=f"course_material_card_{doc_index}", border=False):
@@ -75,16 +107,7 @@ def render_library(api_key):
                 badges = ''.join(f'<span>{label}</span>' for label in statuses) or '<span>Saved material</span>'
                 st.html(f'<div class="material-topline"><span class="material-file {tone}">{file_kind}</span><span class="material-saved">IN YOUR LIBRARY</span></div><h4 class="material-title" title="{escape(title, quote=True)}">{escape(title.replace("_", " "))}</h4><div class="material-badges">{badges}</div>')
                 if st.button('Open material →', key=f'folder_open_{doc["id"]}', use_container_width=True):
-                    st.session_state.ocr_results = dict(doc, filename=doc.get('title', 'Untitled'), lang=doc.get('language', 'Chinese'), time=0.0, is_loaded_from_db=True)
-                    try:
-                        st.session_state[f'chat_history_{doc["id"]}'] = json.loads(doc.get('chat_history') or '[]')
-                    except (ValueError, TypeError):
-                        st.session_state[f'chat_history_{doc["id"]}'] = []
-                    st.session_state.subject_library_active = False
-                    st.session_state.is_processing = False
-                    st.session_state.quiz_data = None
-                    st.session_state.quiz_mode_active = False
-                    st.rerun()
+                    open_course_material(doc)
     with paper_tab:
         st.html('<div class="library-section-label paper-section-label"><span>02</span><div><strong>Your practice paper</strong><p>Select materials, build a paper, then submit all answers together.</p></div></div>')
         st.caption('Save a draft to continue later, or save your marked paper for revision.')
