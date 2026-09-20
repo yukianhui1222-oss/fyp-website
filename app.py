@@ -394,6 +394,7 @@ def fetch_saved_summaries(uid, id_token=None):
                 doc_id = name.split("/")[-1]
                 parsed_docs.append({
                     "id": doc_id,
+                    "folder_id": fields.get("folder_id", {}).get("stringValue", ""),
                     "title": fields.get("title", {}).get("stringValue", "Untitled"),
                     "raw_text": fields.get("raw_text", {}).get("stringValue", ""),
                     "summary": fields.get("summary", {}).get("stringValue", ""),
@@ -421,6 +422,7 @@ def fetch_saved_summaries(uid, id_token=None):
                     doc_id = name.split("/")[-1]
                     parsed_docs.append({
                         "id": doc_id,
+                        "folder_id": fields.get("folder_id", {}).get("stringValue", ""),
                         "title": fields.get("title", {}).get("stringValue", "Untitled"),
                         "raw_text": fields.get("raw_text", {}).get("stringValue", ""),
                         "summary": fields.get("summary", {}).get("stringValue", ""),
@@ -4044,6 +4046,12 @@ def main():
         
         return # Stop execution of the rest of the app until logged in
 
+    if st.session_state.get('subject_library_active', False):
+        from subject_library_ui import render_library
+        with st.container(key="subject_library_workspace"):
+            render_library(api_key)
+        return
+
     if st.session_state.get('edit_profile_active', False):
         render_edit_profile_view()
         return
@@ -4079,6 +4087,10 @@ def main():
         with p_col1:
             with st.popover("Documents", icon="📂", use_container_width=True):
                 st.markdown("<div class='drawer-heading'>Your documents</div>", unsafe_allow_html=True)
+                if st.button("Subject folders & practice papers", key="open_subject_library", use_container_width=True):
+                    st.session_state.subject_library_active = True
+                    st.rerun()
+
                 if not uid:
                     st.caption("Log in to view saved summaries.")
                 else:

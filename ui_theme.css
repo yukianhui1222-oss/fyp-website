@@ -117,7 +117,7 @@ div[data-baseweb="tab-list"] button { min-height: 42px !important; white-space: 
 }
 
 /* Soft lavender, sky and mint surfaces echo the spectrum wordmark. */
-[data-testid="stAppViewContainer"]:has(.workspace-title, .quiz-answer-heading) {
+[data-testid="stAppViewContainer"]:has(.workspace-title, .quiz-answer-heading, .st-key-subject_library_workspace) {
   background: radial-gradient(ellipse at 15% 8%, #e5dcfb 0, transparent 52%),
     radial-gradient(ellipse at 90% 25%, #dcedfc 0, transparent 50%),
     radial-gradient(ellipse at 65% 95%, #dff4ed 0, transparent 55%), #f7f8fd !important;
@@ -905,3 +905,11 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 .st-key-home_learning_guide .learning-route article { background: #ffffffc9; border-color: #deebe5; }
 .documind-footer { margin-top: 48px; padding: 36px 28px 24px; border: 1px solid #dfd8eb; border-top: 3px solid #cec0e1; border-radius: 24px; background: #f3eef9c9; }
 @media(max-width:640px) { .st-key-home_learning_guide { padding: 20px 16px !important; } .documind-footer { padding: 28px 18px 22px; } .home-section-heading h2, .home-section-heading h3 { font-size: 1.25rem !important; } }
+
+
+/* Subject library uses the existing quiet study palette. */
+.st-key-subject_library_workspace { max-width: 1100px; margin: 0 auto; padding: 24px !important; background: #ffffffdf; border: 1px solid #e5dff0; border-radius: 24px; }
+.st-key-subject_library_workspace h2, .st-key-subject_library_workspace h3 { color: #4a3d60 !important; }
+.st-key-subject_library_workspace [data-testid="stForm"] { background: #faf9fd; border-color: #e3d9ee; border-radius: 16px; padding: 24px; }
+.st-key-subject_library_workspace textarea { font-size: 1rem !important; line-height: 1.7 !important; }
+@media(max-width:640px) { .st-key-subject_library_workspace { padding: 16px !important; } }
