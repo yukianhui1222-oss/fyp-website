@@ -1,6 +1,7 @@
 """Subject folders and an isolated, session-scoped mixed practice paper UI."""
 import json
 import uuid
+from html import escape
 import streamlit as st
 import subject_library as library
 
@@ -26,9 +27,10 @@ def render_library(api_key):
     folder_names = {folder['id']: folder['name'] for folder in folders}
     folder_id = st.selectbox('Browse subject', [''] + list(folder_names), format_func=lambda value: folder_names.get(value, 'Unfiled'), key=f'folder_browse_{uid}')
     folder_docs = [doc for doc in docs if doc.get('folder_id', '') == folder_id]
-    st.caption(f'{len(folder_docs)} documents · {folder_names.get(folder_id, "Unfiled")}')
+    st.html(f'<div class="subject-context"><span class="subject-context-icon" aria-hidden="true">▤</span><div><small>CURRENT SUBJECT</small><strong>{escape(folder_names.get(folder_id, "Unfiled"))}</strong></div><span class="subject-count">{len(folder_docs)} documents</span></div>')
     files_tab, paper_tab = st.tabs(['📂 Course materials', '✍️ Practice paper'])
     with files_tab:
+        st.html('<div class="library-section-label"><span>01</span><div><strong>Your course materials</strong><p>Create folders, organize documents, or open a saved lecture.</p></div></div>')
         with st.expander('＋ Create a subject folder', expanded=not bool(folders)):
             with st.form('create_subject_folder'):
                 name = st.text_input('Subject name', max_chars=80, placeholder='e.g. Quantum Computing')
@@ -71,8 +73,7 @@ def render_library(api_key):
                     st.session_state.quiz_mode_active = False
                     st.rerun()
     with paper_tab:
-        st.markdown('### Mixed practice paper')
-        st.caption('Choose materials → Set your paper → Answer & review')
+        st.html('<div class="library-section-label paper-section-label"><span>02</span><div><strong>Your practice paper</strong><p>Select materials, build a paper, then submit all answers together.</p></div></div>')
         st.caption('Papers are kept for this session. Download your results after marking.')
         paper_key = f'subject_paper_{uid}'
         paper = st.session_state.get(paper_key)
@@ -86,7 +87,7 @@ def render_library(api_key):
             mcq_count = mc_col.selectbox('Multiple-choice questions', [4, 6, 8])
             short_count = short_col.selectbox('Short-answer questions', [2, 3, 4])
             language = lang_col.selectbox('Paper language', ['English', 'Chinese', 'Malay'])
-            st.caption(f'{mcq_count * 2 + short_count * 10} marks · Generated from the selected materials; larger files may require a smaller selection.')
+            st.html(f'<div class="paper-blueprint"><div><small>MULTIPLE CHOICE</small><strong>{mcq_count} questions</strong><span>2 marks each</span></div><div><small>SHORT ANSWER</small><strong>{short_count} questions</strong><span>10 marks each</span></div><div><small>TOTAL</small><strong>{mcq_count * 2 + short_count * 10} marks</strong><span>{len(source_ids)} source documents</span></div></div>')
             if st.button('Generate mixed paper', type='primary', disabled=not source_ids or not api_key):
                 try:
                     with st.spinner('Building a paper across your course materials…'):
@@ -112,13 +113,17 @@ def render_library(api_key):
             with st.form(f'paper_form_{paper["id"]}'):
                 answers = {}
                 for number, question in enumerate(paper['questions'], 1):
-                    st.markdown(f'**{number}. {question["question"]}**')
-                    st.caption(f'{question["marks"]} marks · ' + ' / '.join(paper['sources'][x] for x in question['sources']))
-                    key = f'paper_{paper["id"]}_{question["id"]}'
-                    if question['type'] == 'mcq':
-                        answers[question['id']] = st.radio('Select one answer', question['options'], index=None, key=key)
-                    else:
-                        answers[question['id']] = st.text_area('Your answer', height=150, max_chars=12000, key=key)
+                    kind = question['type']
+                    with st.container(key=f"paper_question_{kind}_{number}", border=False):
+                        label = 'MULTIPLE CHOICE · Choose one' if kind == 'mcq' else 'SHORT ANSWER · Explain in your own words'
+                        st.html(f'<div class="paper-question-label"><span>Q{number:02d}</span><strong>{label}</strong><small>{question["marks"]} marks</small></div>')
+                        st.markdown(f'**{number}. {question["question"]}**')
+                        st.caption(f'{question["marks"]} marks · ' + ' / '.join(paper['sources'][x] for x in question['sources']))
+                        key = f'paper_{paper["id"]}_{question["id"]}'
+                        if question['type'] == 'mcq':
+                            answers[question['id']] = st.radio('Select one answer', question['options'], index=None, key=key)
+                        else:
+                            answers[question['id']] = st.text_area('Your answer', height=150, max_chars=12000, key=key)
                 st.caption('Unanswered questions receive 0 marks. Short answers receive AI practice feedback, not an official grade.')
                 submit = st.form_submit_button('Submit paper for marking', type='primary')
             if submit:
@@ -136,7 +141,8 @@ def render_library(api_key):
             st.success(f'Paper complete · {earned} / {maximum} marks')
             for number, question in enumerate(paper['questions'], 1):
                 grade = paper['grades'][question['id']]
-                with st.expander(f'{number}. {question["question"]} · {grade["score"]}/{question["marks"]}'):
+                status = '✓ Full marks' if grade['score'] == question['marks'] else ('◐ Partial credit' if grade['score'] else '↻ Review')
+                with st.expander(f'{number}. {question["question"]} · {grade["score"]}/{question["marks"]} · {status}'):
                     st.write('Your answer:', paper['answers'].get(question['id']) or 'Not answered')
                     st.write('Reference answer:', question['answer'])
                     st.write(grade['feedback'])
