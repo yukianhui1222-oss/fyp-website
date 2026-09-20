@@ -36,6 +36,22 @@ class LibraryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             lib.validate_paper({'questions': invalid}, {'d1','d2'}, 1, 1)
 
+    def test_generation_repairs_wrong_count(self):
+        import json
+        from types import SimpleNamespace
+        with patch('summarizer._get_model_name', return_value='test'), patch('summarizer.genai.GenerativeModel'), patch('summarizer._generate_with_retry', side_effect=[SimpleNamespace(text=json.dumps({'questions': QUESTIONS[:1]})), SimpleNamespace(text=json.dumps({'questions': QUESTIONS}))]) as generate:
+            result = lib.generate_paper([{'id':'d1','summary':'A'}, {'id':'d2','summary':'B'}], 'key', 'English', 1, 1)
+            self.assertEqual(len(result), 2)
+            self.assertEqual(generate.call_count, 2)
+            self.assertIn('EXACTLY 2', generate.call_args.args[1])
+
+    def test_generation_stops_after_three_invalid_responses(self):
+        from types import SimpleNamespace
+        with patch('summarizer._get_model_name', return_value='test'), patch('summarizer.genai.GenerativeModel'), patch('summarizer._generate_with_retry', return_value=SimpleNamespace(text='{"questions": []}')) as generate:
+            with self.assertRaises(ValueError):
+                lib.generate_paper([{'id':'d1','summary':'A'}], 'key', 'English', 1, 1)
+            self.assertEqual(generate.call_count, 3)
+
     def test_blank_answers_score_zero_without_ai(self):
         self.assertEqual(sum(x['score'] for x in lib.grade_paper(QUESTIONS, {}, '').values()), 0)
 

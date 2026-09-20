@@ -913,3 +913,14 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 .st-key-subject_library_workspace [data-testid="stForm"] { background: #faf9fd; border-color: #e3d9ee; border-radius: 16px; padding: 24px; }
 .st-key-subject_library_workspace textarea { font-size: 1rem !important; line-height: 1.7 !important; }
 @media(max-width:640px) { .st-key-subject_library_workspace { padding: 16px !important; } }
+
+.library-hero { padding: 12px 0 24px; }
+.library-hero > span { color: #85719c; font-size: .75rem; font-weight: 700; letter-spacing: .12em; }
+.library-hero h2 { margin: 10px 0 !important; padding: 0 !important; font-size: clamp(1.8rem, 4vw, 2.5rem) !important; }
+.library-hero p { color: #6c647a; font-size: 1rem; line-height: 1.7; }
+.st-key-subject_library_workspace [role="tablist"] { gap: 10px !important; padding: 6px !important; background: #f4f1f8 !important; border-radius: 14px; margin: 12px 0 24px; }
+.st-key-subject_library_workspace [role="tab"] { flex: 1 !important; padding: 14px !important; border-radius: 10px !important; background: transparent !important; }
+.st-key-subject_library_workspace [role="tab"][aria-selected="true"] { background: #ebe3f7 !important; border: 1px solid #d2c2e5 !important; }
+.st-key-subject_library_workspace [role="tab"] p { color: #6c5486 !important; font-weight: 650 !important; }
+.st-key-subject_library_workspace [data-testid="stCheckbox"] { padding: 10px 12px; border-bottom: 1px solid #eee8f3; }
+.st-key-subject_library_workspace [data-testid="stCaptionContainer"] p { color: #756d81 !important; font-size: .9rem !important; }
