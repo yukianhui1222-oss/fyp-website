@@ -1092,3 +1092,13 @@ div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) div[data-testid="stPopo
 div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) div[data-testid="stPopover"] button [data-testid="stMarkdownContainer"] p {
  flex: 0 0 auto !important; width: auto !important; height: auto !important; margin: 0 !important; padding: 0 !important; line-height: 1 !important;
 }
+/* Streamlit retains stale elements while a rerun streams the next page.
+   Hide their paint immediately instead of showing the default faded ghost. */
+[data-testid="stAppViewContainer"] [data-testid="stElementContainer"][data-stale="true"],
+[data-testid="stAppViewContainer"] .element-container[data-stale="true"] {
+ visibility: hidden !important;
+ opacity: 0 !important;
+ pointer-events: none !important;
+ transition: none !important;
+ animation: none !important;
+}
