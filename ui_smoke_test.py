@@ -23,6 +23,13 @@ check('login')
 app.session_state['user'] = {'uid':'ui-test', 'name':'Test User', 'email':'test@example.invalid', 'idToken':'test'}
 app.session_state['user_profile'] = {'uid':'ui-test', 'name':'Test User', 'role':'Standard Account'}
 check('home')
+app.button(key='toggle_navigation').click()
+check('expanded navigation')
+assert app.session_state['nav_expanded'] is True
+assert app.button(key='toggle_navigation').label == 'DocuMind'
+app.button(key='toggle_navigation').click()
+check('collapsed navigation')
+assert app.session_state['nav_expanded'] is False
 assert app.button(key='main_start_analysis_btn').disabled
 assert app.button(key='main_clear_disabled_btn').disabled
 for flag in ['edit_profile_active', 'leaderboard_active']:

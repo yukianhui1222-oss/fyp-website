@@ -4067,16 +4067,17 @@ def main():
     # ------------------ Main Interface ------------------
     # 开始在后台静默加载模型（带延迟以保障过渡动画和页面极速渲染完毕）
     initialize_models()
-    # ------------------ Top Navigation Bar (SaaS Header) ------------------
+    # Compact navigation with a keyboard-accessible brand toggle.
+    nav_expanded = st.session_state.get("nav_expanded", False)
     nav_col1, nav_col2 = st.columns([5.5, 4.5])
     with nav_col1:
-        st.markdown("""
-            <div class="documind-nav-brand" style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 1.6rem; background: linear-gradient(45deg, #f97316, #e11d48, #9f1239); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; font-family: 'Poppins', sans-serif;">DocuMind</span>
-                <span style="background: rgba(99, 102, 241, 0.25); color: #818CF8; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 99px;">PRO</span>
-            </div>
-        """, unsafe_allow_html=True)
-        
+        state_class = "nav-expanded" if nav_expanded else "nav-collapsed"
+        st.markdown(f'<div class="documind-nav-brand {state_class}" aria-hidden="true"></div>', unsafe_allow_html=True)
+        with st.container(key="nav_brand_toggle"):
+            if st.button("DocuMind" if nav_expanded else "Open navigation", key="toggle_navigation", help="Collapse navigation" if nav_expanded else "Expand navigation", use_container_width=True):
+                st.session_state.nav_expanded = not nav_expanded
+                st.rerun()
+
     with nav_col2:
         p_col1, p_col2, p_col3 = st.columns([1, 1, 1])
         
@@ -4085,7 +4086,7 @@ def main():
         id_token = user_info.get("idToken") if user_info else None
         
         with p_col1:
-            with st.popover("📂", help="Documents · Saved files and subject folders", use_container_width=True):
+            with st.popover("📂 Documents" if nav_expanded else "📂", help="Documents · Saved files and subject folders", use_container_width=True):
                 st.markdown("<div class='drawer-heading'>Your documents</div>", unsafe_allow_html=True)
                 if st.button("Subject folders & practice papers", key="open_subject_library", use_container_width=True):
                     st.session_state.subject_library_active = True
@@ -4152,7 +4153,7 @@ def main():
                                         st.error(msg)
                                         
         with p_col2:
-            with st.popover("⚙️", help="Settings", use_container_width=True):
+            with st.popover("⚙️ Settings" if nav_expanded else "⚙️", help="Settings", use_container_width=True):
                 st.markdown("<div class='drawer-heading'>Workspace settings</div>", unsafe_allow_html=True)
                 st.markdown("""
                     <div class="drawer-settings-card" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px;">
@@ -4204,7 +4205,7 @@ def main():
             else:
                 avatar_html = f'<div style="width: 32px; height: 32px; border-radius: 50%; background: #EEF2FF; color: #6366F1; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: 700 !important; font-size: 0.85rem !important; font-family: \'Poppins\', sans-serif !important;">{initials}</div>'
                 
-            with st.popover("👤", help="Profile and account", use_container_width=True):
+            with st.popover("👤 Profile" if nav_expanded else "👤", help="Profile and account", use_container_width=True):
                 st.markdown(f"""
                     <div class="drawer-profile-card" style="display: flex; align-items: center; gap: 12px;">
                         {avatar_html}

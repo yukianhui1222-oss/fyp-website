@@ -1026,3 +1026,22 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="s
  div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button { width: 44px !important; height: 46px !important; }
  .block-container:has(.documind-nav-brand) { padding-left: 72px !important; padding-right: 12px !important; padding-top: 18px !important; }
 }
+/* Expand the rail from its brand button; hide Streamlit's material-icon chevrons too. */
+.documind-nav-brand { display: none !important; }
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPopover"] button [data-testid="stIconMaterial"],
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPopover"] button [data-testid="stIcon"],
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPopover"] button > svg { display: none !important; }
+.st-key-nav_brand_toggle button { width: 100% !important; height: 52px !important; padding: 0 !important; display: flex !important; gap: 12px !important; justify-content: center !important; background: transparent !important; border: 0 !important; box-shadow: none !important; }
+.st-key-nav_brand_toggle button::before { content: ''; display: block; width: 30px; height: 30px; flex: 0 0 30px; border: 3px solid #9065dd; border-bottom-color: #34aaa9; border-radius: 50%; }
+.st-key-nav_brand_toggle button p { display: none !important; }
+.st-key-nav_brand_toggle button:focus-visible { outline: 2px solid #9b7bce !important; outline-offset: 2px; }
+div[data-testid="stHorizontalBlock"]:has(.nav-expanded) { width: 230px !important; padding: 24px 16px !important; }
+div[data-testid="stHorizontalBlock"]:has(.nav-expanded) .st-key-nav_brand_toggle button { justify-content: flex-start !important; padding-left: 10px !important; }
+div[data-testid="stHorizontalBlock"]:has(.nav-expanded) .st-key-nav_brand_toggle button p { display: block !important; font-size: 21px !important; font-weight: 800 !important; color: #473955 !important; }
+div[data-testid="stHorizontalBlock"]:has(.nav-expanded) div[data-testid="stPopover"] button { width: 100% !important; justify-content: flex-start !important; padding: 0 16px !important; }
+div[data-testid="stHorizontalBlock"]:has(.nav-expanded) div[data-testid="stPopover"] button p { font-size: 17px !important; white-space: nowrap !important; }
+.block-container:has(.nav-expanded) { padding-left: 254px !important; }
+@media(max-width:640px) {
+ div[data-testid="stHorizontalBlock"]:has(.nav-expanded) { width: 210px !important; padding: 16px 12px !important; box-shadow: 8px 0 32px #65508020 !important; }
+ .block-container:has(.nav-expanded) { padding-left: 72px !important; }
+}
