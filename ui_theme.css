@@ -1045,3 +1045,17 @@ div[data-testid="stHorizontalBlock"]:has(.nav-expanded) div[data-testid="stPopov
  div[data-testid="stHorizontalBlock"]:has(.nav-expanded) { width: 210px !important; padding: 16px 12px !important; box-shadow: 8px 0 32px #65508020 !important; }
  .block-container:has(.nav-expanded) { padding-left: 72px !important; }
 }
+
+/* Override the legacy header's paragraph and wrapper layout rules. */
+div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) .st-key-nav_brand_toggle button [data-testid="stMarkdownContainer"] {
+ position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip-path: inset(50%) !important; white-space: nowrap !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) .st-key-nav_brand_toggle button p { display: none !important; }
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div.st-key-nav_profile_anchor {
+ position: fixed !important; left: 10px !important; bottom: 24px !important; top: auto !important; width: 52px !important; height: 52px !important; margin: 0 !important; padding: 0 !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.nav-expanded) div.st-key-nav_profile_anchor { left: 16px !important; width: 198px !important; }
+@media(max-width:640px) {
+ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div.st-key-nav_profile_anchor { left: 5px !important; bottom: 16px !important; width: 44px !important; height: 46px !important; }
+ div[data-testid="stHorizontalBlock"]:has(.nav-expanded) div.st-key-nav_profile_anchor { left: 12px !important; width: 186px !important; }
+}

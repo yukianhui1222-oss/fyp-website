@@ -4192,7 +4192,7 @@ def main():
                         </div>
                     """, unsafe_allow_html=True)
                     
-        with p_col3:
+        with p_col3, st.container(key="nav_profile_anchor"):
             user_profile = st.session_state.get('user_profile', {})
             profile_name = user_profile.get('name') or user_name
             profile_role = user_profile.get('role') or 'Standard Account'
