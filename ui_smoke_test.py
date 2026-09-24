@@ -23,6 +23,7 @@ check('login')
 app.session_state['user'] = {'uid':'ui-test', 'name':'Test User', 'email':'test@example.invalid', 'idToken':'test'}
 app.session_state['user_profile'] = {'uid':'ui-test', 'name':'Test User', 'role':'Standard Account'}
 check('home')
+assert app.session_state['_rendered_page_route'] == 'home'
 app.button(key='toggle_navigation').click()
 check('expanded navigation')
 assert app.session_state['nav_expanded'] is True
@@ -35,6 +36,7 @@ assert app.button(key='main_clear_disabled_btn').disabled
 for flag in ['edit_profile_active', 'leaderboard_active']:
     app.session_state[flag] = True
     check(flag)
+    assert app.session_state['_rendered_page_route'] == {'edit_profile_active': 'profile', 'leaderboard_active': 'leaderboard'}[flag]
     app.session_state[flag] = False
 app.session_state['quiz_data'] = [{'question':'Which is a document format?', 'options':['A. PDF','B. Blue'], 'correct_answer':'A. PDF', 'explanation':'PDF is a document format.'}]
 app.session_state['quiz_mode_active'] = True
@@ -42,7 +44,9 @@ check('quiz')
 app.session_state['quiz_mode_active'] = False
 app.session_state['ocr_results'] = {'raw_text':'A short test document.', 'summary':'## Summary\nA short test document.', 'translation':'Test translation.', 'lang':'Chinese', 'filename':'test.pdf', 'time':1.0, 'mindmap_eng':'# Test\n## Document', 'mindmap_trans':'# Translation\n## Document', 'is_loaded_from_db':True}
 check('results')
+assert app.session_state['_rendered_page_route'] == 'results'
 assert len(app.tabs) == 4
 app.button(key='main_clear_results_btn').click()
 check('clear results')
+assert app.session_state['_rendered_page_route'] == 'home'
 assert 'ocr_results' not in app.session_state

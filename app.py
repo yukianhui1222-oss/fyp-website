@@ -2530,7 +2530,35 @@ def render_export_and_share_popover(docx_data, md_data, results, summary_result,
         """
         components.html(share_html, height=92)
 
+def _current_page_route():
+    """Keep the render boundary consistent with the route priority below."""
+    if st.session_state.get("user") is None:
+        return "login"
+    for flag, route in (
+        ("subject_library_active", "library"),
+        ("edit_profile_active", "profile"),
+        ("leaderboard_active", "leaderboard"),
+        ("quiz_mode_active", "quiz"),
+    ):
+        if st.session_state.get(flag, False):
+            return route
+    return "results" if st.session_state.get("ocr_results") else "home"
+
+
 def main():
+    # Replace the whole outgoing page before any network calls in the new view.
+    # Reuse the same container within a page so inputs and tabs remain stable.
+    route = _current_page_route()
+    page_slot = st.empty()
+    if st.session_state.get("_rendered_page_route") != route:
+        page_slot.empty()
+        st.session_state["_rendered_page_route"] = route
+    with page_slot.container():
+        with st.container(key=f"page_view_{route}"):
+            _render_main()
+
+
+def _render_main():
 
     # Initialize session state for auth
     if 'user' not in st.session_state:
