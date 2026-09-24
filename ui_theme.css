@@ -997,3 +997,32 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 .st-key-library_paper_zone { padding: 26px !important; background: #eff8f3ed; border: 1px solid #cde3d6; border-top: 4px solid #a6cdb8; border-radius: 22px; margin-top: 16px; }
 .st-key-subject_library_workspace [role="tablist"] { background: #ffffffc9 !important; border: 1px solid #dfd6eb; padding: 8px !important; }
 @media(max-width:640px) { .library-hero { padding: 24px 20px !important; } .library-hero::after { font-size: 24px; right: 14px; } .st-key-library_subject_zone,.st-key-library_manage_zone,.st-key-library_browse_zone,.st-key-library_paper_zone { padding: 18px 14px !important; } }
+
+/* Compact left navigation rail replaces the fixed top dashboard bar. */
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
+ position: fixed !important; inset: 0 auto 0 0 !important; width: 76px !important; height: 100dvh !important; padding: 24px 10px !important;
+ display: flex !important; flex-direction: column !important; justify-content: flex-start !important; align-items: center !important; gap: 34px !important;
+ border: 0 !important; border-right: 1px solid #e4dcef !important; border-radius: 0 !important; background: #fcfbffed !important; box-shadow: 4px 0 20px #65508006 !important; z-index: 999990 !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stColumn"],
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="column"] {
+ width: 100% !important; min-width: 0 !important; flex: 0 0 auto !important; padding: 0 !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stHorizontalBlock"] {
+ display: flex !important; flex-direction: column !important; gap: 16px !important; width: 100% !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stVerticalBlock"] { gap: 0 !important; width: 100% !important; }
+.documind-nav-brand { justify-content: center !important; width: 100%; padding: 8px 0; }
+.documind-nav-brand > span { display: none !important; }
+.documind-nav-brand::before { width: 30px !important; height: 30px !important; flex: 0 0 30px; }
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button {
+ width: 52px !important; min-width: 0 !important; height: 52px !important; padding: 0 !important; border-radius: 15px !important; justify-content: center !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button p { font-size: 23px !important; line-height: 1 !important; margin: 0 !important; }
+div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button svg { display: none !important; }
+.block-container:has(.documind-nav-brand) { padding-top: 28px !important; padding-left: 100px !important; padding-right: 24px !important; }
+@media(max-width:640px) {
+ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) { width: 58px !important; padding: 16px 5px !important; }
+ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button { width: 44px !important; height: 46px !important; }
+ .block-container:has(.documind-nav-brand) { padding-left: 72px !important; padding-right: 12px !important; padding-top: 18px !important; }
+}
