@@ -969,3 +969,12 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 .material-badges span { font-size: .75rem; padding: 4px 9px; border: 1px solid #e7e2ee; border-radius: 99px; color: #77648b; background: #faf8fd; }
 .st-key-subject_library_workspace [class*="st-key-course_material_card_"] button { background: #f5f0fb !important; border: 1px solid #e2d6ef !important; border-radius: 10px !important; box-shadow: none !important; }
 @media(max-width:700px) { .st-key-subject_library_workspace [data-testid="stHorizontalBlock"]:has([class*="st-key-course_material_card_"]) { flex-wrap: wrap !important; } .st-key-subject_library_workspace [data-testid="stColumn"]:has([class*="st-key-course_material_card_"]) { flex: 1 1 100% !important; width: 100% !important; } }
+
+
+/* A standalone separator marks the transition from study tools to About. */
+.about-section-divider { display: flex; align-items: center; gap: 18px; margin: 52px 0 28px; color: #a78abf; }
+.about-section-divider::before, .about-section-divider::after { content: ''; flex: 1; height: 2px; border-radius: 99px; background: linear-gradient(90deg, transparent, #c0afd9); }
+.about-section-divider::after { background: linear-gradient(90deg, #c0afd9, transparent); }
+.about-section-divider span { font-size: 22px; line-height: 1; }
+.about-section-divider + .documind-footer { margin-top: 0; }
+@media(max-width:640px) { .about-section-divider { margin: 36px 0 22px; gap: 12px; } }

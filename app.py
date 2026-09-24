@@ -5920,6 +5920,7 @@ def main():
         st.markdown("<br>", unsafe_allow_html=True)
 
     st.html("""
+        <div class="about-section-divider" aria-hidden="true"><span>✦</span></div>
         <footer class="documind-footer" aria-label="About DocuMind">
             <div class="footer-about">
                 <span class="footer-eyebrow">ABOUT DOCUMIND</span>
