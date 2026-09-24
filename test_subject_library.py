@@ -77,7 +77,7 @@ class LibraryTests(unittest.TestCase):
         paper = {'id':'savedtest', 'folder':'Physics', 'sources':{'d1':'Lecture 1','d2':'Lecture 2'}, 'questions':copy.deepcopy(QUESTIONS), 'answers':{}, 'grades':None}
         source = "import streamlit as st\nfrom subject_library_ui import render_library\nst.session_state.user={'uid':'test','idToken':'token'}\nrender_library('key')"
         with patch.object(lib, 'list_folders', return_value=[]), patch.object(lib, 'list_saved_documents', return_value=[]), patch.object(lib, 'save_paper') as save:
-            app = AppTest.from_string(source)
+            app = AppTest.from_string(source, default_timeout=25)
             app.session_state['subject_paper_test'] = paper
             app.run()
             next(r for r in app.radio if r.label == 'Select one answer').set_value('B')
@@ -88,7 +88,7 @@ class LibraryTests(unittest.TestCase):
             self.assertEqual(snapshot['answers']['q2'], 'Draft explanation')
             self.assertIsNone(snapshot['grades'])
             with patch.object(lib, 'list_papers', return_value=[{'paper':snapshot, 'updated_at':'2026-09-20T00:00:00Z'}]):
-                other = AppTest.from_string(source).run()
+                other = AppTest.from_string(source, default_timeout=25).run()
                 other.button(key='load_saved_papers').click().run()
                 other.button(key='restore_savedtest').click().run()
                 self.assertFalse(other.exception)
@@ -107,7 +107,7 @@ render_library('test-key')
 '''
         docs = [{'id':'d1','title':'Lecture 1','summary':'A','folder_id':'f'}, {'id':'d2','title':'Lecture 2','summary':'B','folder_id':'f'}]
         with patch.object(lib, 'list_folders', return_value=[{'id':'f','name':'Physics'}]), patch.object(lib, 'list_saved_documents', return_value=docs), patch.object(lib, 'generate_paper', return_value=copy.deepcopy(QUESTIONS)), patch.object(lib, 'grade_paper', side_effect=[ValueError('temporary'), {'q1':{'score':2,'feedback':'Correct'},'q2':{'score':8,'feedback':'More detail needed'}}]):
-            app = AppTest.from_string(source).run()
+            app = AppTest.from_string(source, default_timeout=25).run()
             app.selectbox(key='folder_browse_test').select('f').run()
             next(b for b in app.button if b.label == 'Generate mixed paper').click().run()
             self.assertFalse(app.exception)

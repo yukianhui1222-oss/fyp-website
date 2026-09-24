@@ -978,3 +978,22 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 .about-section-divider span { font-size: 22px; line-height: 1; }
 .about-section-divider + .documind-footer { margin-top: 0; }
 @media(max-width:640px) { .about-section-divider { margin: 36px 0 22px; gap: 12px; } }
+
+/* Distinct functional zones, matching the workspace's soft palette. */
+.st-key-subject_library_workspace { background: transparent !important; border: none !important; padding: 12px 0 !important; }
+.library-hero { position: relative; overflow: hidden; padding: 32px !important; margin: 8px 0 24px; border: 1px solid #dbd0ec; border-radius: 24px; background: linear-gradient(115deg,#e9dff8,#e9f1fc 65%,#e4f3ed); }
+.library-hero::after { content: '✦'; position: absolute; right: 28px; top: 22px; color: #bda6d4; font-size: 48px; pointer-events: none; }
+.library-hero h2 { max-width: 85%; }
+.st-key-library_subject_zone { padding: 22px 24px !important; background: #f5effbd9; border: 1px solid #dcd0ed; border-left: 4px solid #baa0d5; border-radius: 18px; margin-bottom: 22px; }
+.st-key-library_subject_zone .subject-context { margin-bottom: 0; background: #ffffffb3; }
+.st-key-library_manage_zone { padding: 26px !important; background: #edf4fddf; border: 1px solid #cedef0; border-top: 4px solid #adc8e7; border-radius: 22px; margin: 16px 0 26px; }
+.st-key-library_manage_zone .library-section-label { margin-top: 0; }
+.st-key-library_manage_zone [data-testid="stExpander"] details { background: #ffffffcc !important; border-color: #d6e2ef !important; }
+.st-key-library_browse_zone { padding: 26px !important; background: #ffffffeb; border: 1px solid #e0d6ec; border-top: 4px solid #cfb9e2; border-radius: 22px; margin-bottom: 24px; }
+.zone-heading { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.zone-heading > span { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #eee5f8; color: #8c6cab; font-size: 24px; }
+.zone-heading strong { color: #493d58; font-size: 1.3rem; }
+.zone-heading small { display: block; margin-top: 5px; color: #7b7087; font-size: .9rem; }
+.st-key-library_paper_zone { padding: 26px !important; background: #eff8f3ed; border: 1px solid #cde3d6; border-top: 4px solid #a6cdb8; border-radius: 22px; margin-top: 16px; }
+.st-key-subject_library_workspace [role="tablist"] { background: #ffffffc9 !important; border: 1px solid #dfd6eb; padding: 8px !important; }
+@media(max-width:640px) { .library-hero { padding: 24px 20px !important; } .library-hero::after { font-size: 24px; right: 14px; } .st-key-library_subject_zone,.st-key-library_manage_zone,.st-key-library_browse_zone,.st-key-library_paper_zone { padding: 18px 14px !important; } }
