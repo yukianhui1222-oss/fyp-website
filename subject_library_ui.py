@@ -4,6 +4,7 @@ import uuid
 from html import escape
 import streamlit as st
 import subject_library as library
+from navigation import navigate_to
 
 
 def open_course_material(doc):
@@ -19,12 +20,22 @@ def open_course_material(doc):
     st.rerun()
 
 
+def restore_saved_paper(paper_key, saved):
+    import copy
+    st.session_state[paper_key] = copy.deepcopy(saved)
+    for question in saved['questions']:
+        answer = saved.get('answers', {}).get(question['id'])
+        st.session_state[f"paper_{saved['id']}_{question['id']}"] = answer if question['type'] == 'mcq' else (answer or '')
+
+
+def discard_session_paper(paper_key):
+    st.session_state.pop(paper_key, None)
+
+
 def render_library(api_key):
     user = st.session_state.get('user') or {}
     uid, token = user.get('uid'), user.get('idToken')
-    if st.button('← Back to workspace', key='library_back'):
-        st.session_state.subject_library_active = False
-        st.rerun()
+    st.button('← Back to workspace', key='library_back', on_click=navigate_to, args=('workspace',))
     st.html('<div class="library-hero"><span>YOUR SUBJECT SPACE</span><h2>Organize. Connect. Practice.</h2><p>Keep your course materials together and turn them into a focused practice paper.</p></div>')
     if not uid or not token:
         st.info('Sign in to organize your saved documents.')
@@ -131,13 +142,7 @@ def render_library(api_key):
                 saved = row['paper']
                 status = 'Marked' if saved.get('grades') else 'Draft'
                 st.caption(f"{saved.get('folder', 'Subject')} · {status} · {row['updated_at'][:16].replace('T', ' ')} UTC")
-                if st.button('Open saved paper', key=f"restore_{saved['id']}", disabled=not replace_allowed):
-                    import copy
-                    st.session_state[paper_key] = copy.deepcopy(saved)
-                    for question in saved['questions']:
-                        answer = saved.get('answers', {}).get(question['id'])
-                        st.session_state[f"paper_{saved['id']}_{question['id']}"] = answer if question['type'] == 'mcq' else (answer or '')
-                    st.rerun()
+                st.button('Open saved paper', key=f"restore_{saved['id']}", disabled=not replace_allowed, on_click=restore_saved_paper, args=(paper_key, saved))
         if not paper:
             candidates = {doc['id']: doc for doc in folder_docs}
             with st.expander('1 · Select course materials', expanded=True):
@@ -181,6 +186,11 @@ def render_library(api_key):
                         st.markdown(f'**{number}. {question["question"]}**')
                         st.caption(f'{question["marks"]} marks · ' + ' / '.join(paper['sources'][x] for x in question['sources']))
                         key = f'paper_{paper["id"]}_{question["id"]}'
+                        # Streamlit removes widget state when leaving this page.
+                        # Rehydrate saved/submitted answers when returning to it.
+                        if key not in st.session_state:
+                            saved_answer = paper.get('answers', {}).get(question['id'])
+                            st.session_state[key] = saved_answer if question['type'] == 'mcq' else (saved_answer or '')
                         if question['type'] == 'mcq':
                             answers[question['id']] = st.radio('Select one answer', question['options'], index=None, key=key)
                         else:
@@ -231,6 +241,4 @@ def render_library(api_key):
             st.download_button('Download marked paper', json.dumps(paper, ensure_ascii=False, indent=2), file_name='marked-practice-paper.json', mime='application/json')
         with st.expander('Start a different paper'):
             discard = st.checkbox('Discard this paper and its session answers', key=f'discard_{paper["id"]}')
-            if st.button('Start new paper', disabled=not discard):
-                del st.session_state[paper_key]
-                st.rerun()
+            st.button('Start new paper', disabled=not discard, on_click=discard_session_paper, args=(paper_key,))

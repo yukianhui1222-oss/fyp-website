@@ -23,6 +23,7 @@ if sys.version_info < (3, 10):
 
 import streamlit as st
 from ui_theme import load_theme
+from navigation import navigate_to
 import streamlit.components.v1 as components
 import time
 import os
@@ -1407,6 +1408,7 @@ def render_left_panel(raw_text, summary_result, api_key, results):
 
 def clear_quiz_runtime_state():
     """Clears all transient state related to questions, answers, radio widgets, and AI tutor replies."""
+    st.session_state.pop('quiz_missing_answer', None)
     prefixes = (
         'user_ans_', 
         'radio_q_', 
@@ -1500,6 +1502,21 @@ def render_flashcards(summary, api_key, language):
 
 
 def render_quiz_view():
+    def select_question(index):
+        st.session_state.current_q_index = index
+
+    def begin_review():
+        st.session_state.quiz_finished = False
+        st.session_state.review_mode = True
+        st.session_state.current_q_index = 0
+
+    def submit_answer(index, answer_key):
+        answer = st.session_state.get(answer_key)
+        st.session_state.quiz_missing_answer = index if answer is None else None
+        if answer is not None:
+            st.session_state[f'user_ans_{index}'] = answer
+            st.session_state[f'q_submitted_{index}'] = True
+
     def get_true_correct(q_dict):
         opts = q_dict.get('options', [])
         ans = q_dict.get('correct_answer') or q_dict.get('answer') or q_dict.get('correct')
@@ -1811,10 +1828,7 @@ def render_quiz_view():
                         clear_quiz_runtime_state()
                         st.rerun()
                 with col_b:
-                    if st.button("Review Answers 🔍", type="primary", use_container_width=True, key="review_final_btn"):
-                        st.session_state.quiz_finished = False
-                        st.session_state.review_mode = True
-                        st.session_state.current_q_index = 0
+                    st.button("Review Answers 🔍", type="primary", use_container_width=True, key="review_final_btn", on_click=begin_review)
         return
 
     # --- ACTIVE QUIZ QUESTION SCREEN ---
@@ -1860,8 +1874,7 @@ def render_quiz_view():
                         else:
                             btn_label = f"📄 {i+1}"
                     
-                    if st.button(btn_label, key=f"nav_q_{i}", type=btn_type, use_container_width=True):
-                        st.session_state.current_q_index = i
+                    st.button(btn_label, key=f"nav_q_{i}", type=btn_type, use_container_width=True, on_click=select_question, args=(i,))
         
         with st.container(border=False, key="quiz_question_card"):
             q = quiz_data[idx]
@@ -2029,24 +2042,19 @@ Official Explanation: {q.get('explanation', '')}"""
                 
         with nav_cols[1]:
             if idx > 0:
-                if st.button("⬅️ Previous", use_container_width=True, key="prev_quiz_action_btn"):
-                    st.session_state.current_q_index -= 1
+                st.button("⬅️ Previous", use_container_width=True, key="prev_quiz_action_btn", on_click=select_question, args=(idx - 1,))
                     
         with nav_cols[2]:
             if not is_submitted and not review_mode:
-                if st.button("Submit Answer ✓", type="primary", use_container_width=True, key="submit_answer_action_btn"):
-                    if st.session_state.get(radio_key) is None:
-                        st.warning("Please select an answer first.")
-                    else:
-                        st.session_state[f'user_ans_{idx}'] = st.session_state[radio_key]
-                        st.session_state[f'q_submitted_{idx}'] = True
-                        
+                st.button("Submit Answer ✓", type="primary", use_container_width=True, key="submit_answer_action_btn", on_click=submit_answer, args=(idx, radio_key))
+                if st.session_state.get("quiz_missing_answer") == idx and st.session_state.get(radio_key) is None:
+                    st.warning("Please select an answer first.")
+
         with nav_cols[3]:
             # Navigate next or complete
             if is_submitted or review_mode: 
                 if idx < total_q - 1:
-                    if st.button("Next ➡️", type="primary", use_container_width=True, key="next_quiz_action_btn"):
-                        st.session_state.current_q_index += 1
+                    st.button("Next ➡️", type="primary", use_container_width=True, key="next_quiz_action_btn", on_click=select_question, args=(idx + 1,))
                 else:
                     finish_label = "Finish Review" if review_mode else "Finish Quiz 🏆"
                     if st.button(finish_label, type="primary", use_container_width=True, key="finish_quiz_action_btn"):
@@ -2549,11 +2557,19 @@ def main():
     # Replace the whole outgoing page before any network calls in the new view.
     # Reuse the same container within a page so inputs and tabs remain stable.
     route = _current_page_route()
-    page_slot = st.empty()
-    if st.session_state.get("_rendered_page_route") != route:
-        page_slot.empty()
-        st.session_state["_rendered_page_route"] = route
-    with page_slot.container():
+    # Hide the entire outgoing view, including block borders and fixed menus.
+    # Hiding only stale leaf elements leaves their parent cards visible.
+    st.html(f'<style>[class*="st-key-page_view_"]:not(.st-key-page_view_{route}) {{ display: none !important; }}</style>')
+    old_rail = "collapsed" if st.session_state.get("nav_expanded", False) else "expanded"
+    st.html(f'<style>[data-testid="stAppViewContainer"] .st-key-navigation_rail_{old_rail} {{ display: none !important; }}</style>')
+    # Each route owns a stable delta position. Reusing one placeholder lets
+    # Streamlit reconcile the incoming page against the old page's children.
+    # Emit empty blocks for every inactive route to remove whole old subtrees.
+    page_slots = {name: st.empty() for name in (
+        "login", "home", "results", "library", "profile", "leaderboard", "quiz"
+    )}
+    st.session_state["_rendered_page_route"] = route
+    with page_slots[route].container():
         with st.container(key=f"page_view_{route}"):
             _render_main()
 
@@ -2624,7 +2640,7 @@ def _render_main():
         }
         
         /* Style the top navigation horizontal container as a SaaS fixed navbar spanning full width (贯彻头尾) */
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) {
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
@@ -2647,7 +2663,7 @@ def _render_main():
         }
         
         /* Navbar popover buttons: flat, borderless, and light text */
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button {
             background-color: transparent !important;
             border: none !important;
             box-shadow: none !important;
@@ -2663,34 +2679,34 @@ def _render_main():
             justify-content: center !important;
             gap: 4px !important;
         }
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button:hover {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button:hover {
             background-color: rgba(255, 255, 255, 0.08) !important;
             color: #FFFFFF !important;
         }
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button *,
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button span,
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button p {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button *,
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button span,
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button p {
             color: #E2E8F0 !important;
             font-size: 1.05rem !important;
             font-weight: 600 !important;
             white-space: nowrap !important;
             display: inline !important;
         }
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button:hover *,
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button:hover span,
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button:hover p {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button:hover *,
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button:hover span,
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button:hover p {
             color: #FFFFFF !important;
         }
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button svg {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button svg {
             color: #E2E8F0 !important;
             fill: currentColor !important;
         }
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button:hover svg {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button:hover svg {
             color: #FFFFFF !important;
         }
         
         /* Make sure the markdown paragraph container inside navigation bar has zero margin/padding to prevent off-centering */
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) p {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) p {
             margin: 0 !important;
             padding: 0 !important;
             line-height: 1 !important;
@@ -2699,13 +2715,13 @@ def _render_main():
         }
 
         /* Force zero margin and padding on all structural wrapper divs in the logo column to guarantee centering */
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="column"]:first-child div {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="column"]:first-child div {
             margin: 0 !important;
             padding: 0 !important;
         }
 
         /* Align navbar components vertically centered */
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="column"] {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="column"] {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -2714,18 +2730,18 @@ def _render_main():
             padding: 0 !important;
         }
         
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="column"]:first-child {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="column"]:first-child {
             justify-content: flex-start !important;
         }
         
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stHorizontalBlock"] {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stHorizontalBlock"] {
             align-items: center !important;
             margin: 0 !important;
             height: 100% !important;
             width: 100% !important;
         }
         
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stVerticalBlock"] {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stVerticalBlock"] {
             gap: 0px !important;
             margin: 0 !important;
             padding: 0 !important;
@@ -2737,10 +2753,10 @@ def _render_main():
         }
 
         /* Centering intermediate Streamlit wrappers */
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="element-container"],
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[class*="element-container"],
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stMarkdown"],
-        div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stMarkdownContainer"] {
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="element-container"],
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[class*="element-container"],
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stMarkdown"],
+        :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stMarkdownContainer"] {
             margin: 0 !important;
             padding: 0 !important;
             display: flex !important;
@@ -2907,7 +2923,7 @@ def _render_main():
             transition: all 0.3s ease !important;
         }
         
-        .block-container:has(.documind-nav-brand) {
+        .block-container:has(:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded)) {
             max-width: 100% !important;
             padding-left: 3rem !important;
             padding-right: 3rem !important;
@@ -4097,180 +4113,171 @@ def _render_main():
     initialize_models()
     # Compact navigation with a keyboard-accessible brand toggle.
     nav_expanded = st.session_state.get("nav_expanded", False)
-    nav_col1, nav_col2 = st.columns([5.5, 4.5])
-    with nav_col1:
-        state_class = "nav-expanded" if nav_expanded else "nav-collapsed"
-        st.markdown(f'<div class="documind-nav-brand {state_class}" aria-hidden="true"></div>', unsafe_allow_html=True)
-        with st.container(key="nav_brand_toggle"):
-            if st.button("DocuMind" if nav_expanded else "Open navigation", key="toggle_navigation", help="Collapse navigation" if nav_expanded else "Expand navigation", use_container_width=True):
-                st.session_state.nav_expanded = not nav_expanded
-                st.rerun()
-
-    with nav_col2:
-        p_col1, p_col2, p_col3 = st.columns([1, 1, 1])
-        
-        # Access user variables from outer scope
-        uid = user_info.get("uid") if user_info else None
-        id_token = user_info.get("idToken") if user_info else None
-        
-        with p_col1:
-            with st.popover("📂 Documents" if nav_expanded else "📂", help="Documents · Saved files and subject folders", use_container_width=True):
-                st.markdown("<div class='drawer-heading'>Your documents</div>", unsafe_allow_html=True)
-                if st.button("Subject folders & practice papers", key="open_subject_library", use_container_width=True):
-                    st.session_state.subject_library_active = True
+    with st.container(key="navigation_rail_expanded" if nav_expanded else "navigation_rail_collapsed"):
+        nav_col1, nav_col2 = st.columns([5.5, 4.5])
+        with nav_col1:
+            state_class = "nav-expanded" if nav_expanded else "nav-collapsed"
+            st.markdown(f'<div class="documind-nav-brand {state_class}" aria-hidden="true"></div>', unsafe_allow_html=True)
+            with st.container(key="nav_brand_toggle"):
+                if st.button("DocuMind" if nav_expanded else "Open navigation", key="toggle_navigation", help="Collapse navigation" if nav_expanded else "Expand navigation", use_container_width=True):
+                    st.session_state.nav_expanded = not nav_expanded
                     st.rerun()
 
-                if not uid:
-                    st.caption("Log in to view saved summaries.")
-                else:
-                    saved_docs, err = fetch_saved_summaries(uid, id_token)
-                    if err:
-                        st.caption(f"⚠️ Failed to load history: {err[:60]}...")
-                    elif not saved_docs:
-                        st.caption("No saved summaries yet.")
+        with nav_col2:
+            p_col1, p_col2, p_col3 = st.columns([1, 1, 1])
+        
+            # Access user variables from outer scope
+            uid = user_info.get("uid") if user_info else None
+            id_token = user_info.get("idToken") if user_info else None
+        
+            with p_col1:
+                with st.popover("📂 Documents" if nav_expanded else "📂", help="Documents · Saved files and subject folders", use_container_width=True):
+                    st.markdown("<div class='drawer-heading'>Your documents</div>", unsafe_allow_html=True)
+                    st.button("Subject folders & practice papers", key="open_subject_library", use_container_width=True, on_click=navigate_to, args=("library",))
+
+                    if not uid:
+                        st.caption("Log in to view saved summaries.")
                     else:
-                        active_doc_id = st.session_state.ocr_results.get('id') if 'ocr_results' in st.session_state else None
-                        for doc in saved_docs:
-                            doc_title = doc.get("title", "Untitled")
-                            doc_id = doc.get("id")
-                            display_title = doc_title if len(doc_title) <= 22 else doc_title[:20] + "..."
+                        saved_docs, err = fetch_saved_summaries(uid, id_token)
+                        if err:
+                            st.caption(f"⚠️ Failed to load history: {err[:60]}...")
+                        elif not saved_docs:
+                            st.caption("No saved summaries yet.")
+                        else:
+                            active_doc_id = st.session_state.ocr_results.get('id') if 'ocr_results' in st.session_state else None
+                            for doc in saved_docs:
+                                doc_title = doc.get("title", "Untitled")
+                                doc_id = doc.get("id")
+                                display_title = doc_title if len(doc_title) <= 22 else doc_title[:20] + "..."
                             
-                            is_active = (active_doc_id == doc_id)
-                            prefix = "● " if is_active else ""
+                                is_active = (active_doc_id == doc_id)
+                                prefix = "● " if is_active else ""
                             
-                            h_col1, h_col2 = st.columns([7, 1], gap="small")
-                            with h_col1:
-                                if st.button(f"{prefix}{display_title}", key=f"load_doc_{doc_id}", use_container_width=True, help=doc_title):
-                                    st.session_state.ocr_results = {
-                                        'id': doc_id,
-                                        'raw_text': doc.get("raw_text", "Loaded from cloud account database."),
-                                        'summary': doc.get("summary", ""),
-                                        'translation': doc.get("translation", ""),
-                                        'mindmap_eng': doc.get("mindmap_eng", ""),
-                                        'mindmap_trans': doc.get("mindmap_trans", ""),
-                                        'time': 0.0,
-                                        'lang': doc.get("language", "Chinese"),
-                                        'is_loaded_from_db': True,
-                                        'filename': doc_title,
-                                        'chat_history': doc.get("chat_history", "")
-                                    }
-                                    chat_history_key = f"chat_history_{doc_id}"
-                                    db_history_str = doc.get("chat_history", "")
-                                    if db_history_str:
-                                        try:
-                                            st.session_state[chat_history_key] = json.loads(db_history_str)
-                                        except Exception:
+                                h_col1, h_col2 = st.columns([7, 1], gap="small")
+                                with h_col1:
+                                    if st.button(f"{prefix}{display_title}", key=f"load_doc_{doc_id}", use_container_width=True, help=doc_title):
+                                        st.session_state.ocr_results = {
+                                            'id': doc_id,
+                                            'raw_text': doc.get("raw_text", "Loaded from cloud account database."),
+                                            'summary': doc.get("summary", ""),
+                                            'translation': doc.get("translation", ""),
+                                            'mindmap_eng': doc.get("mindmap_eng", ""),
+                                            'mindmap_trans': doc.get("mindmap_trans", ""),
+                                            'time': 0.0,
+                                            'lang': doc.get("language", "Chinese"),
+                                            'is_loaded_from_db': True,
+                                            'filename': doc_title,
+                                            'chat_history': doc.get("chat_history", "")
+                                        }
+                                        chat_history_key = f"chat_history_{doc_id}"
+                                        db_history_str = doc.get("chat_history", "")
+                                        if db_history_str:
+                                            try:
+                                                st.session_state[chat_history_key] = json.loads(db_history_str)
+                                            except Exception:
+                                                st.session_state[chat_history_key] = []
+                                        else:
                                             st.session_state[chat_history_key] = []
-                                    else:
-                                        st.session_state[chat_history_key] = []
                                     
-                                    st.session_state.is_processing = False
-                                    st.toast(f"Loaded summary: {doc_title}!", icon="📥")
-                                    st.rerun()
-                            with h_col2:
-                                if st.button("✕", key=f"del_doc_{doc_id}", use_container_width=True, help=f"Delete '{doc_title}'"):
-                                    success, msg = delete_summary_from_firestore(uid, doc_id, id_token)
-                                    if success:
-                                        st.toast(f"Deleted '{doc_title}'!", icon="🗑️")
-                                        if 'ocr_results' in st.session_state:
-                                            cur_results = st.session_state.ocr_results
-                                            if cur_results.get('is_loaded_from_db') and cur_results.get('id') == doc_id:
-                                                del st.session_state.ocr_results
+                                        st.session_state.is_processing = False
+                                        st.toast(f"Loaded summary: {doc_title}!", icon="📥")
                                         st.rerun()
-                                    else:
-                                        st.error(msg)
+                                with h_col2:
+                                    if st.button("✕", key=f"del_doc_{doc_id}", use_container_width=True, help=f"Delete '{doc_title}'"):
+                                        success, msg = delete_summary_from_firestore(uid, doc_id, id_token)
+                                        if success:
+                                            st.toast(f"Deleted '{doc_title}'!", icon="🗑️")
+                                            if 'ocr_results' in st.session_state:
+                                                cur_results = st.session_state.ocr_results
+                                                if cur_results.get('is_loaded_from_db') and cur_results.get('id') == doc_id:
+                                                    del st.session_state.ocr_results
+                                            st.rerun()
+                                        else:
+                                            st.error(msg)
                                         
-        with p_col2:
-            with st.popover("⚙️ Settings" if nav_expanded else "⚙️", help="Settings", use_container_width=True):
-                st.markdown("<div class='drawer-heading'>Workspace settings</div>", unsafe_allow_html=True)
-                st.markdown("""
-                    <div class="drawer-settings-card" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);"></span>
-                            <span style="font-size: 0.8rem; font-weight: 700; color: #1f2937;">API Status: Online</span>
-                        </div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; color: #4b5563;">
-                            <span>⚡ GPU Mode</span>
-                            <span style="background: rgba(16, 185, 129, 0.1); color: #059669; font-weight: 700; padding: 1px 6px; border-radius: 4px;">FAST</span>
-                        </div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; color: #4b5563;">
-                            <span>🧠 Engine Model</span>
-                            <span style="font-family: monospace; font-size: 0.7rem; color: #6366f1; font-weight: 600;">Gemini 1.5 Pro</span>
-                        </div>
-                    </div>
-                """, unsafe_allow_html=True)
-                
-                if uid:
-                    saved_docs, _ = fetch_saved_summaries(uid, id_token)
-                    doc_count = len(saved_docs) if saved_docs else 0
-                    quota_max = 20
-                    percentage = min(int((doc_count / quota_max) * 100), 100)
-                    progress_color = "#6366f1" if percentage < 80 else "#ef4444"
-                    
-                    st.markdown(f"""
-                        <div style="padding: 4px 8px;">
-                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; color: #4b5563; margin-bottom: 6px;">
-                                <span>☁️ Storage Quota</span>
-                                <span>{doc_count}/{quota_max} docs</span>
+            with p_col2:
+                with st.popover("⚙️ Settings" if nav_expanded else "⚙️", help="Settings", use_container_width=True):
+                    st.markdown("<div class='drawer-heading'>Workspace settings</div>", unsafe_allow_html=True)
+                    st.markdown("""
+                        <div class="drawer-settings-card" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);"></span>
+                                <span style="font-size: 0.8rem; font-weight: 700; color: #1f2937;">API Status: Online</span>
                             </div>
-                            <div style="width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 99px; overflow: hidden; display: flex;">
-                                <div style="width: {percentage}%; height: 100%; background-color: {progress_color}; border-radius: 99px; transition: width 0.3s ease;"></div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; color: #4b5563;">
+                                <span>⚡ GPU Mode</span>
+                                <span style="background: rgba(16, 185, 129, 0.1); color: #059669; font-weight: 700; padding: 1px 6px; border-radius: 4px;">FAST</span>
                             </div>
-                            <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 6px;">Upgrade for unlimited docs.</div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; color: #4b5563;">
+                                <span>🧠 Engine Model</span>
+                                <span style="font-family: monospace; font-size: 0.7rem; color: #6366f1; font-weight: 600;">Gemini 1.5 Pro</span>
+                            </div>
                         </div>
                     """, unsafe_allow_html=True)
+
+                    if uid:
+                        saved_docs, _ = fetch_saved_summaries(uid, id_token)
+                        doc_count = len(saved_docs) if saved_docs else 0
+                        quota_max = 20
+                        percentage = min(int((doc_count / quota_max) * 100), 100)
+                        progress_color = "#6366f1" if percentage < 80 else "#ef4444"
+
+                        st.markdown(f"""
+                            <div style="padding: 4px 8px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; color: #4b5563; margin-bottom: 6px;">
+                                    <span>☁️ Storage Quota</span>
+                                    <span>{doc_count}/{quota_max} docs</span>
+                                </div>
+                                <div style="width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 99px; overflow: hidden; display: flex;">
+                                    <div style="width: {percentage}%; height: 100%; background-color: {progress_color}; border-radius: 99px; transition: width 0.3s ease;"></div>
+                                </div>
+                                <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 6px;">Upgrade for unlimited docs.</div>
+                            </div>
+                        """, unsafe_allow_html=True)
                     
-        with p_col3, st.container(key="nav_profile_anchor"):
-            user_profile = st.session_state.get('user_profile', {})
-            profile_name = user_profile.get('name') or user_name
-            profile_role = user_profile.get('role') or 'Standard Account'
-            profile_avatar = user_profile.get('avatar', '')
-            initials = profile_name[0].upper() if profile_name else "U"
+            with p_col3, st.container(key="nav_profile_anchor"):
+                user_profile = st.session_state.get('user_profile', {})
+                profile_name = user_profile.get('name') or user_name
+                profile_role = user_profile.get('role') or 'Standard Account'
+                profile_avatar = user_profile.get('avatar', '')
+                initials = profile_name[0].upper() if profile_name else "U"
             
-            avatar_html = ""
-            if profile_avatar:
-                avatar_html = f'<img src="{profile_avatar}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: none; display: block !important;">'
-            else:
-                avatar_html = f'<div style="width: 32px; height: 32px; border-radius: 50%; background: #EEF2FF; color: #6366F1; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: 700 !important; font-size: 0.85rem !important; font-family: \'Poppins\', sans-serif !important;">{initials}</div>'
+                avatar_html = ""
+                if profile_avatar:
+                    avatar_html = f'<img src="{profile_avatar}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: none; display: block !important;">'
+                else:
+                    avatar_html = f'<div style="width: 32px; height: 32px; border-radius: 50%; background: #EEF2FF; color: #6366F1; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: 700 !important; font-size: 0.85rem !important; font-family: \'Poppins\', sans-serif !important;">{initials}</div>'
                 
-            with st.popover("👤 Profile" if nav_expanded else "👤", help="Profile and account", use_container_width=True):
-                st.markdown(f"""
-                    <div class="drawer-profile-card" style="display: flex; align-items: center; gap: 12px;">
-                        {avatar_html}
-                        <div style="display: flex; flex-direction: column; overflow: hidden;">
-                            <span style="font-weight: 700; color: #1f2937; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{profile_name}</span>
-                            <span style="font-size: 0.75rem; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{profile_role}</span>
+                with st.popover("👤 Profile" if nav_expanded else "👤", help="Profile and account", use_container_width=True):
+                    st.markdown(f"""
+                        <div class="drawer-profile-card" style="display: flex; align-items: center; gap: 12px;">
+                            {avatar_html}
+                            <div style="display: flex; flex-direction: column; overflow: hidden;">
+                                <span style="font-weight: 700; color: #1f2937; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{profile_name}</span>
+                                <span style="font-size: 0.75rem; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{profile_role}</span>
+                            </div>
                         </div>
-                    </div>
-                """, unsafe_allow_html=True)
+                    """, unsafe_allow_html=True)
                 
-                if st.button("⚙️ Edit Profile", key="nav_edit_profile_btn", use_container_width=True):
-                    st.session_state.edit_profile_active = True
-                    st.session_state.quiz_mode_active = False
-                    st.session_state.leaderboard_active = False
-                    st.rerun()
+                    st.button("⚙️ Edit Profile", key="nav_edit_profile_btn", use_container_width=True, on_click=navigate_to, args=("profile",))
                     
-                if st.button("🏆 Global Leaderboard", key="nav_leaderboard_btn", use_container_width=True):
-                    st.session_state.leaderboard_active = True
-                    st.session_state.edit_profile_active = False
-                    st.session_state.quiz_mode_active = False
-                    st.rerun()
+                    st.button("🏆 Global Leaderboard", key="nav_leaderboard_btn", use_container_width=True, on_click=navigate_to, args=("leaderboard",))
                     
-                if st.button("Logout", key="nav_logout_button", use_container_width=True, type="primary"):
-                    st.session_state.user = None
-                    st.session_state.logout_request = True
-                    st.session_state.user_profile = None
-                    if 'ocr_results' in st.session_state:
-                        del st.session_state.ocr_results
-                    if 'quiz_data' in st.session_state:
-                        del st.session_state.quiz_data
-                    st.session_state.quiz_mode_active = False
-                    st.session_state.edit_profile_active = False
-                    st.session_state.leaderboard_active = False
-                    st.session_state.quiz_finished = False
-                    st.session_state.quiz_submitted = False
-                    st.session_state.guest_quiz_attempts = []
-                    st.rerun()
+                    if st.button("Logout", key="nav_logout_button", use_container_width=True, type="primary"):
+                        st.session_state.user = None
+                        st.session_state.logout_request = True
+                        st.session_state.user_profile = None
+                        if 'ocr_results' in st.session_state:
+                            del st.session_state.ocr_results
+                        if 'quiz_data' in st.session_state:
+                            del st.session_state.quiz_data
+                        st.session_state.quiz_mode_active = False
+                        st.session_state.edit_profile_active = False
+                        st.session_state.leaderboard_active = False
+                        st.session_state.quiz_finished = False
+                        st.session_state.quiz_submitted = False
+                        st.session_state.guest_quiz_attempts = []
+                        st.rerun()
 
     
     
@@ -5870,7 +5877,11 @@ def _render_main():
                                         btn_rev_col, btn_ret_col = st.columns(2)
                                         with btn_rev_col:
                                             if st.button("Review 🔍", key=f"rev_att_{att_id}", use_container_width=True):
+                                                clear_quiz_runtime_state()
                                                 st.session_state.quiz_data = att.get("answers", [])
+                                                for i_ans, ans_obj in enumerate(att.get("answers", [])):
+                                                    st.session_state[f"user_ans_{i_ans}"] = ans_obj.get("user_answer", "")
+                                                    st.session_state[f"q_submitted_{i_ans}"] = True
                                                 st.session_state.review_mode = True
                                                 st.session_state.quiz_mode_active = True
                                                 st.session_state.current_q_index = 0

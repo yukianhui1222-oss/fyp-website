@@ -4,10 +4,10 @@
   background: radial-gradient(ellipse at 85% 0%, #eaeaff 0, transparent 42%), #f5f7fb !important;
 }
 .block-container { max-width: 1440px; transition: none !important; }
-.block-container:has(.documind-nav-brand) {
+.block-container:has(:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded)) {
   max-width: 1440px !important; padding: 106px 3rem 3rem !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) {
   background: #17243a !important; height: 72px !important;
   box-shadow: 0 3px 16px #18283b12 !important; backdrop-filter: none !important;
 }
@@ -65,19 +65,19 @@ div[data-baseweb="tab-list"] button { min-height: 42px !important; white-space: 
 [data-testid="stExpander"] details { border-radius: 14px !important; }
 [data-testid="stAlert"] { border-radius: 12px !important; }
 @media (max-width: 900px) {
-  .block-container:has(.documind-nav-brand) { padding: 148px 1rem 2rem !important; }
-  div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
+  .block-container:has(:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded)) { padding: 148px 1rem 2rem !important; }
+  :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) {
     height: auto !important; min-height: 116px; padding: 12px 16px !important;
     flex-wrap: wrap !important; gap: 10px !important;
   }
-  div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) > [data-testid="stColumn"] {
+  :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) > [data-testid="stColumn"] {
     width: 100% !important; flex: 1 1 100% !important; min-width: 0 !important;
   }
-  div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+  :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
     width: auto !important; flex: 1 1 0 !important; min-width: 0 !important;
   }
-  div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPopover"] button { padding: 8px !important; }
-  div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPopover"] button p { font-size: 0.92rem !important; }
+  :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stPopover"] button { padding: 8px !important; }
+  :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stPopover"] button p { font-size: 0.92rem !important; }
   .hero-container { padding: 26px 18px !important; }
 }
 @media (max-width: 600px) {
@@ -123,7 +123,7 @@ div[data-baseweb="tab-list"] button { min-height: 42px !important; white-space: 
     radial-gradient(ellipse at 65% 95%, #dff4ed 0, transparent 55%), #f7f8fd !important;
   background-attachment: fixed !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) {
   background: #27221f !important;
   border-bottom: 1px solid #ffffff12 !important;
   box-shadow: 0 4px 22px #27221f12 !important;
@@ -191,27 +191,27 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
 }
 
 /* Lightweight dashboard navigation and matching menu panels. */
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) {
   background: #fcfcff !important;
   border-bottom: 1px solid #e0dff0 !important;
   box-shadow: 0 4px 20px #51428b08 !important;
 }
 .documind-nav-brand > span:first-child { -webkit-text-fill-color: #27221f !important; }
 .documind-nav-brand > span:last-child { background: #ede8fb !important; color: #7157a7 !important; }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button {
   background: #f1f0fb !important; border: 1px solid #e4e1f2 !important;
   border-radius: 24px !important; color: #4c5474 !important; padding: 9px 16px !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button *,
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button p,
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button span {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button *,
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button p,
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button span {
   color: #4c5474 !important; font-size: 0.95rem !important; font-weight: 600 !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button:hover,
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button[aria-expanded="true"] {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button:hover,
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button[aria-expanded="true"] {
   background: #e7e4fa !important; border-color: #bab0df !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button:hover * {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button:hover * {
   color: #65519c !important;
 }
 div[data-testid="stPopoverBody"] {
@@ -625,7 +625,7 @@ div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b8
 }
 
 /* Align navigation icons, labels and chevrons on one shared center line. */
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPopover"] button {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stPopover"] button {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -635,7 +635,7 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
   gap: 8px !important;
   box-sizing: border-box !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPopover"] button > div {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stPopover"] button > div {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -643,12 +643,12 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
   margin: 0 !important;
   padding: 0 !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPopover"] button p {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stPopover"] button p {
   margin: 0 !important;
   padding: 0 !important;
   line-height: 24px !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPopover"] button svg {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stPopover"] button svg {
   display: block !important;
   align-self: center !important;
   flex-shrink: 0 !important;
@@ -999,97 +999,97 @@ div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPo
 @media(max-width:640px) { .library-hero { padding: 24px 20px !important; } .library-hero::after { font-size: 24px; right: 14px; } .st-key-library_subject_zone,.st-key-library_manage_zone,.st-key-library_browse_zone,.st-key-library_paper_zone { padding: 18px 14px !important; } }
 
 /* Compact left navigation rail replaces the fixed top dashboard bar. */
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) {
  position: fixed !important; inset: 0 auto 0 0 !important; width: 76px !important; height: 100dvh !important; padding: 24px 10px !important;
  display: flex !important; flex-direction: column !important; justify-content: flex-start !important; align-items: center !important; gap: 34px !important;
  border: 0 !important; border-right: 1px solid #e4dcef !important; border-radius: 0 !important; background: #fcfbffed !important; box-shadow: 4px 0 20px #65508006 !important; z-index: 999990 !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stColumn"],
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="column"] {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stColumn"],
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="column"] {
  width: 100% !important; min-width: 0 !important; flex: 0 0 auto !important; padding: 0 !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stHorizontalBlock"] {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stHorizontalBlock"] {
  display: flex !important; flex-direction: column !important; gap: 16px !important; width: 100% !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stVerticalBlock"] { gap: 0 !important; width: 100% !important; }
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stVerticalBlock"] { gap: 0 !important; width: 100% !important; }
 .documind-nav-brand { justify-content: center !important; width: 100%; padding: 8px 0; }
 .documind-nav-brand > span { display: none !important; }
 .documind-nav-brand::before { width: 30px !important; height: 30px !important; flex: 0 0 30px; }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button {
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button {
  width: 52px !important; min-width: 0 !important; height: 52px !important; padding: 0 !important; border-radius: 15px !important; justify-content: center !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button p { font-size: 23px !important; line-height: 1 !important; margin: 0 !important; }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button svg { display: none !important; }
-.block-container:has(.documind-nav-brand) { padding-top: 28px !important; padding-left: 100px !important; padding-right: 24px !important; }
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button p { font-size: 23px !important; line-height: 1 !important; margin: 0 !important; }
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button svg { display: none !important; }
+.block-container:has(:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded)) { padding-top: 28px !important; padding-left: 100px !important; padding-right: 24px !important; }
 @media(max-width:640px) {
- div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) { width: 58px !important; padding: 16px 5px !important; }
- div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div[data-testid="stPopover"] button { width: 44px !important; height: 46px !important; }
- .block-container:has(.documind-nav-brand) { padding-left: 72px !important; padding-right: 12px !important; padding-top: 18px !important; }
+ :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) { width: 58px !important; padding: 16px 5px !important; }
+ :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button { width: 44px !important; height: 46px !important; }
+ .block-container:has(:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded)) { padding-left: 72px !important; padding-right: 12px !important; padding-top: 18px !important; }
 }
 /* Expand the rail from its brand button; hide Streamlit's material-icon chevrons too. */
 .documind-nav-brand { display: none !important; }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPopover"] button [data-testid="stIconMaterial"],
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPopover"] button [data-testid="stIcon"],
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) [data-testid="stPopover"] button > svg { display: none !important; }
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stPopover"] button [data-testid="stIconMaterial"],
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stPopover"] button [data-testid="stIcon"],
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stPopover"] button > svg { display: none !important; }
 .st-key-nav_brand_toggle button { width: 100% !important; height: 52px !important; padding: 0 !important; display: flex !important; gap: 12px !important; justify-content: center !important; background: transparent !important; border: 0 !important; box-shadow: none !important; }
 .st-key-nav_brand_toggle button::before { content: ''; display: block; width: 30px; height: 30px; flex: 0 0 30px; border: 3px solid #9065dd; border-bottom-color: #34aaa9; border-radius: 50%; }
 .st-key-nav_brand_toggle button p { display: none !important; }
 .st-key-nav_brand_toggle button:focus-visible { outline: 2px solid #9b7bce !important; outline-offset: 2px; }
-div[data-testid="stHorizontalBlock"]:has(.nav-expanded) { width: 230px !important; padding: 24px 16px !important; }
-div[data-testid="stHorizontalBlock"]:has(.nav-expanded) .st-key-nav_brand_toggle button { justify-content: flex-start !important; padding-left: 10px !important; }
-div[data-testid="stHorizontalBlock"]:has(.nav-expanded) .st-key-nav_brand_toggle button p { display: block !important; font-size: 21px !important; font-weight: 800 !important; color: #473955 !important; }
-div[data-testid="stHorizontalBlock"]:has(.nav-expanded) div[data-testid="stPopover"] button { width: 100% !important; justify-content: flex-start !important; padding: 0 16px !important; }
-div[data-testid="stHorizontalBlock"]:has(.nav-expanded) div[data-testid="stPopover"] button p { font-size: 17px !important; white-space: nowrap !important; }
-.block-container:has(.nav-expanded) { padding-left: 254px !important; }
+.st-key-navigation_rail_expanded { width: 230px !important; padding: 24px 16px !important; }
+.st-key-navigation_rail_expanded .st-key-nav_brand_toggle button { justify-content: flex-start !important; padding-left: 10px !important; }
+.st-key-navigation_rail_expanded .st-key-nav_brand_toggle button p { display: block !important; font-size: 21px !important; font-weight: 800 !important; color: #473955 !important; }
+.st-key-navigation_rail_expanded div[data-testid="stPopover"] button { width: 100% !important; justify-content: flex-start !important; padding: 0 16px !important; }
+.st-key-navigation_rail_expanded div[data-testid="stPopover"] button p { font-size: 17px !important; white-space: nowrap !important; }
+.block-container:has(.st-key-navigation_rail_expanded) { padding-left: 254px !important; }
 @media(max-width:640px) {
- div[data-testid="stHorizontalBlock"]:has(.nav-expanded) { width: 210px !important; padding: 16px 12px !important; box-shadow: 8px 0 32px #65508020 !important; }
- .block-container:has(.nav-expanded) { padding-left: 72px !important; }
+ .st-key-navigation_rail_expanded { width: 210px !important; padding: 16px 12px !important; box-shadow: 8px 0 32px #65508020 !important; }
+ .block-container:has(.st-key-navigation_rail_expanded) { padding-left: 72px !important; }
 }
 
 /* Override the legacy header's paragraph and wrapper layout rules. */
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) .st-key-nav_brand_toggle button [data-testid="stMarkdownContainer"] {
+.st-key-navigation_rail_collapsed .st-key-nav_brand_toggle button [data-testid="stMarkdownContainer"] {
  position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip-path: inset(50%) !important; white-space: nowrap !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) .st-key-nav_brand_toggle button p { display: none !important; }
-div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div.st-key-nav_profile_anchor {
+.st-key-navigation_rail_collapsed .st-key-nav_brand_toggle button p { display: none !important; }
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div.st-key-nav_profile_anchor {
  position: fixed !important; left: 10px !important; bottom: 24px !important; top: auto !important; width: 52px !important; height: 52px !important; margin: 0 !important; padding: 0 !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.nav-expanded) div.st-key-nav_profile_anchor { left: 16px !important; width: 198px !important; }
+.st-key-navigation_rail_expanded div.st-key-nav_profile_anchor { left: 16px !important; width: 198px !important; }
 @media(max-width:640px) {
- div[data-testid="stHorizontalBlock"]:has(.documind-nav-brand) div.st-key-nav_profile_anchor { left: 5px !important; bottom: 16px !important; width: 44px !important; height: 46px !important; }
- div[data-testid="stHorizontalBlock"]:has(.nav-expanded) div.st-key-nav_profile_anchor { left: 12px !important; width: 186px !important; }
+ :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div.st-key-nav_profile_anchor { left: 5px !important; bottom: 16px !important; width: 44px !important; height: 46px !important; }
+ .st-key-navigation_rail_expanded div.st-key-nav_profile_anchor { left: 12px !important; width: 186px !important; }
 }
 /* Equal square icon tiles on the collapsed rail, including the brand and profile. */
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) { padding-left: 12px !important; padding-right: 12px !important; box-sizing: border-box !important; }
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) .st-key-nav_brand_toggle button,
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) div[data-testid="stPopover"] button {
+.st-key-navigation_rail_collapsed { padding-left: 12px !important; padding-right: 12px !important; box-sizing: border-box !important; }
+.st-key-navigation_rail_collapsed .st-key-nav_brand_toggle button,
+.st-key-navigation_rail_collapsed div[data-testid="stPopover"] button {
  width: 52px !important; min-width: 52px !important; max-width: 52px !important; height: 52px !important; min-height: 52px !important;
  box-sizing: border-box !important; margin: 0 !important; padding: 0 !important; border: 1px solid #e4dcef !important; border-radius: 12px !important;
  display: flex !important; align-items: center !important; justify-content: center !important; gap: 0 !important; background: #f3effb !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) div[data-testid="stPopover"] button [data-testid="stMarkdownContainer"],
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) div[data-testid="stPopover"] button p { width: 100% !important; display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; }
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) div.st-key-nav_profile_anchor { left: 12px !important; }
+.st-key-navigation_rail_collapsed div[data-testid="stPopover"] button [data-testid="stMarkdownContainer"],
+.st-key-navigation_rail_collapsed div[data-testid="stPopover"] button p { width: 100% !important; display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; }
+.st-key-navigation_rail_collapsed div.st-key-nav_profile_anchor { left: 12px !important; }
 @media(max-width:640px) {
- div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) { padding-left: 7px !important; padding-right: 7px !important; }
- div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) .st-key-nav_brand_toggle button,
- div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) div[data-testid="stPopover"] button { width: 44px !important; min-width: 44px !important; max-width: 44px !important; height: 44px !important; min-height: 44px !important; }
- div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) div.st-key-nav_profile_anchor { left: 7px !important; height: 44px !important; }
+ .st-key-navigation_rail_collapsed { padding-left: 7px !important; padding-right: 7px !important; }
+ .st-key-navigation_rail_collapsed .st-key-nav_brand_toggle button,
+ .st-key-navigation_rail_collapsed div[data-testid="stPopover"] button { width: 44px !important; min-width: 44px !important; max-width: 44px !important; height: 44px !important; min-height: 44px !important; }
+ .st-key-navigation_rail_collapsed div.st-key-nav_profile_anchor { left: 7px !important; height: 44px !important; }
 }
 /* Center the visible icon independently of Streamlit's hidden label/chevron wrappers. */
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) .st-key-nav_brand_toggle button,
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) div[data-testid="stPopover"] button { position: relative !important; }
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) .st-key-nav_brand_toggle button::before {
+.st-key-navigation_rail_collapsed .st-key-nav_brand_toggle button,
+.st-key-navigation_rail_collapsed div[data-testid="stPopover"] button { position: relative !important; }
+.st-key-navigation_rail_collapsed .st-key-nav_brand_toggle button::before {
  position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; margin: 0 !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) div[data-testid="stPopover"] button > div {
+.st-key-navigation_rail_collapsed div[data-testid="stPopover"] button > div {
  position: static !important; gap: 0 !important; padding: 0 !important; margin: 0 !important;
 }
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) div[data-testid="stPopover"] button [data-testid="stMarkdownContainer"] {
+.st-key-navigation_rail_collapsed div[data-testid="stPopover"] button [data-testid="stMarkdownContainer"] {
  position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important;
  display: flex !important; align-items: center !important; justify-content: center !important; pointer-events: none;
 }
-div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) div[data-testid="stPopover"] button [data-testid="stMarkdownContainer"] p {
+.st-key-navigation_rail_collapsed div[data-testid="stPopover"] button [data-testid="stMarkdownContainer"] p {
  flex: 0 0 auto !important; width: auto !important; height: auto !important; margin: 0 !important; padding: 0 !important; line-height: 1 !important;
 }
 /* Streamlit retains stale elements while a rerun streams the next page.
@@ -1102,3 +1102,19 @@ div[data-testid="stHorizontalBlock"]:has(.nav-collapsed) div[data-testid="stPopo
  transition: none !important;
  animation: none !important;
 }
+
+/* The rail owns its layout; unrelated horizontal blocks must never become rails. */
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) > [data-testid="stHorizontalBlock"] { height: auto !important; gap: 30px !important; }
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stColumn"],
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="column"],
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stVerticalBlock"] { height: auto !important; }
+/* Preserve the square brand tile against global button styles. */
+div.st-key-navigation_rail_collapsed .st-key-nav_brand_toggle div.stButton > button { border-radius: 12px !important; }
+.st-key-navigation_rail_collapsed .st-key-nav_brand_toggle button p { display: block !important; }
+/* Avoid an intermediate 52px Streamlit wrapper while the expanded rail measures. */
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stLayoutWrapper"],
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stElementContainer"],
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stButton"] {
+ width: 100% !important; min-width: 0 !important; max-width: none !important; transition: none !important;
+}
+.st-key-navigation_rail_expanded .st-key-nav_brand_toggle button p { white-space: nowrap !important; }
