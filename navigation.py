@@ -2,6 +2,10 @@
 import streamlit as st
 
 
+def toggle_navigation():
+    st.session_state.nav_expanded = not st.session_state.get('nav_expanded', False)
+
+
 def navigate_to(page):
     for flag, name in (
         ('subject_library_active', 'library'),

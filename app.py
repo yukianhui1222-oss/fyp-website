@@ -23,7 +23,7 @@ if sys.version_info < (3, 10):
 
 import streamlit as st
 from ui_theme import load_theme
-from navigation import navigate_to
+from navigation import navigate_to, toggle_navigation
 import streamlit.components.v1 as components
 import time
 import os
@@ -4119,9 +4119,7 @@ def _render_main():
             state_class = "nav-expanded" if nav_expanded else "nav-collapsed"
             st.markdown(f'<div class="documind-nav-brand {state_class}" aria-hidden="true"></div>', unsafe_allow_html=True)
             with st.container(key="nav_brand_toggle"):
-                if st.button("DocuMind" if nav_expanded else "Open navigation", key="toggle_navigation", help="Collapse navigation" if nav_expanded else "Expand navigation", use_container_width=True):
-                    st.session_state.nav_expanded = not nav_expanded
-                    st.rerun()
+                st.button("DocuMind", key="toggle_navigation", help="Collapse navigation" if nav_expanded else "Expand navigation", use_container_width=True, on_click=toggle_navigation)
 
         with nav_col2:
             p_col1, p_col2, p_col3 = st.columns([1, 1, 1])
@@ -4131,7 +4129,7 @@ def _render_main():
             id_token = user_info.get("idToken") if user_info else None
         
             with p_col1:
-                with st.popover("📂 Documents" if nav_expanded else "📂", help="Documents · Saved files and subject folders", use_container_width=True):
+                with st.container(key="nav_documents_anchor"), st.popover("Documents", help="Documents · Saved files and subject folders", use_container_width=True):
                     st.markdown("<div class='drawer-heading'>Your documents</div>", unsafe_allow_html=True)
                     st.button("Subject folders & practice papers", key="open_subject_library", use_container_width=True, on_click=navigate_to, args=("library",))
 
@@ -4196,7 +4194,7 @@ def _render_main():
                                             st.error(msg)
                                         
             with p_col2:
-                with st.popover("⚙️ Settings" if nav_expanded else "⚙️", help="Settings", use_container_width=True):
+                with st.container(key="nav_settings_anchor"), st.popover("Settings", help="Settings", use_container_width=True):
                     st.markdown("<div class='drawer-heading'>Workspace settings</div>", unsafe_allow_html=True)
                     st.markdown("""
                         <div class="drawer-settings-card" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px;">
@@ -4248,7 +4246,7 @@ def _render_main():
                 else:
                     avatar_html = f'<div style="width: 32px; height: 32px; border-radius: 50%; background: #EEF2FF; color: #6366F1; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: 700 !important; font-size: 0.85rem !important; font-family: \'Poppins\', sans-serif !important;">{initials}</div>'
                 
-                with st.popover("👤 Profile" if nav_expanded else "👤", help="Profile and account", use_container_width=True):
+                with st.popover("Profile", help="Profile and account", use_container_width=True):
                     st.markdown(f"""
                         <div class="drawer-profile-card" style="display: flex; align-items: center; gap: 12px;">
                             {avatar_html}

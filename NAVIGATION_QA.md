@@ -1,5 +1,7 @@
 # Navigation verification
 
+Follow-up sidebar verification: stable labels now remain clipped in collapsed mode while independent icons stay visible. Brand expansion uses a pre-render callback. Browser checks confirmed 52 × 52 px tiles with 12 px corner radii, repeated expand/collapse, and readable Settings/Profile popovers. The sidebar uses a blue-gray/teal palette. All 8 navigation regression tests passed after this change.
+
 Verified locally on 2026-09-26 using the production render functions with offline service fixtures.
 
 ## Fixes

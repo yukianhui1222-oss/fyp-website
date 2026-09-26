@@ -1109,7 +1109,7 @@ div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b8
 :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="column"],
 :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stVerticalBlock"] { height: auto !important; }
 /* Preserve the square brand tile against global button styles. */
-div.st-key-navigation_rail_collapsed .st-key-nav_brand_toggle div.stButton > button { border-radius: 12px !important; }
+div.st-key-navigation_rail_collapsed .st-key-nav_brand_toggle [data-testid="stButton"] button { border-radius: 12px !important; }
 .st-key-navigation_rail_collapsed .st-key-nav_brand_toggle button p { display: block !important; }
 /* Avoid an intermediate 52px Streamlit wrapper while the expanded rail measures. */
 :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) [data-testid="stLayoutWrapper"],
@@ -1118,3 +1118,39 @@ div.st-key-navigation_rail_collapsed .st-key-nav_brand_toggle div.stButton > but
  width: 100% !important; min-width: 0 !important; max-width: none !important; transition: none !important;
 }
 .st-key-navigation_rail_expanded .st-key-nav_brand_toggle button p { white-space: nowrap !important; }
+
+/* Stable labels and independent icons: text can never spill out of a compact tile. */
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) {
+ background: #f1f7f9 !important; border-right-color: #d3e4e8 !important;
+ box-shadow: 3px 0 18px #244b5710 !important;
+}
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button,
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-key-nav_brand_toggle [data-testid="stButton"] button {
+ background: #e6f0f3 !important; border: 1px solid #cddfe5 !important;
+ border-radius: 12px !important; color: #285963 !important; overflow: hidden !important;
+}
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button:hover,
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button[aria-expanded="true"] {
+ background: #d6eeeb !important; border-color: #83bdb4 !important;
+}
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button p {
+ color: #285963 !important; -webkit-text-fill-color: #285963 !important;
+}
+div.st-key-navigation_rail_collapsed div[data-testid="stPopover"] button [data-testid="stMarkdownContainer"] {
+ position: absolute !important; inset: auto !important; width: 1px !important; height: 1px !important;
+ overflow: hidden !important; clip-path: inset(50%) !important; white-space: nowrap !important;
+}
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button::before {
+ display: block; flex: 0 0 26px; width: 26px; font-size: 24px; line-height: 26px;
+ text-align: center; margin: 0 10px 0 0;
+}
+.st-key-nav_documents_anchor [data-testid="stPopover"] button::before { content: '📂'; }
+.st-key-nav_settings_anchor [data-testid="stPopover"] button::before { content: '⚙'; }
+.st-key-nav_profile_anchor [data-testid="stPopover"] button::before { content: '👤'; }
+div.st-key-navigation_rail_collapsed div[data-testid="stPopover"] button::before {
+ position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); margin: 0;
+}
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-key-nav_brand_toggle button::before {
+ border-color: #4796a6; border-bottom-color: #69b79f;
+}
+div.st-key-navigation_rail_expanded .st-key-nav_brand_toggle button p { color: #285963 !important; }
