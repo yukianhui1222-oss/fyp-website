@@ -7,6 +7,8 @@ source = source.replace('\npatch_streamlit_js_hotkeys()', '\n# Skip installed-pa
 source = source[:source.rindex('if __name__ == "__main__":')]
 source += '''
 initialize_models = lambda: True
+import subject_library
+subject_library.list_folders = lambda *a, **kw: []
 fetch_saved_summaries = lambda *a, **kw: ([], None)
 fetch_leaderboard = lambda *a, **kw: ([], None)
 fetch_quiz_attempts = lambda *a, **kw: ([], None)

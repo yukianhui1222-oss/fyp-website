@@ -49,6 +49,9 @@ def render_library(api_key):
             st.rerun()
         return
     folder_names = {folder['id']: folder['name'] for folder in folders}
+    if 'pending_subject_folder' in st.session_state:
+        requested_folder = st.session_state.pop('pending_subject_folder')
+        st.session_state[f'folder_browse_{uid}'] = requested_folder if requested_folder in folder_names else ''
     with st.container(key="library_subject_zone"):
         folder_id = st.selectbox('Browse subject', [''] + list(folder_names), format_func=lambda value: folder_names.get(value, 'Unfiled'), key=f'folder_browse_{uid}')
         folder_docs = [doc for doc in docs if doc.get('folder_id', '') == folder_id]

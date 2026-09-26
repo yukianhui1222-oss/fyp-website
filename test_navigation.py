@@ -153,6 +153,27 @@ class NavigationTests(unittest.TestCase):
         self.click('nav_logout_button', 'login')
         self.assertIsNone(self.app.session_state['user'])
 
+    def test_home_subject_and_review_queue(self):
+        self.click('home_subject_biology', 'library')
+        self.assertEqual(self.app.selectbox(key='folder_browse_navigation-user').value, 'biology')
+        self.click('library_back', 'home')
+        self.assertEqual(self.app.metric[0].value, '2')
+        self.open_results()
+        self.click('quiz_activity_Flashcards', 'results')
+        self.click('generate_flashcards', 'results')
+        self.click('knowledge_card_face', 'results')
+        self.click('card_again', 'results')
+        self.click('main_clear_results_btn', 'home')
+        self.assertEqual(self.app.metric[1].value, '1')
+        next(c for c in self.app.checkbox if c.label == 'Show answer').check().run()
+        next(b for b in self.app.button if b.label == 'Got it ✓').click().run()
+        self.assertEqual(self.app.metric[1].value, '0')
+        self.app.session_state['home_review_attempts_navigation-user'] = None
+        self.app.run()
+        self.assertEqual(self.app.metric[0].value, '—')
+        self.click('home_refresh_review', 'home')
+        self.assertEqual(self.app.metric[0].value, '2')
+
     def test_navigation_css_is_owned(self):
         for name in ['app.py', 'ui_theme.css']:
             source = Path(__file__).with_name(name).read_text(encoding='utf-8')

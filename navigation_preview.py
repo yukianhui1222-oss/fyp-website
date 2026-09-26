@@ -28,7 +28,7 @@ import summarizer
 summarizer.generate_quiz = lambda *a, **k: (json.dumps(QUESTIONS), None)
 summarizer.generate_flashcards = lambda *a, **k: (json.dumps(QUESTIONS), None)
 import subject_library as library
-library.list_folders = lambda *a, **k: []
+library.list_folders = lambda *a, **k: [dict(id='biology', name='Biology')]
 def slow_documents(*a, **k):
     time.sleep(float(os.environ.get('NAV_TEST_DELAY', '0.5')))
     return [DOC.copy()]

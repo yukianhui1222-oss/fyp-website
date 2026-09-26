@@ -1156,6 +1156,17 @@ div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-
 div.st-key-navigation_rail_expanded .st-key-nav_brand_toggle button p { color: #285963 !important; }
 
 /* Home: a calm glass workspace with a colorful, code-native study illustration. */
+.st-key-home_subject_shortcuts, .st-key-home_review_queue {
+ padding: 26px !important; margin-top: 22px !important; border: 1px solid #ffffffc9 !important;
+ border-radius: 24px !important; background: #ffffff85 !important; box-shadow: 0 8px 26px #695a890a;
+}
+.st-key-home_subject_shortcuts [data-testid="stColumn"] button {
+ min-height: 64px; background: #ede7f6 !important; border: 1px solid #dcd1ef !important; border-radius: 15px !important;
+}
+.st-key-home_subject_shortcuts [data-testid="stColumn"]:nth-child(2) button { background: #e5eff8 !important; border-color: #cedeef !important; }
+.st-key-home_subject_shortcuts [data-testid="stColumn"]:nth-child(3) button { background: #e3f2ec !important; border-color: #cce4d9 !important; }
+.st-key-home_subject_shortcuts [data-testid="stColumn"]:nth-child(4) button { background: #f7e9ee !important; border-color: #eed6df !important; }
+.st-key-home_review_queue [data-testid="stMetric"] { padding: 16px; border-radius: 16px; background: #ffffffaa; border: 1px solid #e7e1ef; }
 [data-testid="stAppViewContainer"]:has(.st-key-page_view_home) {
  background: radial-gradient(ellipse at 82% 12%, #c7eced 0, transparent 37%), radial-gradient(ellipse at 12% 2%, #d6c5ef 0, transparent 48%), radial-gradient(ellipse at 85% 75%, #eee0ef 0, transparent 45%), #f0eef8 !important;
 }

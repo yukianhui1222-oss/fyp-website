@@ -1457,7 +1457,7 @@ def render_flashcards(summary, api_key, language):
                                 cards.append({'question': front, 'answer': answer, 'explanation': question.get('explanation', '')})
                         if not cards:
                             raise ValueError('No usable cards')
-                        st.session_state[deck_key] = {'cards': cards, 'index': 0, 'revealed': False, 'known': []}
+                        st.session_state[deck_key] = {'cards': cards, 'index': 0, 'revealed': False, 'known': [], 'again': [], 'owner': (st.session_state.get('user') or {}).get('uid') or 'guest'}
                     except (ValueError, TypeError, AttributeError, IndexError):
                         st.error("The cards could not be read. Please try generating them again.")
         deck = st.session_state.get(deck_key)
@@ -1480,6 +1480,11 @@ def render_flashcards(summary, api_key, language):
             st.button(face_text, key="knowledge_card_face", on_click=flip_card, use_container_width=True)
             def rate_card(mastered):
                 current = deck['cards'][deck['index']]['question']
+                again = deck.setdefault('again', [])
+                if mastered and current in again:
+                    again.remove(current)
+                elif not mastered and current not in again:
+                    again.append(current)
                 if mastered and current not in known:
                     known.append(current)
                 elif not mastered and current in known:
@@ -1771,6 +1776,7 @@ def render_quiz_view():
                         st.session_state.guest_quiz_attempts = []
                     st.session_state.guest_quiz_attempts.append(attempt_data)
                 
+                st.session_state.pop(f'home_review_attempts_{uid or "guest"}', None)
                 st.session_state.quiz_attempt_saved = True
                 st.session_state.xp_earned_this_run = xp_earned
                 st.session_state.badge_unlocked_this_run = badge_to_unlock
@@ -4387,6 +4393,8 @@ def _render_main():
                     st.button("🗑️ Clear Results", type="secondary", use_container_width=True, disabled=True, key="main_clear_disabled_btn")
 
     if not has_results and not st.session_state.is_processing:
+        from home_tools import render_home_tools
+        render_home_tools(uid, id_token, fetch_quiz_attempts)
         with st.container(key="home_continue_learning", border=False):
             st.html('<div class="home-section-heading"><span class="home-section-icon" aria-hidden="true">▤</span><div><span class="home-section-kicker">YOUR LIBRARY</span><h3>Continue learning</h3></div></div>')
             st.caption("Your latest saved documents · Pick one to continue")
