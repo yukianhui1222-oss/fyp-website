@@ -4285,7 +4285,11 @@ def _render_main():
     has_results = 'ocr_results' in st.session_state and not st.session_state.is_processing
     uploaded_file = None
 
-    st.markdown("""
+    from home_design import HOME_HERO
+    if not has_results:
+        st.html(HOME_HERO)
+    else:
+        st.markdown("""
         <div class="workspace-heading">
             <div class="workspace-art" aria-hidden="true">
                 <span class="title-star star-one">✦</span><span class="title-star star-two">✧</span>
@@ -4308,6 +4312,8 @@ def _render_main():
         setup_container = st.container(border=True, key="setup_container")
         
     with setup_container:
+        if not has_results:
+            st.html('<div id="home-upload" class="home-upload-heading"><span class="home-step-number">01</span><div><span>LET’S MAKE IT CLEAR</span><h2>What are we learning today?</h2></div></div>')
         uploaded_file = st.file_uploader(
             "Upload Document or Image", 
             type=["png", "pdf", "docx", "doc", "pptx", "ppt"],

@@ -1154,3 +1154,55 @@ div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-
  border-color: #4796a6; border-bottom-color: #69b79f;
 }
 div.st-key-navigation_rail_expanded .st-key-nav_brand_toggle button p { color: #285963 !important; }
+
+/* Home: a calm glass workspace with a colorful, code-native study illustration. */
+[data-testid="stAppViewContainer"]:has(.st-key-page_view_home) {
+ background: radial-gradient(ellipse at 82% 12%, #c7eced 0, transparent 37%), radial-gradient(ellipse at 12% 2%, #d6c5ef 0, transparent 48%), radial-gradient(ellipse at 85% 75%, #eee0ef 0, transparent 45%), #f0eef8 !important;
+}
+.st-key-page_view_home .glass-home-hero {
+ display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: 16px;
+ padding: 44px 44px 32px; margin: 12px 0 24px; overflow: hidden; position: relative;
+ border: 1px solid #ffffffcf; border-radius: 30px;
+ background: linear-gradient(115deg, #ffffffa8, #ffffff3d);
+ box-shadow: 0 18px 60px #65528512, inset 0 1px 0 #fff9; backdrop-filter: blur(18px);
+}
+.home-brand-line { display: flex; align-items: center; gap: 9px; color: #675580; font: 700 11px/1.5 sans-serif; letter-spacing: 1.8px; }
+.home-brand-line > span { color: #9673bf; font-size: 20px; }
+.glass-home-copy h1 { font-size: clamp(36px, 4.3vw, 64px) !important; line-height: 1.08 !important; letter-spacing: -2px !important; color: #302942 !important; padding: 22px 0 16px !important; margin: 0 !important; font-weight: 800 !important; }
+.glass-home-copy h1 em { color: #8061b2; font-style: normal; }
+.glass-home-copy > p { color: #655e78; font-size: 16px !important; line-height: 1.8 !important; margin: 0 0 24px; }
+.home-upload-link { display: inline-flex; align-items: center; gap: 24px; padding: 14px 22px; color: #fff !important; background: #413754; border: 1px solid #655377; border-radius: 13px; text-decoration: none !important; font-size: 16px; font-weight: 700; box-shadow: 0 7px 18px #49385b22; }
+.home-upload-link:hover { background: #5b4874; }
+.home-upload-link:focus-visible { outline: 3px solid #9c7bc4; outline-offset: 4px; }
+.home-feature-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.home-feature-pills span { padding: 6px 12px; border: 1px solid #fff; border-radius: 30px; color: #6d6081; background: #ffffff66; font-size: 12px; }
+.glass-home-art { text-align: center; min-width: 0; }
+.glass-home-art img { width: 100%; max-width: 500px; height: auto; display: block; margin: auto; }
+.home-art-caption { display: block; font-size: 12px; letter-spacing: .8px; color: #78668c; margin-top: -12px; }
+.st-key-page_view_home .st-key-setup_container {
+ background: #ffffffad !important; border: 1px solid #fff !important; border-radius: 26px !important;
+ box-shadow: 0 12px 40px #695a8910 !important; backdrop-filter: blur(16px); padding: 28px !important;
+}
+.home-upload-heading { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; scroll-margin-top: 28px; }
+.home-step-number { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px; background: #e9e0f8; color: #8764b5; font-weight: 800; }
+.home-upload-heading div > span { color: #827094; font-size: 10px; font-weight: 700; letter-spacing: 1.8px; }
+.home-upload-heading h2 { color: #3c334e !important; font-size: 23px !important; margin: 3px 0 0 !important; padding: 0 !important; }
+.st-key-page_view_home [data-testid="stFileUploaderDropzone"] { background: #f5f2fb99 !important; border: 1px dashed #bdb0d9 !important; min-height: 160px !important; }
+.st-key-page_view_home .st-key-home_continue_learning,
+.st-key-page_view_home .st-key-home_learning_guide { background: #ffffff55 !important; border: 1px solid #ffffffb8 !important; border-radius: 26px !important; padding: 28px !important; margin-top: 22px !important; }
+.st-key-page_view_home [class*="st-key-recent_document_"],
+.st-key-page_view_home .learning-route article { background: #ffffffb5 !important; border-color: #ffffff !important; box-shadow: 0 6px 20px #64557d09 !important; }
+@media(max-width:900px) {
+ .st-key-page_view_home .glass-home-hero { padding: 30px 26px; gap: 0; }
+ .glass-home-copy h1 { font-size: 42px !important; }
+}
+@media(max-width:640px) {
+ .st-key-page_view_home .glass-home-hero { grid-template-columns: 1fr; padding: 26px 22px; }
+ .glass-home-copy h1 { font-size: 38px !important; letter-spacing: -1px !important; }
+ .glass-home-art { margin-top: 16px; }
+ .glass-home-art img { max-width: 280px; }
+ .st-key-page_view_home .st-key-setup_container,
+ .st-key-page_view_home .st-key-home_continue_learning,
+ .st-key-page_view_home .st-key-home_learning_guide { padding: 20px 16px !important; }
+ .home-upload-heading h2 { font-size: 20px !important; }
+}
