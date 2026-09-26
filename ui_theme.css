@@ -1121,8 +1121,8 @@ div.st-key-navigation_rail_collapsed .st-key-nav_brand_toggle [data-testid="stBu
 
 /* Stable labels and independent icons: text can never spill out of a compact tile. */
 div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) {
- background: #f1f7f9 !important; border-right-color: #d3e4e8 !important;
- box-shadow: 3px 0 18px #244b5710 !important;
+ background: #293f4d !important; border-right-color: #3c5665 !important;
+ box-shadow: 3px 0 18px #152b3926 !important;
 }
 div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div[data-testid="stPopover"] button,
 div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-key-nav_brand_toggle [data-testid="stButton"] button {
