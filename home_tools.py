@@ -18,7 +18,7 @@ def mark_reviewed(deck_key, question):
 
 def render_home_tools(uid, token, fetch_attempts):
     with st.container(key='home_subject_shortcuts'):
-        st.html('<div class="home-section-heading"><span class="home-section-icon">▤</span><div><span class="home-section-kicker">SUBJECT SPACES</span><h3>Jump into a subject</h3></div></div>')
+        st.html('<div class="home-section-heading"><span class="home-section-icon">▤</span><div><h3>Subjects</h3></div></div>')
         try:
             folders = library.list_folders(uid, token) if uid and token else []
         except Exception:
@@ -30,11 +30,11 @@ def render_home_tools(uid, token, fetch_attempts):
                 with columns[index % 4]:
                     st.button('📁 ' + folder['name'], key=f'home_subject_{folder["id"]}', on_click=open_subject, args=(folder['id'],), use_container_width=True)
         elif folders is not None:
-            st.caption('Keep lectures from the same course together. Create your first subject folder to get started.')
-        st.button('All subjects & folders →', key='home_all_subjects', on_click=navigate_to, args=('library',))
+            st.caption('Create a folder to organize your notes.')
+        st.button('All subjects →', key='home_all_subjects', on_click=navigate_to, args=('library',))
 
     with st.container(key='home_review_queue'):
-        st.html('<div class="home-section-heading"><span class="home-section-icon">↺</span><div><span class="home-section-kicker">A LITTLE PRACTICE</span><h3>Ready for another look?</h3></div></div>')
+        st.html('<div class="home-section-heading"><span class="home-section-icon">↺</span><div><h3>Review queue</h3></div></div>')
         owner = uid or 'guest'
         cache_key = f'home_review_attempts_{owner}'
         refresh = st.button('Refresh review list', key='home_refresh_review')
@@ -55,7 +55,7 @@ def render_home_tools(uid, token, fetch_attempts):
         if attempts is None:
             st.caption('Quiz history could not be loaded. Refresh to try again.')
         if not mistakes and not cards and attempts is not None:
-            st.caption('Nothing queued yet. Complete a quiz or mark a flashcard “Practice again”.')
+            st.caption('Nothing to review yet.')
         with st.expander('Review incorrect answers', expanded=False):
             for index, (attempt, question) in enumerate(mistakes):
                 st.caption(str(attempt.get('topic', 'Quiz')))

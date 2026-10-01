@@ -4,11 +4,10 @@ import base64
 HOME_HERO = """
 <section class="glass-home-hero" aria-labelledby="home-title">
   <div class="glass-home-copy">
-    <span class="home-brand-line"><span aria-hidden="true">✦</span> DOCUMIND · YOUR STUDY SPACE</span>
+    <span class="home-brand-line"><span aria-hidden="true">✦</span> DOCUMIND</span>
     <h1 id="home-title">Big ideas.<br><em>Clearer minds.</em></h1>
-    <p>Turn your lecture notes into a little more clarity.<br>Summarize, connect and practice — all in one place.</p>
-    <a class="home-upload-link" href="#home-upload">Start with your notes <span aria-hidden="true">↗</span></a>
-    <div class="home-feature-pills"><span>Summaries</span><span>Mind maps</span><span>Practice</span></div>
+    <p>Your notes, made clear.</p>
+    <a class="home-upload-link" href="#home-upload">Upload notes <span aria-hidden="true">↗</span></a>
   </div>
   <div class="glass-home-art" aria-hidden="true">
     <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
@@ -44,7 +43,6 @@ HOME_HERO = """
       <g fill="#aa8ace"><path d="M228 63L233 76L246 81L233 86L228 99L223 86L210 81L223 76Z"/><path d="M411 273L415 282L424 286L415 290L411 299L407 290L398 286L407 282Z"/></g>
       <circle cx="80" cy="182" r="5" fill="#efb4cb"/><circle cx="302" cy="346" r="4" fill="#72c7b9"/>
     </svg>
-    <span class="home-art-caption">A fresh perspective starts here.</span>
   </div>
 </section>
 """

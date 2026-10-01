@@ -4310,7 +4310,7 @@ def _render_main():
             ("⌘", "Mind maps", sum(bool(doc.get("mindmap_eng") or doc.get("mindmap_trans")) for doc in dashboard_docs) if dashboard_docs is not None else "—", "Documents with a saved map", "maps"),
         ]
         st.html('<div class="dashboard-overview">' + ''.join(
-            f'<div class="dashboard-stat stat-{tone}"><span class="dashboard-stat-icon" aria-hidden="true">{icon}</span><div><span class="dashboard-stat-label">{label}</span><strong>{value}</strong><small>{note}</small></div></div>'
+            f'<div class="dashboard-stat stat-{tone}"><span class="dashboard-stat-icon" aria-hidden="true">{icon}</span><div><span class="dashboard-stat-label">{label}</span><strong>{value}</strong></div></div>'
             for icon, label, value, note, tone in dashboard_stats
         ) + '</div>')
     else:
@@ -4338,7 +4338,7 @@ def _render_main():
         
     with setup_container:
         if not has_results:
-            st.html('<div id="home-upload" class="home-upload-heading"><span class="home-step-number">01</span><div><span>LET’S MAKE IT CLEAR</span><h2>What are we learning today?</h2></div></div>')
+            st.html('<div id="home-upload" class="home-upload-heading"><span class="home-step-number">01</span><div><h2>Upload your notes</h2></div></div>')
         uploaded_file = st.file_uploader(
             "Upload Document or Image", 
             type=["png", "pdf", "docx", "doc", "pptx", "ppt"],
@@ -4415,8 +4415,7 @@ def _render_main():
         from home_tools import render_home_tools
         render_home_tools(uid, id_token, fetch_quiz_attempts)
         with st.container(key="home_continue_learning", border=False):
-            st.html('<div class="home-section-heading"><span class="home-section-icon" aria-hidden="true">▤</span><div><span class="home-section-kicker">YOUR LIBRARY</span><h3>Continue learning</h3></div></div>')
-            st.caption("Your latest saved documents · Pick one to continue")
+            st.html('<div class="home-section-heading"><span class="home-section-icon" aria-hidden="true">▤</span><div><h3>Recent documents</h3></div></div>')
             recent_docs = saved_docs if uid and not err else []
             if recent_docs:
                 recent_columns = st.columns(3, gap="medium")
@@ -4480,7 +4479,7 @@ def _render_main():
                                 st.success(str(answer.get('correct_answer', '')))
                                 st.markdown(str(answer.get('explanation', '')))
 
-        with st.container(key="home_learning_guide"):
+        with st.container(key="home_learning_guide"), st.expander("How it works & tips", expanded=False):
             st.html("""
                 <div class="home-section-heading guide-section-heading"><span class="home-section-icon" aria-hidden="true">✦</span><div><span class="home-section-kicker">STUDY GUIDE</span><h2>Your next steps, made simple</h2></div></div>
                 <div class="learning-route">
