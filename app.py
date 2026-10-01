@@ -4127,6 +4127,14 @@ def _render_main():
             with st.container(key="nav_brand_toggle"):
                 st.button("DocuMind", key="toggle_navigation", help="Collapse navigation" if nav_expanded else "Expand navigation", use_container_width=True, on_click=toggle_navigation)
 
+            with st.container(key="rail_shortcuts"):
+                st.button("Subjects" if nav_expanded else "▤", key="rail_subjects", help="Subjects · Open folders and practice papers", use_container_width=True, on_click=navigate_to, args=("library",))
+                st.button("Leaderboard" if nav_expanded else "🏆", key="rail_ranking", help="Leaderboard · View learning rankings", use_container_width=True, on_click=navigate_to, args=("leaderboard",))
+                with st.container(key="rail_help"), st.popover("Quick guide" if nav_expanded else "?", help="Quick guide · How to use DocuMind", use_container_width=True):
+                    st.markdown("### Quick guide")
+                    st.markdown("**1 · Upload**\n\nAdd a document on the home page and start analysis.\n\n**2 · Explore**\n\nRead the summary, translation and mind map.\n\n**3 · Practice**\n\nGenerate a quiz or open Subjects to create practice papers.")
+                    st.caption("Documents contains saved files. Profile contains account settings. Click the logo to expand or collapse this navigation.")
+
         with nav_col2:
             p_col1, p_col2, p_col3 = st.columns([1, 1, 1])
         

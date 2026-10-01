@@ -46,6 +46,14 @@ class NavigationTests(unittest.TestCase):
     def open_results(self):
         self.click('resume_saved_0', 'results')
 
+    def test_rail_shortcuts(self):
+        self.click('rail_subjects', 'library')
+        self.click('library_back', 'home')
+        self.click('rail_ranking', 'leaderboard')
+        self.click('lbl_back_home_btn', 'home')
+        self.click('toggle_navigation', 'home')
+        self.click('rail_subjects', 'library')
+
     def test_home_library_profile_leaderboard_round_trips(self):
         for _ in range(2):
             self.click('open_subject_library', 'library')

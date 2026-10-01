@@ -1279,3 +1279,24 @@ div.st-key-navigation_rail_expanded .st-key-nav_brand_toggle button p { color: #
 .st-key-page_view_home .home-step-number { box-shadow: inset 0 1px 0 #fff, 0 3px 0 #b7d8cf; }
 .st-key-page_view_home [class*="st-key-recent_document_"] { box-shadow: 0 4px 0 #e0e3eb, 0 9px 20px #30274009 !important; }
 @media (max-width: 700px) { .dashboard-overview { grid-template-columns: 1fr; gap: 12px; }.dashboard-stat { padding: 16px; }.dashboard-stat strong { font-size: 26px; margin: 3px 0; } }
+
+/* Rail shortcuts: subject workspace, rankings and an in-place quick guide. */
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-key-rail_shortcuts {
+ margin-top: 18px !important; padding-top: 18px !important; border-top: 1px solid #cddfe5;
+}
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-key-rail_shortcuts > [data-testid="stVerticalBlock"] { gap: 14px !important; }
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) :is(.st-key-rail_subjects, .st-key-rail_ranking) button {
+ height: 52px !important; width: 100% !important; min-width: 0 !important; padding: 0 !important;
+ border-radius: 12px !important; border: 1px solid #d7cce8 !important;
+ background: #ede6f6 !important; color: #694787 !important; box-shadow: 0 3px 0 #d8cbe5 !important;
+}
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-key-rail_ranking button { background: #fbefdb !important; border-color: #ebd5af !important; box-shadow: 0 3px 0 #e8d5b4 !important; }
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) :is(.st-key-rail_subjects, .st-key-rail_ranking) button p { font-size: 23px !important; color: #514366 !important; }
+.st-key-navigation_rail_expanded :is(.st-key-rail_subjects, .st-key-rail_ranking) button { justify-content: flex-start !important; padding: 0 16px !important; }
+.st-key-navigation_rail_expanded :is(.st-key-rail_subjects, .st-key-rail_ranking) button p { font-size: 15px !important; }
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-key-rail_help [data-testid="stPopover"] button::before { content: '?'; font-weight: 700; }
+:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) :is(.st-key-rail_subjects, .st-key-rail_ranking) button:hover { filter: brightness(.96); }
+@media (max-height: 720px) {
+ :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) { overflow-y: auto !important; }
+ :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-key-nav_profile_anchor { position: static !important; margin-top: 18px !important; }
+}
