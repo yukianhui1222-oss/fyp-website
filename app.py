@@ -4300,34 +4300,27 @@ def _render_main():
     uploaded_file = None
 
     from home_design import HOME_HERO
-    if not has_results:
-        st.html(HOME_HERO)
-        # Reuse the library response already loaded for navigation; no extra request.
-        dashboard_docs = saved_docs if uid and not err else None
-        dashboard_stats = [
-            ("▤", "Saved documents", len(dashboard_docs) if dashboard_docs is not None else "—", "In your library", "library"),
-            ("◎", "Translations", sum(bool(doc.get("translation")) for doc in dashboard_docs) if dashboard_docs is not None else "—", "Documents with a translation", "translation"),
-            ("⌘", "Mind maps", sum(bool(doc.get("mindmap_eng") or doc.get("mindmap_trans")) for doc in dashboard_docs) if dashboard_docs is not None else "—", "Documents with a saved map", "maps"),
-        ]
-        st.html('<div class="dashboard-overview">' + ''.join(
-            f'<div class="dashboard-stat stat-{tone}"><span class="dashboard-stat-icon" aria-hidden="true">{icon}</span><div><span class="dashboard-stat-label">{label}</span><strong>{value}</strong></div></div>'
-            for icon, label, value, note, tone in dashboard_stats
-        ) + '</div>')
+    st.html(HOME_HERO)
+    # Reuse the library response already loaded for navigation; no extra request.
+    dashboard_docs = saved_docs if uid and not err else None
+    dashboard_stats = [
+        ("▤", "Saved documents", len(dashboard_docs) if dashboard_docs is not None else "—", "In your library", "library"),
+        ("◎", "Translations", sum(bool(doc.get("translation")) for doc in dashboard_docs) if dashboard_docs is not None else "—", "Documents with a translation", "translation"),
+        ("⌘", "Mind maps", sum(bool(doc.get("mindmap_eng") or doc.get("mindmap_trans")) for doc in dashboard_docs) if dashboard_docs is not None else "—", "Documents with a saved map", "maps"),
+    ]
+    st.html('<div class="dashboard-overview">' + ''.join(
+        f'<div class="dashboard-stat stat-{tone}"><span class="dashboard-stat-icon" aria-hidden="true">{icon}</span><div><span class="dashboard-stat-label">{label}</span><strong>{value}</strong></div></div>'
+        for icon, label, value, note, tone in dashboard_stats
+    ) + '</div>')
 
-    # Render Setup & Upload container
-    if has_results:
-        with st.container(key="setup_expander"):
-            setup_container = st.expander("📤 Analyze New Document", expanded=False)
-    else:
-        setup_container = st.container(border=True, key="setup_container")
-        
+    # Keep the same upload workspace when reviewing a saved document.
+    setup_container = st.container(border=True, key="setup_container")
     with setup_container:
-        if not has_results:
-            st.html('<div id="home-upload" class="home-upload-heading"><span class="home-step-number">01</span><div><h2>Upload your notes</h2></div></div>')
+        st.html('<div id="home-upload" class="home-upload-heading"><span class="home-step-number">01</span><div><h2>Upload your notes</h2></div></div>')
         uploaded_file = st.file_uploader(
             "Upload Document or Image", 
             type=["png", "pdf", "docx", "doc", "pptx", "ppt"],
-            label_visibility="collapsed" if has_results else "visible"
+            label_visibility="visible"
         )
         
         # 1. Preview / Status Section (Full Width, Centered)

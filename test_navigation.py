@@ -70,6 +70,11 @@ class NavigationTests(unittest.TestCase):
         rendered = '\n'.join(e.value for e in self.app.markdown)
         self.assertNotIn('A LITTLE CURIOSITY GOES A LONG WAY', rendered)
         self.assertIn('Document workspace', rendered)
+        html = '\n'.join(e.proto.body for e in self.app.get('html'))
+        self.assertIn('glass-home-hero', html)
+        self.assertIn('dashboard-overview', html)
+        self.assertIn('Upload your notes', html)
+
         for entry, back, route in [('open_subject_library', 'library_back', 'library'), ('nav_edit_profile_btn', 'profile_cancel_btn', 'profile'), ('nav_leaderboard_btn', 'lbl_back_home_btn', 'leaderboard')]:
             self.click(entry, route)
             self.click(back, 'results')
