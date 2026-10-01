@@ -1300,3 +1300,35 @@ div.st-key-navigation_rail_expanded .st-key-nav_brand_toggle button p { color: #
  :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) { overflow-y: auto !important; }
  :is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-key-nav_profile_anchor { position: static !important; margin-top: 18px !important; }
 }
+
+/* Equal rail rhythm across Streamlit's nested column/container wrappers. */
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) {
+ --rail-tile-size: 52px;
+}
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) > [data-testid="stHorizontalBlock"] {
+ gap: 16px !important;
+}
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div.st-key-rail_shortcuts {
+ margin: 0 !important; padding: 0 !important; border: none !important;
+}
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-key-rail_shortcuts [data-testid="stVerticalBlock"],
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-key-rail_shortcuts[data-testid="stVerticalBlock"] {
+ gap: 0 !important;
+}
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) :is(.st-key-nav_brand_toggle, .st-key-rail_subjects, .st-key-rail_ranking) [data-testid="stButton"] button {
+ margin: 0 0 16px !important;
+ height: var(--rail-tile-size) !important; min-height: var(--rail-tile-size) !important;
+ box-sizing: border-box !important; box-shadow: none !important;
+ display: flex !important; align-items: center !important; justify-content: center !important;
+}
+div.st-key-navigation_rail_collapsed :is(.st-key-rail_subjects, .st-key-rail_ranking) [data-testid="stButton"] button {
+ width: var(--rail-tile-size) !important; min-width: var(--rail-tile-size) !important; max-width: var(--rail-tile-size) !important;
+ padding: 0 !important; border-radius: 12px !important;
+}
+div.st-key-navigation_rail_collapsed :is(.st-key-rail_subjects, .st-key-rail_ranking) button p {
+ text-align: center !important; margin: 0 !important; line-height: 1 !important;
+}
+div.st-key-navigation_rail_expanded :is(.st-key-nav_brand_toggle, .st-key-rail_subjects, .st-key-rail_ranking) [data-testid="stButton"] button { justify-content: flex-start !important; }
+@media (max-width: 640px) {
+ div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) { --rail-tile-size: 44px; }
+}
