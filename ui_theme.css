@@ -1217,3 +1217,46 @@ div.st-key-navigation_rail_expanded .st-key-nav_brand_toggle button p { color: #
  .st-key-page_view_home .st-key-home_learning_guide { padding: 20px 16px !important; }
  .home-upload-heading h2 { font-size: 20px !important; }
 }
+
+/* Home hierarchy: dark introduction, white workspace, teal upload action. */
+[data-testid="stAppViewContainer"]:has(.st-key-page_view_home) {
+ background: radial-gradient(ellipse at 90% 0%, #e4e9f4 0, transparent 48%), #f2f3f6 !important;
+}
+.st-key-page_view_home .glass-home-hero {
+ background: linear-gradient(115deg, #302740, #4e4066) !important;
+ border-color: #594a70 !important; backdrop-filter: none;
+ box-shadow: 0 16px 36px #30274020 !important;
+}
+.st-key-page_view_home .glass-home-copy h1 { color: #ffffff !important; }
+.st-key-page_view_home .glass-home-copy h1 em { color: #e2c4ff !important; }
+.st-key-page_view_home .glass-home-copy > p,
+.st-key-page_view_home .home-brand-line,
+.st-key-page_view_home .home-art-caption { color: #e0d8ec !important; }
+.st-key-page_view_home .home-brand-line > span { color: #e2c4ff; }
+.st-key-page_view_home .home-feature-pills span { background: #ffffff0d; border-color: #ffffff30; color: #eee8f5; }
+.st-key-page_view_home .home-upload-link { background: #fff !important; color: #352745 !important; border-color: #fff !important; box-shadow: 0 5px 16px #0002; }
+.st-key-page_view_home .home-upload-link:hover { background: #f1e7ff !important; }
+.st-key-page_view_home .st-key-setup_container {
+ background: #fff !important; border: 1px solid #d5dfe2 !important;
+ border-top: 4px solid #2b817b !important; backdrop-filter: none;
+ box-shadow: 0 10px 30px #253e4810 !important;
+}
+.st-key-page_view_home .home-step-number { background: #dcefeb; color: #21645e; }
+.st-key-page_view_home .home-upload-heading div > span { color: #38746e; }
+.st-key-page_view_home .home-upload-heading h2 { color: #203e40 !important; }
+.st-key-page_view_home .st-key-setup_container div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] {
+ background: #eef7f5 !important; border: 1.5px dashed #75aaa1 !important;
+}
+.st-key-page_view_home .st-key-setup_container div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"]:hover { background: #e2f2ed !important; border-color: #287d72 !important; }
+.st-key-page_view_home .st-key-main_start_analysis_btn button { background: #24776f !important; border: none !important; box-shadow: none !important; }
+.st-key-page_view_home .st-key-main_start_analysis_btn button:hover:not(:disabled) { background: #195e58 !important; }
+.st-key-page_view_home .st-key-main_start_analysis_btn button p { color: #fff !important; }
+.st-key-page_view_home :is(.st-key-home_continue_learning, .st-key-home_learning_guide, .st-key-home_subject_shortcuts, .st-key-home_review_queue) {
+ background: #fff !important; border: 1px solid #dce1e8 !important; box-shadow: 0 5px 18px #28304307 !important;
+}
+.st-key-page_view_home .st-key-home_continue_learning { border-top: 3px solid #9080b6 !important; }
+.st-key-page_view_home .st-key-home_learning_guide { border-top: 3px solid #c69756 !important; }
+.st-key-page_view_home .st-key-home_review_queue { border-top: 3px solid #7095ba !important; }
+.st-key-page_view_home [class*="st-key-recent_document_"],
+.st-key-page_view_home .learning-route article { background: #f7f8fb !important; border-color: #e0e4ec !important; box-shadow: none !important; }
+.st-key-page_view_home .st-key-home_review_queue [data-testid="stMetric"] { background: #eff4fa; border-color: #d7e1ee; }
