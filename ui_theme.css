@@ -1342,3 +1342,27 @@ div.st-key-navigation_rail_expanded :is(.st-key-nav_brand_toggle, .st-key-rail_s
 .st-key-page_view_results .results-heading h2 { color: #302740 !important; font-size: 1.8rem !important; }
 .st-key-page_view_results .st-key-setup_expander { background: #fff !important; border: 1px solid #dce1e8 !important; border-radius: 18px !important; box-shadow: 0 5px 18px #28304307 !important; }
 .st-key-page_view_results [data-baseweb="tab-list"] { background: #fff !important; border-color: #dce1e8 !important; }
+
+/* Keep primary destinations above, with help/settings/account grouped below. */
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) {
+ --rail-utility-left: 12px; --rail-utility-width: 52px; --rail-utility-bottom: 24px; --rail-utility-step: 68px;
+}
+div.st-key-navigation_rail_expanded { --rail-utility-left: 16px; --rail-utility-width: 198px; }
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) :is(div.st-key-rail_help, div.st-key-nav_settings_anchor, div.st-key-nav_profile_anchor) {
+ position: fixed !important; left: var(--rail-utility-left) !important;
+ width: var(--rail-utility-width) !important; height: var(--rail-tile-size) !important;
+ top: auto !important; margin: 0 !important; padding: 0 !important;
+}
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div.st-key-rail_help { bottom: calc(var(--rail-utility-bottom) + 2 * var(--rail-utility-step)) !important; }
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div.st-key-nav_settings_anchor { bottom: calc(var(--rail-utility-bottom) + var(--rail-utility-step)) !important; }
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) div.st-key-nav_profile_anchor { bottom: var(--rail-utility-bottom) !important; }
+div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) .st-key-rail_ranking [data-testid="stButton"] button { margin-bottom: 0 !important; }
+@media (max-width: 640px) {
+ div.st-key-navigation_rail_collapsed { --rail-utility-left: 7px; --rail-utility-width: 44px; --rail-utility-bottom: 16px; --rail-utility-step: 60px; }
+ div.st-key-navigation_rail_expanded { --rail-utility-left: 12px; --rail-utility-width: 186px; --rail-utility-bottom: 16px; --rail-utility-step: 60px; }
+}
+@media (max-height: 580px) {
+ div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) :is(div.st-key-rail_help, div.st-key-nav_settings_anchor, div.st-key-nav_profile_anchor) {
+ position: relative !important; left: auto !important; bottom: auto !important; margin-top: 16px !important;
+ }
+}
