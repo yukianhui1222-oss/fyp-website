@@ -462,7 +462,8 @@ div[data-testid="stPopoverBody"] .st-key-nav_logout_button button p { color: #b8
 }
 
 /* Quiet reading surface for document analysis. */
-.block-container:has(.results-heading) { max-width: 1200px !important; }
+/* Results retain the same 1440px workspace width as the home page. */
+.block-container:has(.results-heading) { max-width: 1440px !important; }
 .results-heading { margin: 18px 0 12px; }
 .results-heading h2 { font-size: 1.9rem !important; font-weight: 700 !important; letter-spacing: -.035em; padding: 0 0 8px !important; color: #30344b !important; }
 [data-testid="stMarkdownContainer"] .results-heading p { margin: 0 !important; font-size: 1rem !important; font-weight: 500 !important; color: #68718a !important; }
