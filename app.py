@@ -4294,6 +4294,17 @@ def _render_main():
     from home_design import HOME_HERO
     if not has_results:
         st.html(HOME_HERO)
+        # Reuse the library response already loaded for navigation; no extra request.
+        dashboard_docs = saved_docs if uid and not err else None
+        dashboard_stats = [
+            ("▤", "Saved documents", len(dashboard_docs) if dashboard_docs is not None else "—", "In your library", "library"),
+            ("◎", "Translations", sum(bool(doc.get("translation")) for doc in dashboard_docs) if dashboard_docs is not None else "—", "Documents with a translation", "translation"),
+            ("⌘", "Mind maps", sum(bool(doc.get("mindmap_eng") or doc.get("mindmap_trans")) for doc in dashboard_docs) if dashboard_docs is not None else "—", "Documents with a saved map", "maps"),
+        ]
+        st.html('<div class="dashboard-overview">' + ''.join(
+            f'<div class="dashboard-stat stat-{tone}"><span class="dashboard-stat-icon" aria-hidden="true">{icon}</span><div><span class="dashboard-stat-label">{label}</span><strong>{value}</strong><small>{note}</small></div></div>'
+            for icon, label, value, note, tone in dashboard_stats
+        ) + '</div>')
     else:
         st.markdown("""
         <div class="workspace-heading">
