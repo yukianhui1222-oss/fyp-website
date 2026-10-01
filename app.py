@@ -4313,21 +4313,6 @@ def _render_main():
             f'<div class="dashboard-stat stat-{tone}"><span class="dashboard-stat-icon" aria-hidden="true">{icon}</span><div><span class="dashboard-stat-label">{label}</span><strong>{value}</strong></div></div>'
             for icon, label, value, note, tone in dashboard_stats
         ) + '</div>')
-    else:
-        st.markdown("""
-        <div class="workspace-heading">
-            <div class="workspace-art" aria-hidden="true">
-                <span class="title-star star-one">✦</span><span class="title-star star-two">✧</span>
-                <span class="title-star star-three">✦</span><span class="title-orbit"></span>
-                <span class="title-sticker sticker-notes">📄</span><span class="title-sticker sticker-ideas">💡</span>
-            </div>
-            <div class="workspace-eyebrow"><span></span> A LITTLE CURIOSITY GOES A LONG WAY</div>
-            <h1 class="workspace-title">DocuMind</h1>
-            <div class="title-underline" aria-hidden="true"></div>
-            <p class="workspace-tagline">Less reading. More understanding.</p>
-            <div class="workspace-tags"><span>Read less</span><i aria-hidden="true">✦</i><span>Connect ideas</span><i aria-hidden="true">✦</i><span>Learn more</span></div>
-        </div>
-    """, unsafe_allow_html=True)
 
     # Render Setup & Upload container
     if has_results:
@@ -4625,7 +4610,7 @@ def _render_main():
         word_count = len(raw_text.split())
         is_saved = results.get('is_loaded_from_db', False)
 
-        st.markdown('<div class="results-heading"><h2>Analysis results</h2><p>Read, explore and review your document.</p></div>', unsafe_allow_html=True)
+        st.markdown('<div class="results-heading"><h2>Document workspace</h2></div>', unsafe_allow_html=True)
 
         # Prepare data for Export popover (needed regardless of rename mode)
         from doc_generator import generate_docx

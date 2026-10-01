@@ -1332,3 +1332,12 @@ div.st-key-navigation_rail_expanded :is(.st-key-nav_brand_toggle, .st-key-rail_s
 @media (max-width: 640px) {
  div:is(.st-key-navigation_rail_collapsed, .st-key-navigation_rail_expanded) { --rail-tile-size: 44px; }
 }
+
+/* Saved files and fresh analyses share the current document workspace. */
+[data-testid="stAppViewContainer"]:has(.st-key-page_view_results) {
+ background: radial-gradient(ellipse at 90% 0%, #e4e9f4 0, transparent 48%), #f2f3f6 !important;
+}
+.st-key-page_view_results .results-heading { margin: 20px 0 12px; border-left: 4px solid #796492; padding-left: 16px; }
+.st-key-page_view_results .results-heading h2 { color: #302740 !important; font-size: 1.8rem !important; }
+.st-key-page_view_results .st-key-setup_expander { background: #fff !important; border: 1px solid #dce1e8 !important; border-radius: 18px !important; box-shadow: 0 5px 18px #28304307 !important; }
+.st-key-page_view_results [data-baseweb="tab-list"] { background: #fff !important; border-color: #dce1e8 !important; }

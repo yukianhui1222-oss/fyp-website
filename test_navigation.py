@@ -67,6 +67,9 @@ class NavigationTests(unittest.TestCase):
 
     def test_results_round_trips_and_document_entries(self):
         self.click('load_doc_navigation-doc', 'results')
+        rendered = '\n'.join(e.value for e in self.app.markdown)
+        self.assertNotIn('A LITTLE CURIOSITY GOES A LONG WAY', rendered)
+        self.assertIn('Document workspace', rendered)
         for entry, back, route in [('open_subject_library', 'library_back', 'library'), ('nav_edit_profile_btn', 'profile_cancel_btn', 'profile'), ('nav_leaderboard_btn', 'lbl_back_home_btn', 'leaderboard')]:
             self.click(entry, route)
             self.click(back, 'results')
